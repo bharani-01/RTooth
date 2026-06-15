@@ -1,0 +1,6 @@
+@import url("/css/style.css");
+
+/* Doctor Patient Directory Specific Styles */
+.clinic-table {
+  animation: fadeIn 0.3s ease-out;
+}

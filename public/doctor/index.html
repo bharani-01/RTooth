@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dentist Dashboard - RTooth Portal</title>
+  <link rel="stylesheet" href="/css/doctor_index.css">
+</head>
+<body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/doctor/index.html" class="logo" id="header-logo">
+          <div class="logo-icon-container">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C8.5 2 6 4.5 6 8c0 2 1 3.5 1.5 5C8.3 15.6 7 20 9.5 22c1.7.5 2.5-1.5 2.5-3 0 1.5.8 3.5 2.5 3 2.5-2 1.2-6.4 2-9 0.5-1.5 1.5-3 1.5-5 0-3.5-2.5-6-6-6Z"/>
+            </svg>
+          </div>
+          <span class="logo-text">RTooth</span>
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/doctor/profile.html" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="doc-avatar">DR</div>
+            <div class="user-info">
+              <div class="user-name" id="doc-name-badge">Doctor Loading...</div>
+              <div class="user-role-label">Oncology Practitioner</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <main class="dashboard-layout">
+    
+    <!-- Dynamic Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container">
+      <div style="color: var(--text-muted); font-size: 13px;">Loading navigation menu...</div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="dashboard-content">
+      <div class="dashboard-header">
+        <div>
+          <h2 id="doc-welcome-title">Welcome Back, Dr.</h2>
+          <p style="color: var(--text-muted); font-size: 14px;">Here is your oral oncology summary for today.</p>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Active Oncology Cases</div>
+          <div class="stat-value" id="stat-cases-count">Loading...</div>
+          <div class="stat-desc">Total registered cases</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Biopsies</div>
+          <div class="stat-value">3</div>
+          <div class="stat-desc">Awaiting pathology reports</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">High-Risk Patients</div>
+          <div class="stat-value">5</div>
+          <div class="stat-desc">Stage III / IV / Dysplasia</div>
+        </div>
+      </div>
+
+      <!-- Appointments Table -->
+      <div class="table-card">
+        <div class="table-title-area">
+          <h3>Today's Oncology Screening Queue</h3>
+        </div>
+        <table class="clinic-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Time</th>
+              <th>Lesion Site</th>
+              <th>Staging</th>
+              <th>Pathology Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Patient"><strong>Rahul Sharma</strong></td>
+              <td data-label="Time">10:00 AM</td>
+              <td data-label="Lesion Site">Lateral Tongue</td>
+              <td data-label="Staging"><span style="font-weight: 600; color: var(--danger);">Stage II</span></td>
+              <td data-label="Pathology Status"><span class="status-pill status-confirmed">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td data-label="Patient"><strong>Priya Patel</strong></td>
+              <td data-label="Time">11:30 AM</td>
+              <td data-label="Lesion Site">Floor of Mouth</td>
+              <td data-label="Staging"><span style="font-weight: 600; color: var(--accent-teal);">Stage I</span></td>
+              <td data-label="Pathology Status"><span class="status-pill status-confirmed">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td data-label="Patient"><strong>Amit Verma</strong></td>
+              <td data-label="Time">02:00 PM</td>
+              <td data-label="Lesion Site">Buccal Mucosa</td>
+              <td data-label="Staging"><span style="font-weight: 600; color: var(--warning);">High-Risk Dysplasia</span></td>
+              <td data-label="Pathology Status"><span class="status-pill status-pending">Pending Biopsy</span></td>
+            </tr>
+            <tr>
+              <td data-label="Patient"><strong>Sneha Gupta</strong></td>
+              <td data-label="Time">03:30 PM</td>
+              <td data-label="Lesion Site">Hard Palate</td>
+              <td data-label="Staging"><span style="font-weight: 600; color: var(--text-muted);">Suspicious Lesion</span></td>
+              <td data-label="Pathology Status"><span class="status-pill status-confirmed">Confirmed</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/doctor.js"></script>
+</body>
+</html>

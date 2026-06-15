@@ -1,0 +1,6 @@
+@import url("/css/style.css");
+
+/* Admin Profile Page Specific Styles */
+.table-card {
+  animation: fadeIn 0.35s ease-out;
+}

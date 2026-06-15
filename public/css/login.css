@@ -1,0 +1,6 @@
+@import url("/css/style.css");
+
+/* Login Page Specific Styles */
+.auth-card {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}

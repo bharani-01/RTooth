@@ -1,0 +1,35 @@
+@import url("/css/style.css");
+
+/* Patient Profile Page Specific Styles */
+.profile-section-card {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  margin-bottom: 24px;
+  animation: fadeIn 0.35s ease-out;
+}
+
+.profile-section-card h3 {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  color: var(--primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

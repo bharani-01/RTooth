@@ -1,0 +1,22 @@
+@import url("/css/style.css");
+
+/* Doctor Register Patient Form Specific Styles */
+#register-patient-form {
+  animation: fadeIn 0.35s ease-out;
+}
+.form-section-title {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 24px 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-color);
+  grid-column: span 2;
+}
+
+@media (max-width: 992px) {
+  .form-section-title {
+    grid-column: span 1;
+  }
+}

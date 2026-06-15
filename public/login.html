@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - rtooth Portal</title>
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav-bar">
+      <a href="/" class="logo" id="header-logo">
+        <div class="logo-icon-container">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C8.5 2 6 4.5 6 8c0 2 1 3.5 1.5 5C8.3 15.6 7 20 9.5 22c1.7.5 2.5-1.5 2.5-3 0 1.5.8 3.5 2.5 3 2.5-2 1.2-6.4 2-9 0.5-1.5 1.5-3 1.5-5 0-3.5-2.5-6-6-6Z"/>
+          </svg>
+        </div>
+        <span class="logo-text">RTooth</span>
+      </a>
+      <nav class="nav-links">
+      </nav>
+    </div>
+  </header>
+
+  <!-- Login Main Card -->
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      <h2 class="auth-title">Welcome Back</h2>
+      <p class="auth-subtitle">Sign in to access your rtooth account</p>
+
+      <!-- Alerts -->
+      <div class="alert alert-error" id="error-alert"></div>
+
+      <!-- Login Form -->
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="e.g. doctor@rtooth.com" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="password" class="form-label" style="margin: 0;">Password</label>
+          </div>
+          <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; font-size: 15px;" id="login-submit-btn">
+          Sign In
+        </button>
+      </form>
+
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 rtooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+</body>
+</html>

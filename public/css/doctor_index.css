@@ -1,0 +1,9 @@
+@import url("/css/style.css");
+
+/* Doctor Dashboard Overview Specific Styles */
+.stats-grid {
+  animation: fadeIn 0.3s ease-out;
+}
+.clinic-table {
+  animation: fadeIn 0.4s ease-out;
+}
