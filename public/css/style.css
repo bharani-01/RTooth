@@ -117,6 +117,7 @@ header {
   background: linear-gradient(120deg, var(--primary) 0%, var(--accent-teal) 35%, #38bdf8 70%, var(--primary) 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: shine-logo 4s linear infinite;
   letter-spacing: -0.03em;

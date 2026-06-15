@@ -32,6 +32,7 @@ async function getResolvedProfile(profileId) {
     const docData = doctor || {};
     return {
       id: profile.id,
+      doctor_code: docData.doctor_code,
       first_name: profile.first_name,
       last_name: profile.last_name,
       email: profile.email,
@@ -92,6 +93,7 @@ async function getResolvedProfile(profileId) {
 
     return {
       id: profile.id,
+      patient_code: patData.patient_code,
       first_name: profile.first_name,
       last_name: profile.last_name,
       email: profile.email,
@@ -121,8 +123,16 @@ async function getResolvedProfile(profileId) {
   }
 
   // IT-Admin
+  const { data: admin } = await supabase
+    .from('admins')
+    .select('*')
+    .eq('id', profileId)
+    .maybeSingle();
+
+  const adminData = admin || {};
   return {
     id: profile.id,
+    admin_code: adminData.admin_code,
     first_name: profile.first_name,
     last_name: profile.last_name,
     email: profile.email,
@@ -181,6 +191,19 @@ export const signUpUser = async (email, password, role, profileData) => {
       await supabaseAdmin.auth.admin.deleteUser(userId);
     }
     throw profileError;
+  }
+
+  // Create admin details (generates admin_code)
+  const { error: adminError } = await dbClient
+    .from('admins')
+    .insert([{ id: userId }]);
+
+  if (adminError) {
+    await dbClient.from('profiles').delete().eq('id', userId);
+    if (supabaseAdmin) {
+      await supabaseAdmin.auth.admin.deleteUser(userId);
+    }
+    throw adminError;
   }
 
   return {
@@ -289,6 +312,7 @@ export const listDoctors = async () => {
     const docData = docMap.get(p.id) || {};
     return {
       id: p.id,
+      doctor_code: docData.doctor_code,
       first_name: p.first_name,
       last_name: p.last_name,
       email: p.email,
@@ -537,6 +561,7 @@ export const listPatients = async (doctorId) => {
 
     return {
       id: p.id,
+      patient_code: patientData.patient_code,
       first_name: p.first_name,
       last_name: p.last_name,
       email: p.email,

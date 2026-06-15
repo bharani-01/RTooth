@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 3. Trigger page-specific logic
   const path = window.location.pathname;
-  if (path.endsWith('index.html') || path.endsWith('/doctor/')) {
-    loadPatientsCount();
-  } else if (path.endsWith('patients.html')) {
+  if (path.endsWith('/doctor') || path.endsWith('/doctor/') || path.endsWith('index.html')) {
+    await loadDashboardData();
+  } else if (path.endsWith('/patients') || path.endsWith('patients.html')) {
     loadPatientsDirectory();
-  } else if (path.endsWith('register_patient.html')) {
+  } else if (path.endsWith('/register_patient') || path.endsWith('register_patient.html')) {
     const registerPatientForm = document.getElementById('register-patient-form');
     if (registerPatientForm) {
       registerPatientForm.addEventListener('submit', (e) => handlePatientRegistration(e, 'active'));
@@ -58,12 +58,13 @@ async function loadDoctorSidebar() {
 
     // Highlight active link based on current path
     const path = window.location.pathname;
+    const cleanPath = path.replace(/\/$/, '').replace(/\.html$/, '');
     const sidebarItems = sidebarContainer.querySelectorAll('.sidebar-item');
     
     sidebarItems.forEach(item => {
       const href = item.getAttribute('href');
-      // Match path suffix or exact match
-      if (path === href || path.endsWith(href) || (href === '/doctor/index.html' && path.endsWith('/doctor/'))) {
+      const cleanHref = href.replace(/\/$/, '').replace(/\.html$/, '');
+      if (cleanPath === cleanHref || cleanPath.endsWith(cleanHref) || (cleanHref === '/doctor' && cleanPath === '/doctor')) {
         item.classList.add('active');
       } else {
         item.classList.remove('active');
@@ -187,7 +188,7 @@ async function handlePatientRegistration(event, status = 'active') {
   };
 
   try {
-    const response = await apiRequest('/auth/doctor/register-patient', {
+    const response = await apiRequest('/patients', {
       method: 'POST',
       body
     });
@@ -236,20 +237,126 @@ function setLoading(button, isLoading, text) {
 }
 
 /**
- * Fetch and display the count of registered patients (for the Overview page)
+ * Helper to generate clinical screening slot times (9:00 AM start, 1.5h spacing)
  */
-async function loadPatientsCount() {
+function getSimulatedSlotTime(index) {
+  const startHour = 9; // 9:00 AM
+  const minutesPerSlot = 90; // 1.5 hours
+  const totalMinutes = startHour * 60 + index * minutesPerSlot;
+  let hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+  return `${hours}:${minutesStr} ${ampm}`;
+}
+
+/**
+ * Fetch and display the count of registered patients, calculate oncology statistics, and render the screening queue
+ */
+async function loadDashboardData() {
   const patientCountStat = document.getElementById('stat-cases-count');
-  if (!patientCountStat) return;
+  const pendingBiopsiesStat = document.getElementById('stat-pending-biopsies');
+  const highRiskStat = document.getElementById('stat-high-risk');
+  const queueBody = document.getElementById('screening-queue-body');
+
+  if (patientCountStat) patientCountStat.innerText = 'Loading...';
+  if (pendingBiopsiesStat) pendingBiopsiesStat.innerText = 'Loading...';
+  if (highRiskStat) highRiskStat.innerText = 'Loading...';
+
+  if (queueBody) {
+    queueBody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 32px;">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+            <div class="spinner"></div>
+            <div style="color: var(--text-muted); font-size: 14px; font-weight: 500;">Retrieving oncology queue...</div>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
 
   try {
-    const response = await apiRequest('/auth/doctor/patients');
+    const response = await apiRequest('/patients');
     if (response.success) {
-      patientCountStat.innerText = response.data.patients.length;
+      const patients = response.data.patients;
+
+      // Calculate statistics
+      const totalCases = patients.length;
+      
+      const pendingBiopsies = patients.filter(p => {
+        const stage = (p.cancer_stage || '').toLowerCase();
+        return p.status === 'draft' || stage.includes('suspicious') || stage.includes('dysplasia');
+      }).length;
+
+      const highRisk = patients.filter(p => {
+        const stage = (p.cancer_stage || '').toLowerCase();
+        return stage.includes('stage iii') || stage.includes('stage iv') || stage.includes('high-risk dysplasia');
+      }).length;
+
+      // Update UI stats cards
+      if (patientCountStat) patientCountStat.innerText = totalCases;
+      if (pendingBiopsiesStat) pendingBiopsiesStat.innerText = pendingBiopsies;
+      if (highRiskStat) highRiskStat.innerText = highRisk;
+
+      // Update Queue Table
+      if (queueBody) {
+        if (patients.length === 0) {
+          queueBody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No patients currently in the screening queue.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        queueBody.innerHTML = patients.map((pat, idx) => {
+          const slotTime = getSimulatedSlotTime(idx);
+          const isPending = pat.status === 'draft' || 
+            (pat.cancer_stage && (pat.cancer_stage.toLowerCase().includes('suspicious') || pat.cancer_stage.toLowerCase().includes('dysplasia')));
+          
+          const statusClass = isPending ? 'status-pending' : 'status-confirmed';
+          const statusText = isPending ? 'Pending Biopsy' : 'Confirmed';
+
+          let stageColor = 'var(--text-muted)';
+          const stage = (pat.cancer_stage || '').toLowerCase();
+          if (stage.includes('stage iv') || stage.includes('stage iii') || stage.includes('stage ii')) {
+            stageColor = 'var(--danger)';
+          } else if (stage.includes('stage i')) {
+            stageColor = 'var(--accent-teal)';
+          } else if (stage.includes('dysplasia')) {
+            stageColor = 'var(--warning)';
+          }
+
+          return `
+            <tr>
+              <td data-label="Patient">
+                <strong><a href="/doctor/patient_profile?id=${pat.patient_code}" style="color: var(--primary); text-decoration: none; font-weight: 600;">${pat.first_name} ${pat.last_name}</a></strong>
+              </td>
+              <td data-label="Time">${slotTime}</td>
+              <td data-label="Lesion Site">${pat.lesion_location || 'Not Specified'}</td>
+              <td data-label="Staging"><span style="font-weight: 600; color: ${stageColor};">${pat.cancer_stage || 'Suspicious Lesion'}</span></td>
+              <td data-label="Pathology Status"><span class="status-pill ${statusClass}">${statusText}</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
   } catch (error) {
-    console.error('Error loading patients count:', error.message);
-    patientCountStat.innerText = 'Error';
+    console.error('Error loading doctor dashboard data:', error.message);
+    if (patientCountStat) patientCountStat.innerText = 'Error';
+    if (pendingBiopsiesStat) pendingBiopsiesStat.innerText = 'Error';
+    if (highRiskStat) highRiskStat.innerText = 'Error';
+    
+    if (queueBody) {
+      queueBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; color: var(--danger); padding: 24px;">Failed to load screening queue.</td>
+        </tr>
+      `;
+    }
   }
 }
 
@@ -261,7 +368,7 @@ async function loadPatientsDirectory() {
   if (!tableBody) return;
 
   try {
-    const response = await apiRequest('/auth/doctor/patients');
+    const response = await apiRequest('/patients');
     if (response.success) {
       const patients = response.data.patients;
       
@@ -283,15 +390,12 @@ async function loadPatientsDirectory() {
           : `<span class="status-pill status-confirmed" style="margin-left: 8px; font-size: 11px; padding: 2px 6px; background-color: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">Active</span>`;
 
         let stageColor = 'var(--text-muted)';
-        if (pat.cancer_stage && pat.cancer_stage.toLowerCase().includes('stage iv')) {
+        const stage = (pat.cancer_stage || '').toLowerCase();
+        if (stage.includes('stage iv') || stage.includes('stage iii') || stage.includes('stage ii')) {
           stageColor = 'var(--danger)';
-        } else if (pat.cancer_stage && pat.cancer_stage.toLowerCase().includes('stage iii')) {
-          stageColor = 'var(--danger)';
-        } else if (pat.cancer_stage && pat.cancer_stage.toLowerCase().includes('stage ii')) {
-          stageColor = 'var(--danger)';
-        } else if (pat.cancer_stage && pat.cancer_stage.toLowerCase().includes('stage i')) {
+        } else if (stage.includes('stage i')) {
           stageColor = 'var(--accent-teal)';
-        } else if (pat.cancer_stage && pat.cancer_stage.toLowerCase().includes('dysplasia')) {
+        } else if (stage.includes('dysplasia')) {
           stageColor = 'var(--warning)';
         }
 
@@ -299,7 +403,7 @@ async function loadPatientsDirectory() {
           <tr>
             <td data-label="Patient">
               <div style="display: flex; align-items: center;">
-                <strong>${pat.first_name} ${pat.last_name}</strong>
+                <strong><a href="/doctor/patient_profile?id=${pat.patient_code}" style="color: var(--primary); text-decoration: none; font-weight: 600;">${pat.first_name} ${pat.last_name}</a></strong>
                 ${statusBadge}
               </div>
             </td>

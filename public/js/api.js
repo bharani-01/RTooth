@@ -2,7 +2,7 @@
  * API Helper and Session Manager
  */
 
-const API_BASE = '/api';
+const API_BASE = '/api/v1';
 
 export const getSessionToken = () => {
   return localStorage.getItem('supabase_auth_token');
@@ -75,6 +75,6 @@ export const logoutUser = async () => {
     console.error('Logout backend sync error:', err.message);
   } finally {
     clearSessionToken();
-    window.location.href = '/login.html';
+    window.location.href = '/login';
   }
 };

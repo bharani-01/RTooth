@@ -155,27 +155,25 @@ async function seedData() {
     try {
       console.log(`Seeding Doctor: ${doc.firstName} ${doc.lastName} (${doc.email})...`);
       
-      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-        email: doc.email,
-        password: doc.password,
-        email_confirm: true,
-        user_metadata: {
-          first_name: doc.firstName,
-          last_name: doc.lastName,
-          role: 'doctor'
-        }
-      });
+      let userId = await getUserIdByEmail(doc.email);
+      if (userId) {
+        console.log(`  Doctor auth account already exists. Using ID: ${userId}`);
+      } else {
+        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+          email: doc.email,
+          password: doc.password,
+          email_confirm: true,
+          user_metadata: {
+            first_name: doc.firstName,
+            last_name: doc.lastName,
+            role: 'doctor'
+          }
+        });
 
-      let userId;
-      if (authError) {
-        if (authError.message.includes("already registered") || authError.message.includes("already exists")) {
-          console.log(`  Doctor auth account already exists. Retrieving ID...`);
-          userId = await getUserIdByEmail(doc.email);
-        } else {
+        if (authError) {
           console.error(`  Failed to create Doctor auth: ${authError.message}`);
           continue;
         }
-      } else {
         userId = authData.user?.id;
       }
 
@@ -216,27 +214,25 @@ async function seedData() {
         continue;
       }
 
-      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-        email: pat.email,
-        password: pat.password,
-        email_confirm: true,
-        user_metadata: {
-          first_name: pat.firstName,
-          last_name: pat.lastName,
-          role: 'patient'
-        }
-      });
+      let userId = await getUserIdByEmail(pat.email);
+      if (userId) {
+        console.log(`  Patient auth account already exists. Using ID: ${userId}`);
+      } else {
+        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+          email: pat.email,
+          password: pat.password,
+          email_confirm: true,
+          user_metadata: {
+            first_name: pat.firstName,
+            last_name: pat.lastName,
+            role: 'patient'
+          }
+        });
 
-      let userId;
-      if (authError) {
-        if (authError.message.includes("already registered") || authError.message.includes("already exists")) {
-          console.log(`  Patient auth account already exists. Retrieving ID...`);
-          userId = await getUserIdByEmail(pat.email);
-        } else {
+        if (authError) {
           console.error(`  Failed to create Patient auth: ${authError.message}`);
           continue;
         }
-      } else {
         userId = authData.user?.id;
       }
 
@@ -284,6 +280,76 @@ async function seedData() {
           risk_factors: pat.riskFactors
         }
       ]);
+
+      // Clear existing checkups and medications to avoid duplicate seed runs
+      await supabaseAdmin.from('medications').delete().eq('patient_id', userId);
+      await supabaseAdmin.from('checkups').delete().eq('patient_id', userId);
+
+      if (pat.email === "rahul@rtooth.in") {
+        console.log(`  Seeding clinical medications for Rahul...`);
+        await supabaseAdmin.from('medications').insert([
+          {
+            patient_id: userId,
+            medication_name: "Amoxicillin",
+            dosage: "500mg",
+            frequency: "Twice daily",
+            start_date: "2026-06-01",
+            end_date: "2026-06-07"
+          },
+          {
+            patient_id: userId,
+            medication_name: "Curcumin Oral Gel",
+            dosage: "1 application",
+            frequency: "3 times daily",
+            start_date: "2026-06-05",
+            end_date: null
+          }
+        ]);
+
+        console.log(`  Seeding checkups for Rahul...`);
+        await supabaseAdmin.from('checkups').insert([
+          {
+            patient_id: userId,
+            doctor_id: doctorId,
+            checkup_date: new Date("2026-06-05T10:00:00Z").toISOString(),
+            findings: "Initial lesion on lateral border of tongue observed. Advised biopsy.",
+            notes: "Patient complained of mild pain while chewing.",
+            recommendations: "Schedule biopsy, maintain strict oral hygiene."
+          },
+          {
+            patient_id: userId,
+            doctor_id: doctorId,
+            checkup_date: new Date("2026-06-12T11:30:00Z").toISOString(),
+            findings: "Post-biopsy follow-up. Lesion size stable. Mild discomfort reporting.",
+            notes: "Sutures healing well.",
+            recommendations: "Follow-up scan in 3 months."
+          }
+        ]);
+      } else if (pat.email === "priya@rtooth.in") {
+        console.log(`  Seeding clinical medications for Priya...`);
+        await supabaseAdmin.from('medications').insert([
+          {
+            patient_id: userId,
+            medication_name: "Vitamin C Supplements",
+            dosage: "500mg",
+            frequency: "Once daily",
+            start_date: "2026-06-10",
+            end_date: null
+          }
+        ]);
+
+        console.log(`  Seeding checkups for Priya...`);
+        await supabaseAdmin.from('checkups').insert([
+          {
+            patient_id: userId,
+            doctor_id: doctorId,
+            checkup_date: new Date("2026-06-10T11:30:00Z").toISOString(),
+            findings: "Small red area on floor of mouth. Looks like early stage erythroplakia.",
+            notes: "Patient is non-smoker, occasional alcohol drinker.",
+            recommendations: "Regular follow-up in 2 weeks to check regression."
+          }
+        ]);
+      }
 
       console.log(`  Patient ${pat.firstName} seeded successfully. (Status: ${pat.status.toUpperCase()})`);
     } catch (e) {

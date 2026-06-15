@@ -4,6 +4,10 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
+import patientRoutes from './routes/patientRoutes.js';
+import doctorRoutes from './routes/doctorRoutes.js';
+import { errorHandler } from './middlewares/errorMiddleware.js';
+import { NotFoundError } from './utils/errors.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,17 +24,26 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Serve Static Frontend Files
-// Assuming public folder is at the root level of the project
-app.use(express.static(path.join(__dirname, '../public')));
+// Redirect requests ending in .html to their clean URL path counterparts (permanent redirect)
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html')) {
+    const newPath = req.path.slice(0, -5);
+    const query = req.url.slice(req.path.length); // Preserve query string parameters
+    return res.redirect(301, newPath + query);
+  }
+  next();
+});
 
-// API Routes
-app.use('/api/auth', authRoutes);
+// Serve Static Frontend Files with clean URLs support
+app.use(express.static(path.join(__dirname, '../public'), { extensions: ['html'] }));
+
+// Versioned API Routes (v1)
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/patients', patientRoutes);
+app.use('/api/v1/doctors', doctorRoutes);
 
 // Catch-all route to serve index.html for undefined frontend routes (if doing SPA routing)
-// For static HTML files (like doctor_dashboard.html), the user can access them directly: e.g. /login.html
 app.get('*', (req, res, next) => {
-  // If requesting API, let it pass to standard 404 handler
   if (req.url.startsWith('/api/')) {
     return next();
   }
@@ -42,20 +55,11 @@ app.get('*', (req, res, next) => {
 });
 
 // Global 404 Handler for API
-app.use('/api/*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'API endpoint not found.'
-  });
+app.use('/api/*', (req, res, next) => {
+  next(new NotFoundError('API endpoint not found.'));
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Express Error Handler:', err);
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal Server Error'
-  });
-});
+// Global Exception Handler Middleware
+app.use(errorHandler);
 
 export default app;

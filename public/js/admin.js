@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 3. Trigger page-specific logic
   const path = window.location.pathname;
-  if (path.endsWith('index.html') || path.endsWith('/admin/')) {
+  if (path.endsWith('/admin') || path.endsWith('/admin/') || path.endsWith('index.html')) {
     loadDoctorsCount();
-  } else if (path.endsWith('doctors.html')) {
+  } else if (path.endsWith('/doctors') || path.endsWith('doctors.html')) {
     loadDoctorDirectory();
-  } else if (path.endsWith('register_doctor.html')) {
+  } else if (path.endsWith('/register_doctor') || path.endsWith('register_doctor.html')) {
     const registerDocForm = document.getElementById('register-doctor-form');
     if (registerDocForm) {
       registerDocForm.addEventListener('submit', handleDoctorRegister);
@@ -47,12 +47,13 @@ async function loadAdminSidebar() {
 
     // Highlight active link based on current path
     const path = window.location.pathname;
+    const cleanPath = path.replace(/\/$/, '').replace(/\.html$/, '');
     const sidebarItems = sidebarContainer.querySelectorAll('.sidebar-item');
     
     sidebarItems.forEach(item => {
       const href = item.getAttribute('href');
-      // Match path suffix or exact match
-      if (path === href || path.endsWith(href) || (href === '/admin/index.html' && path.endsWith('/admin/'))) {
+      const cleanHref = href.replace(/\/$/, '').replace(/\.html$/, '');
+      if (cleanPath === cleanHref || cleanPath.endsWith(cleanHref) || (cleanHref === '/admin' && cleanPath === '/admin')) {
         item.classList.add('active');
       } else {
         item.classList.remove('active');
@@ -104,7 +105,7 @@ async function loadDoctorsCount() {
   if (!doctorCountStat) return;
 
   try {
-    const response = await apiRequest('/auth/admin/doctors');
+    const response = await apiRequest('/doctors');
     if (response.success) {
       doctorCountStat.innerText = response.data.doctors.length;
     }
@@ -122,7 +123,7 @@ async function loadDoctorDirectory() {
   if (!tableBody) return;
 
   try {
-    const response = await apiRequest('/auth/admin/doctors');
+    const response = await apiRequest('/doctors');
     if (response.success) {
       const doctors = response.data.doctors;
       
@@ -187,7 +188,7 @@ async function handleDoctorRegister(event) {
   };
 
   try {
-    const response = await apiRequest('/auth/admin/register-doctor', {
+    const response = await apiRequest('/doctors', {
       method: 'POST',
       body
     });

@@ -1,9 +1,11 @@
 import * as authService from '../services/authService.js';
+import { sendResponse } from '../utils/response.js';
+import { BadRequestError } from '../utils/errors.js';
 
 /**
- * Handle user registration
+ * Handle user registration (IT-Admin only)
  */
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   try {
     const { 
       email, 
@@ -11,32 +13,15 @@ export const register = async (req, res) => {
       role, 
       firstName, 
       lastName, 
-      phone,
-      // Doctor specific
-      specialization,
-      licenseNumber,
-      // Patient specific
-      dateOfBirth,
-      gender,
-      // Oral Oncology specific
-      cancerStage,
-      lesionLocation,
-      riskFactors
+      phone 
     } = req.body;
 
-    // Basic Input Validations
     if (!email || !password || !role || !firstName || !lastName) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required fields: email, password, role, firstName, and lastName are mandatory.',
-      });
+      throw new BadRequestError('Missing required fields: email, password, role, firstName, and lastName are mandatory.');
     }
 
     if (role !== 'admin') {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid role. Public registration is restricted to 'admin' (IT-Admin) accounts.",
-      });
+      throw new BadRequestError("Invalid role. Public registration is restricted to 'admin' (IT-Admin) accounts.");
     }
 
     const profileData = {
@@ -45,115 +30,74 @@ export const register = async (req, res) => {
       phone,
     };
 
-    // Execute service layer signup (forces role = 'admin' for IT-Admins)
     const result = await authService.signUpUser(email, password, 'admin', profileData);
 
-    return res.status(201).json({
-      success: true,
-      message: 'IT-Admin registered successfully.',
-      data: {
-        user: result.user,
-        profile: result.profile,
-        session: result.session,
-      },
+    return sendResponse(res, 201, 'IT-Admin registered successfully.', {
+      user: result.user,
+      profile: result.profile,
+      session: result.session,
     });
   } catch (error) {
-    console.error('Registration Error:', error.message);
-    return res.status(400).json({
-      success: false,
-      message: error.message || 'An error occurred during registration.',
-    });
+    next(error);
   }
 };
 
 /**
  * Handle user login
  */
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email and password are required.',
-      });
+      throw new BadRequestError('Email and password are required.');
     }
 
-    // Execute service layer login
     const result = await authService.signInUser(email, password);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Login successful.',
-      data: {
-        session: result.session,
-        profile: result.profile,
-      },
+    return sendResponse(res, 200, 'Login successful.', {
+      session: result.session,
+      profile: result.profile,
     });
   } catch (error) {
-    console.error('Login Error:', error.message);
-    return res.status(400).json({
-      success: false,
-      message: error.message || 'Invalid credentials.',
-    });
+    next(error);
   }
 };
 
 /**
  * Handle user logout
  */
-export const logout = async (req, res) => {
+export const logout = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(400).json({
-        success: false,
-        message: 'No authorization header provided.',
-      });
+      throw new BadRequestError('No authorization header provided.');
     }
 
     const token = authHeader.split(' ')[1];
     await authService.signOutUser(token);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Logged out successfully.',
-    });
+    return sendResponse(res, 200, 'Logged out successfully.');
   } catch (error) {
-    console.error('Logout Error:', error.message);
-    return res.status(500).json({
-      success: false,
-      message: error.message || 'An error occurred during logout.',
-    });
+    next(error);
   }
 };
 
 /**
  * Get the current user profile (guarded by requireAuth middleware)
  */
-export const getMe = async (req, res) => {
+export const getMe = async (req, res, next) => {
   try {
-    // req.profile is populated by requireAuth middleware
-    return res.status(200).json({
-      success: true,
-      data: {
-        profile: req.profile,
-      },
-    });
+    return sendResponse(res, 200, 'User profile fetched successfully.', { profile: req.profile });
   } catch (error) {
-    console.error('Get Me Error:', error.message);
-    return res.status(500).json({
-      success: false,
-      message: 'An error occurred fetching user details.',
-    });
+    next(error);
   }
 };
 
 /**
  * Register a patient under the logged-in doctor session
  */
-export const registerPatient = async (req, res) => {
+export const registerPatient = async (req, res, next) => {
   try {
     const {
       email,
@@ -178,12 +122,8 @@ export const registerPatient = async (req, res) => {
       status,
     } = req.body;
 
-    // Validate patient base details
     if (!email || !password || !firstName || !lastName) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required patient fields: email, password, firstName, and lastName are mandatory.',
-      });
+      throw new BadRequestError('Missing required patient fields: email, password, firstName, and lastName are mandatory.');
     }
 
     const patientData = {
@@ -204,42 +144,30 @@ export const registerPatient = async (req, res) => {
       alcoholDuration,
       betelNut,
       familyHistory,
-      doctor_id: req.profile.id, // Map the patient to the registering doctor
+      doctor_id: req.profile.id, // Map patient to registering doctor
       status: status || 'active',
     };
 
-    // Execute service layer patient registration
     const result = await authService.registerPatientByDoctor(email, password, patientData);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Patient registered successfully in RTooth Oncology Registry.',
-      data: {
-        user: result.user,
-        profile: result.profile,
-      },
+    return sendResponse(res, 201, 'Patient registered successfully in RTooth Oncology Registry.', {
+      user: result.user,
+      profile: result.profile,
     });
   } catch (error) {
-    console.error('Doctor Register Patient Error:', error.message);
-    return res.status(400).json({
-      success: false,
-      message: error.message || 'An error occurred during patient registration.',
-    });
+    next(error);
   }
 };
 
 /**
  * Register a doctor (IT-Admin only)
  */
-export const registerDoctor = async (req, res) => {
+export const registerDoctor = async (req, res, next) => {
   try {
     const { email, password, firstName, lastName, phone, specialization, licenseNumber } = req.body;
 
     if (!email || !password || !firstName || !lastName || !specialization || !licenseNumber) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required fields: email, password, firstName, lastName, specialization, and licenseNumber are mandatory.',
-      });
+      throw new BadRequestError('Missing required fields: email, password, firstName, lastName, specialization, and licenseNumber are mandatory.');
     }
 
     const doctorData = {
@@ -252,63 +180,38 @@ export const registerDoctor = async (req, res) => {
 
     const result = await authService.registerDoctorByAdmin(email, password, doctorData);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Doctor registered successfully in the system.',
-      data: {
-        user: result.user,
-        profile: result.profile
-      }
+    return sendResponse(res, 201, 'Doctor registered successfully in the system.', {
+      user: result.user,
+      profile: result.profile
     });
   } catch (error) {
-    console.error('Admin Register Doctor Error:', error.message);
-    return res.status(400).json({
-      success: false,
-      message: error.message || 'An error occurred during doctor registration.'
-    });
+    next(error);
   }
 };
 
 /**
  * Get all registered doctors (IT-Admin only)
  */
-export const getDoctors = async (req, res) => {
+export const getDoctors = async (req, res, next) => {
   try {
     const doctors = await authService.listDoctors();
-    return res.status(200).json({
-      success: true,
-      data: {
-        doctors
-      }
-    });
+    return sendResponse(res, 200, 'Doctors directory retrieved successfully.', { doctors });
   } catch (error) {
-    console.error('Get Doctors Error:', error.message);
-    return res.status(500).json({
-      success: false,
-      message: 'An error occurred fetching doctors.'
-    });
+    next(error);
   }
 };
 
 /**
- * Get all registered patients (Doctor only)
+ * Get all registered patients (Doctor/Admin only)
  */
-export const getPatients = async (req, res) => {
+export const getPatients = async (req, res, next) => {
   try {
-    // Only fetch patients registered by the logged-in doctor
-    const patients = await authService.listPatients(req.profile.id);
-    return res.status(200).json({
-      success: true,
-      data: {
-        patients
-      }
-    });
+    // Only fetch patients registered by the logged-in doctor (or all if admin)
+    const isDoc = req.profile.role === 'doctor';
+    const patients = await authService.listPatients(isDoc ? req.profile.id : null);
+    return sendResponse(res, 200, 'Patients directory retrieved successfully.', { patients });
   } catch (error) {
-    console.error('Get Patients Error:', error.message);
-    return res.status(500).json({
-      success: false,
-      message: 'An error occurred fetching patients.'
-    });
+    next(error);
   }
 };
 

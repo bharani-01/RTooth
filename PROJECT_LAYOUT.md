@@ -95,3 +95,47 @@ This document provides a directory index of the RTooth Clinic Management system,
 * [src/routes/authRoutes.js](file:///d:/dental%20project/src/routes/authRoutes.js) - Defines backend endpoints and routes.
 * [src/controllers/authController.js](file:///d:/dental%20project/src/controllers/authController.js) - Controller logic processing authentication requests.
 * [src/services/authService.js](file:///d:/dental%20project/src/services/authService.js) - Database service performing Supabase CRUD operations.
+
+---
+
+## 🌐 MNC-Grade API Routes Registry
+
+All backend endpoints are structured and versioned under the `/api/v1` prefix. All endpoints require a JSON payload for `POST` requests and return a standardized JSON envelope.
+
+### Standard Response Formats
+
+#### Success Response (200 / 201)
+```json
+{
+  "success": true,
+  "message": "Resource description action completed successfully.",
+  "data": { ... }
+}
+```
+
+#### Error Response (400 / 401 / 403 / 404 / 500)
+```json
+{
+  "success": false,
+  "message": "Specific error description details.",
+  "stack": "..." // Only included in non-production environments
+}
+```
+
+---
+
+### API Endpoint Index
+
+| Route | Method | Description | Auth Level | Key Fields & Custom Codes |
+|---|---|---|---|---|
+| `/api/v1/auth/login` | `POST` | Authenticate user and return session token | Public | Requires `email`, `password` |
+| `/api/v1/auth/register` | `POST` | Create a new IT-Admin account | IT-Admin | Requires `email`, `password`, role `admin`, generates `admin_code` (`ADM-xxxxx`) |
+| `/api/v1/auth/logout` | `POST` | Sign out and invalidate session token | User Session | Invalidate active JWT |
+| `/api/v1/auth/me` | `GET` | Get current user's profile and credentials | User Session | Returns active profile |
+| `/api/v1/doctors` | `GET` | List all registered oncology practitioners | IT-Admin | Returns list of doctors with `doctor_code` (`DOC-xxxxx`) |
+| `/api/v1/doctors` | `POST` | Register a new doctor profile in system | IT-Admin | Requires demographics & license, generates `doctor_code` (`DOC-xxxxx`) |
+| `/api/v1/patients` | `GET` | List all patients registered | Doctor / Admin | For Doctor role, filters only assigned patients. Returns `patient_code` (`PAT-xxxxx`) |
+| `/api/v1/patients` | `POST` | Register new patient & record clinical metrics | Doctor | Requires demographics, lifestyle data, and staging, generates `patient_code` (`PAT-xxxxx`) |
+| `/api/v1/patients/:id` | `GET` | Retrieve full clinical profile of a patient | Doctor / Admin / Patient | Resolves custom code (`PAT-xxxxx`) internally. Returns habits, medications, and checkups |
+| `/api/v1/patients/:id/checkups` | `POST` | Log a new clinical check-up visit | Doctor / Admin | Resolves custom code (`PAT-xxxxx`). Requires findings |
+| `/api/v1/patients/:id/medications` | `POST` | Prescribe a medication for the patient | Doctor / Admin | Resolves custom code (`PAT-xxxxx`). Requires name, dosage, frequency, and start_date |

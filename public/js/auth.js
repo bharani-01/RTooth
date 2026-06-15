@@ -45,11 +45,11 @@ async function handleLoginSubmit(event) {
 
       // Redirect depending on role
       if (profile.role === 'admin') {
-        window.location.href = '/admin/index.html';
+        window.location.href = '/admin';
       } else if (profile.role === 'doctor') {
-        window.location.href = '/doctor/index.html';
+        window.location.href = '/doctor';
       } else {
-        window.location.href = '/patient/index.html';
+        window.location.href = '/patient';
       }
     }
   } catch (error) {
@@ -103,11 +103,11 @@ async function handleRegisterSubmit(event) {
         setSessionToken(session.access_token);
         setUserProfile(profile);
         setTimeout(() => {
-          window.location.href = '/admin/index.html';
+          window.location.href = '/admin';
         }, 1500);
       } else {
         setTimeout(() => {
-          window.location.href = '/login.html';
+          window.location.href = '/login';
         }, 2000);
       }
     }
@@ -133,7 +133,7 @@ async function initPageGuard() {
 
   if (!token || !profile) {
     // Session missing
-    window.location.href = '/login.html';
+    window.location.href = '/login';
     return;
   }
 
@@ -143,11 +143,11 @@ async function initPageGuard() {
     if (!allowedRoles.includes(profile.role)) {
       // Access role mismatch -> redirect to their own correct dashboard
       if (profile.role === 'admin') {
-        window.location.href = '/admin/index.html';
+        window.location.href = '/admin';
       } else if (profile.role === 'doctor') {
-        window.location.href = '/doctor/index.html';
+        window.location.href = '/doctor';
       } else {
-        window.location.href = '/patient/index.html';
+        window.location.href = '/patient';
       }
       return;
     }
@@ -166,7 +166,7 @@ async function initPageGuard() {
     document.dispatchEvent(new CustomEvent('auth-verified', { detail: response.data.profile }));
   } catch (error) {
     console.error('Session guard verification failed:', error.message);
-    window.location.href = '/login.html';
+    window.location.href = '/login';
   }
 }
 

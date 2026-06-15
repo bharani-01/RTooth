@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Clinical Profile - RTooth Portal</title>
+  <link rel="stylesheet" href="/css/doctor_patient_profile.css">
+</head>
+<body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/doctor/index.html" class="logo" id="header-logo">
+          <div class="logo-icon-container">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C8.5 2 6 4.5 6 8c0 2 1 3.5 1.5 5C8.3 15.6 7 20 9.5 22c1.7.5 2.5-1.5 2.5-3 0 1.5.8 3.5 2.5 3 2.5-2 1.2-6.4 2-9 0.5-1.5 1.5-3 1.5-5 0-3.5-2.5-6-6-6Z"/>
+            </svg>
+          </div>
+          <span class="logo-text">RTooth</span>
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/doctor/profile.html" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="doc-avatar">DR</div>
+            <div class="user-info">
+              <div class="user-name" id="doc-name-badge">Doctor Loading...</div>
+              <div class="user-role-label">Oncology Practitioner</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <main class="dashboard-layout">
+    
+    <!-- Dynamic Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container">
+      <div style="color: var(--text-muted); font-size: 13px;">Loading navigation menu...</div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="dashboard-content">
+      <div class="dashboard-header" style="border-bottom: none; margin-bottom: 16px; padding-bottom: 0;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <a href="/doctor/patients.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+            &larr; Back to Patients
+          </a>
+          <div>
+            <h2 id="patient-profile-title" style="display: inline-block;">Patient Clinical Profile</h2>
+            <span id="patient-status-pill" class="status-pill status-confirmed" style="margin-left: 12px; vertical-align: middle;">Active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Demographics Card -->
+      <div class="profile-card" style="margin-bottom: 24px;">
+        <div class="profile-grid">
+          <div>
+            <p style="margin-bottom: 8px;"><strong>Full Name:</strong> <span id="pat-full-name">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Email Contact:</strong> <span id="pat-email">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Phone Contact:</strong> <span id="pat-phone">Loading...</span></p>
+            <p><strong>Registered Address:</strong> <span id="pat-address">Loading...</span></p>
+          </div>
+          <div>
+            <p style="margin-bottom: 8px;"><strong>Date of Birth:</strong> <span id="pat-dob">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Biological Gender:</strong> <span id="pat-gender">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Lesion Site Location:</strong> <span id="pat-lesion-location" style="font-weight: 600;">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Oncology Staging:</strong> <span id="pat-cancer-stage" style="color: var(--danger); font-weight: 600;">Loading...</span></p>
+            <p><strong>Primary Risk Factors:</strong> <span id="pat-risk-factors" style="color: var(--warning); font-weight: 600;">Loading...</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lifestyle Habits Card -->
+      <div class="profile-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          Social History & Lifestyle Habits
+        </h3>
+        <div class="profile-grid">
+          <div>
+            <p style="margin-bottom: 8px;"><strong>Tobacco Habit:</strong> <span id="pat-tobacco-habit" style="text-transform: capitalize;">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Tobacco Frequency:</strong> <span id="pat-tobacco-freq">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Tobacco Duration:</strong> <span id="pat-tobacco-dur">Loading...</span></p>
+            <p><strong>Betel Quid Nut Chewing:</strong> <span id="pat-betel-nut" style="text-transform: capitalize; font-weight: 600;">Loading...</span></p>
+          </div>
+          <div>
+            <p style="margin-bottom: 8px;"><strong>Alcohol Consumption:</strong> <span id="pat-alcohol-habit" style="text-transform: capitalize;">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Alcohol Frequency:</strong> <span id="pat-alcohol-freq">Loading...</span></p>
+            <p style="margin-bottom: 8px;"><strong>Alcohol Duration:</strong> <span id="pat-alcohol-dur">Loading...</span></p>
+            <p><strong>Family History of Oral Cancer:</strong> <span id="pat-family-history" style="text-transform: capitalize; font-weight: 600;">Loading...</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Tabs / Details -->
+      <div class="profile-tabs-container">
+        <div class="profile-tabs-header">
+          <button class="profile-tab-btn active" data-tab="checkups">Check-up & Visit Records</button>
+          <button class="profile-tab-btn" data-tab="medications">Active Prescriptions</button>
+        </div>
+
+        <!-- Tab 1: Checkups -->
+        <div class="profile-tab-content active" id="tab-checkups">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--text-dark);">Logged Check-up Visits</h3>
+            <button class="btn btn-primary" style="font-size: 13px; padding: 8px 16px;" id="btn-open-checkup-modal">
+              Log New Check-up
+            </button>
+          </div>
+
+          <!-- Checkups List -->
+          <div class="checkups-timeline" id="checkups-list-container">
+            <div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 24px;">
+              Loading check-up records...
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Medications -->
+        <div class="profile-tab-content" id="tab-medications">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--text-dark);">Medications List</h3>
+            <button class="btn btn-primary btn-teal" style="font-size: 13px; padding: 8px 16px;" id="btn-open-med-modal">
+              Prescribe Medication
+            </button>
+          </div>
+
+          <!-- Medications Table -->
+          <div class="table-card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 0;">
+            <table class="clinic-table" id="medications-table">
+              <thead>
+                <tr>
+                  <th>Medication Name</th>
+                  <th>Dosage</th>
+                  <th>Frequency</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                </tr>
+              </thead>
+              <tbody id="medications-table-body">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                    Loading medications...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Log Checkup Modal Overlay -->
+  <div class="modal-overlay" id="checkup-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Log Clinical Check-up</h3>
+        <button class="modal-close" id="btn-close-checkup-modal">&times;</button>
+      </div>
+      <form id="checkup-form">
+        <div class="form-group">
+          <label class="form-label" for="checkup_findings">Clinical Findings *</label>
+          <textarea class="form-input" id="checkup_findings" rows="3" placeholder="e.g. Size of lesion reduced by 20%. Staging stable. Normal mucosal color returning." required style="resize: vertical; font-family: var(--font-body);"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="checkup_notes">General Clinic Notes</label>
+          <textarea class="form-input" id="checkup_notes" rows="2" placeholder="General observations or patient comments..." style="resize: vertical; font-family: var(--font-body);"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="checkup_recs">Recommendations</label>
+          <input type="text" class="form-input" id="checkup_recs" placeholder="e.g. Follow-up scan in 3 months, continue oral hygiene routine">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="checkup_date">Check-up Date</label>
+          <input type="datetime-local" class="form-input" id="checkup_date">
+        </div>
+        <div class="alert alert-error" id="checkup-error-alert"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-checkup">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-checkup">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Prescribe Medication Modal Overlay -->
+  <div class="modal-overlay" id="med-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Prescribe Medication</h3>
+        <button class="modal-close" id="btn-close-med-modal">&times;</button>
+      </div>
+      <form id="med-form">
+        <div class="form-group">
+          <label class="form-label" for="med_name">Medication Name *</label>
+          <input type="text" class="form-input" id="med_name" placeholder="e.g. Amoxicillin, Curcumin Oral Gel" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="med_dosage">Dosage *</label>
+            <input type="text" class="form-input" id="med_dosage" placeholder="e.g. 500mg, 1 application" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="med_freq">Frequency *</label>
+            <input type="text" class="form-input" id="med_freq" placeholder="e.g. Twice daily, Once every night" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="med_start">Start Date *</label>
+            <input type="date" class="form-input" id="med_start" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="med_end">End Date</label>
+            <input type="date" class="form-input" id="med_end">
+          </div>
+        </div>
+        <div class="alert alert-error" id="med-error-alert"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-med">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-teal" id="btn-submit-med">Add Prescription</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/patient_profile_doctor.js"></script>
+</body>
+</html>

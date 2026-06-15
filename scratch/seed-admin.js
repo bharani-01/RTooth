@@ -25,28 +25,29 @@ async function seedAdmin() {
 
   console.log(`Attempting to seed default IT-Admin account: ${email}...`);
 
-  // 1. Create auth user
-  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: {
-      first_name: firstName,
-      last_name: lastName,
-      role: 'admin'
-    }
-  });
+  let userId = await getUserIdByEmail(email);
+  if (userId) {
+    console.log(`IT-Admin auth account already exists. Using ID: ${userId}`);
+  } else {
+    // 1. Create auth user
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        first_name: firstName,
+        last_name: lastName,
+        role: 'admin'
+      }
+    });
 
-  if (authError) {
-    if (authError.message.includes("already has been registered") || authError.message.includes("already exists")) {
-      console.log("IT-Admin auth account already exists. Verifying profile record...");
-    } else {
+    if (authError) {
       console.error("Auth creation failed:", authError.message);
       return;
     }
+    userId = authData.user?.id;
   }
 
-  const userId = authData.user?.id || (await getUserIdByEmail(email));
   if (!userId) {
     console.error("Failed to retrieve or create User ID.");
     return;
@@ -66,13 +67,26 @@ async function seedAdmin() {
 
   if (profileError) {
     console.error("Database profile insertion failed:", profileError.message);
-  } else {
-    console.log("==================================================");
-    console.log("IT-Admin seeded successfully!");
-    console.log(`Email:    ${email}`);
-    console.log(`Password: ${password}`);
-    console.log("==================================================");
+    return;
   }
+
+  // 3. Create Admin record (generates admin_code)
+  const { error: adminError } = await supabaseAdmin
+    .from('admins')
+    .upsert({
+      id: userId
+    });
+
+  if (adminError) {
+    console.error("Database admin details insertion failed:", adminError.message);
+    return;
+  }
+
+  console.log("==================================================");
+  console.log("IT-Admin seeded successfully!");
+  console.log(`Email:    ${email}`);
+  console.log(`Password: ${password}`);
+  console.log("==================================================");
 }
 
 async function getUserIdByEmail(email) {
