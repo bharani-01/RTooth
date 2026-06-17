@@ -4,3 +4,259 @@
 .auth-card {
   animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Container layout to hold both cards */
+.auth-container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base styles for demo-card to match auth-card */
+.demo-card {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  color: var(--text-dark);
+}
+
+.demo-subtitle {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  margin-bottom: 24px;
+}
+
+.demo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  max-height: 480px;
+  padding-right: 4px;
+}
+
+/* Custom Scrollbar for demo-list */
+.demo-list::-webkit-scrollbar {
+  width: 6px;
+}
+.demo-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.demo-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+.demo-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Demo Item styling with glass and micro-interaction */
+.demo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.demo-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+/* Hover effects */
+.demo-item:hover {
+  background-color: white;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.demo-item:active {
+  transform: translateY(0);
+}
+
+/* Left border highlights depending on role on hover */
+.demo-item[data-email*="admin"]:hover::before {
+  background-color: #8b5cf6; /* purple for admin */
+}
+.demo-item[data-email*="emily"]:hover::before,
+.demo-item[data-email*="amit"]:hover::before {
+  background-color: var(--accent-teal); /* teal for doctors */
+}
+.demo-item[data-email*="rahul"]:hover::before {
+  background-color: var(--success); /* green for active patients */
+}
+.demo-item[data-email*="sneha"]:hover::before {
+  background-color: var(--danger); /* red/orange for draft patient */
+}
+
+/* Icon Container styles */
+.demo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.demo-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* Role Icon Colors */
+.admin-bg {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+}
+.doctor-bg {
+  background-color: var(--accent-teal-light);
+  color: var(--accent-teal);
+}
+.patient-bg {
+  background-color: var(--success-light);
+  color: var(--success);
+}
+.draft-bg {
+  background-color: var(--danger-light);
+  color: var(--danger);
+}
+
+/* Info Section */
+.demo-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.demo-name {
+  font-family: var(--font-heading);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Badges */
+.demo-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge-admin {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+.badge-doctor {
+  background-color: var(--accent-teal-light);
+  color: var(--accent-teal);
+  border: 1px solid rgba(13, 148, 136, 0.2);
+}
+.badge-patient-active {
+  background-color: var(--success-light);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.badge-patient-draft {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.demo-desc {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.demo-credentials {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text-light);
+  background-color: var(--bg-subtle);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+/* Animations for filling in credentials */
+@keyframes fillPulse {
+  0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4); border-color: var(--primary); }
+  50% { box-shadow: 0 0 0 6px rgba(2, 132, 199, 0.25); border-color: var(--primary); }
+  100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+}
+
+.field-highlight {
+  animation: fillPulse 0.6s ease-in-out 2;
+}
+
+/* Responsive updates for mobile/tablet */
+@media (max-width: 900px) {
+  .auth-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .demo-card {
+    max-width: 520px;
+    padding: 32px;
+  }
+  .demo-list {
+    max-height: 380px;
+  }
+}
+

@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
     loginForm.addEventListener('submit', handleLoginSubmit);
+    initDemoAccounts();
   }
 
   // Initialize registration page elements
@@ -17,6 +18,47 @@ document.addEventListener('DOMContentLoaded', () => {
     registerForm.addEventListener('submit', handleRegisterSubmit);
   }
 });
+
+/**
+ * Initialize Demo Accounts Autofill feature
+ */
+function initDemoAccounts() {
+  const demoItems = document.querySelectorAll('.demo-item');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+
+  if (!demoItems.length || !emailInput || !passwordInput) return;
+
+  demoItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const email = item.getAttribute('data-email');
+      const password = item.getAttribute('data-password');
+
+      if (email && password) {
+        // Set values
+        emailInput.value = email;
+        passwordInput.value = password;
+
+        // Visual feedback: briefly highlight the inputs
+        emailInput.classList.remove('field-highlight');
+        passwordInput.classList.remove('field-highlight');
+        
+        // Force reflow to restart animation
+        void emailInput.offsetWidth;
+        void passwordInput.offsetWidth;
+
+        emailInput.classList.add('field-highlight');
+        passwordInput.classList.add('field-highlight');
+
+        // Remove the classes after animation ends
+        setTimeout(() => {
+          emailInput.classList.remove('field-highlight');
+          passwordInput.classList.remove('field-highlight');
+        }, 1200);
+      }
+    });
+  });
+}
 
 /**
  * Handle Login Submission
