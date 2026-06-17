@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patient Clinical Profile - RTooth Portal</title>
+  <title>Patient Profile — RTooth Portal</title>
+  <meta name="description" content="RTooth clinical patient profile — view oncology history, consultations, medications and symptom logs.">
   <link rel="stylesheet" href="/css/doctor_patient_profile.css">
 </head>
 <body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
@@ -12,18 +13,11 @@
   <header>
     <div class="nav-bar">
       <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
       </button>
       <div class="header-brand-area">
         <a href="/doctor/index.html" class="logo" id="header-logo">
-          <div class="logo-icon-container">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C8.5 2 6 4.5 6 8c0 2 1 3.5 1.5 5C8.3 15.6 7 20 9.5 22c1.7.5 2.5-1.5 2.5-3 0 1.5.8 3.5 2.5 3 2.5-2 1.2-6.4 2-9 0.5-1.5 1.5-3 1.5-5 0-3.5-2.5-6-6-6Z"/>
-            </svg>
-          </div>
-          <span class="logo-text">RTooth</span>
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
         </a>
       </div>
       <nav class="nav-links">
@@ -31,7 +25,7 @@
           <div class="user-badge">
             <div class="user-avatar" id="doc-avatar">DR</div>
             <div class="user-info">
-              <div class="user-name" id="doc-name-badge">Doctor Loading...</div>
+              <div class="user-name" id="doc-name-badge">Loading...</div>
               <div class="user-role-label">Oncology Practitioner</div>
             </div>
           </div>
@@ -40,161 +34,273 @@
     </div>
   </header>
 
-  <!-- Dashboard Layout -->
   <main class="dashboard-layout">
-    
-    <!-- Dynamic Sidebar Container -->
     <aside class="sidebar" id="sidebar-container">
-      <div style="color: var(--text-muted); font-size: 13px;">Loading navigation menu...</div>
+      <div style="color: var(--text-muted); font-size: 13px;">Loading...</div>
     </aside>
 
-    <!-- Main Content Area -->
     <section class="dashboard-content">
-      <div class="dashboard-header" style="border-bottom: none; margin-bottom: 16px; padding-bottom: 0;">
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <a href="/doctor/patients.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
-            &larr; Back to Patients
-          </a>
-          <div>
-            <h2 id="patient-profile-title" style="display: inline-block;">Patient Clinical Profile</h2>
-            <span id="patient-status-pill" class="status-pill status-confirmed" style="margin-left: 12px; vertical-align: middle;">Active</span>
+
+      <!-- Breadcrumb + back -->
+      <div class="breadcrumb-row">
+        <a href="/doctor/patients.html" class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Patient Registry
+        </a>
+        <span class="breadcrumb-sep">/</span>
+        <span id="breadcrumb-name" class="breadcrumb-current">Loading...</span>
+      </div>
+
+      <!-- Patient Hero Card -->
+      <div class="patient-hero">
+        <div class="hero-avatar" id="hero-avatar">—</div>
+        <div class="hero-info">
+          <div class="hero-name-row">
+            <h1 id="pat-full-name" class="hero-name">
+              <span class="skeleton-line" style="width:200px; height:22px; display:inline-block;"></span>
+            </h1>
+            <span id="patient-status-pill" class="status-badge badge-active">Active</span>
           </div>
+          <div class="hero-meta" id="hero-meta">
+            <span class="meta-chip" id="meta-code">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+              <span class="skeleton-line" style="width:70px; height:11px; display:inline-block;"></span>
+            </span>
+            <span class="meta-chip" id="meta-age">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7 7 0 0 1 13 0"/></svg>
+              <span class="skeleton-line" style="width:80px; height:11px; display:inline-block;"></span>
+            </span>
+            <span class="meta-chip" id="meta-stage">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span class="skeleton-line" style="width:90px; height:11px; display:inline-block;"></span>
+            </span>
+            <span class="meta-chip" id="meta-location">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="skeleton-line" style="width:90px; height:11px; display:inline-block;"></span>
+            </span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-sm" id="btn-open-visit-modal">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Record Visit
+          </button>
         </div>
       </div>
 
-      <!-- Quick Demographics Card -->
-      <div class="profile-card" style="margin-bottom: 24px;">
-        <div class="profile-grid">
-          <div>
-            <p style="margin-bottom: 8px;"><strong>Full Name:</strong> <span id="pat-full-name">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Email Contact:</strong> <span id="pat-email">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Phone Contact:</strong> <span id="pat-phone">Loading...</span></p>
-            <p><strong>Registered Address:</strong> <span id="pat-address">Loading...</span></p>
-          </div>
-          <div>
-            <p style="margin-bottom: 8px;"><strong>Date of Birth:</strong> <span id="pat-dob">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Biological Gender:</strong> <span id="pat-gender">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Lesion Site Location:</strong> <span id="pat-lesion-location" style="font-weight: 600;">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Oncology Staging:</strong> <span id="pat-cancer-stage" style="color: var(--danger); font-weight: 600;">Loading...</span></p>
-            <p><strong>Primary Risk Factors:</strong> <span id="pat-risk-factors" style="color: var(--warning); font-weight: 600;">Loading...</span></p>
-          </div>
-        </div>
-      </div>
+      <!-- Two-column info cards -->
+      <div class="info-grid">
 
-      <!-- Lifestyle Habits Card -->
-      <div class="profile-card" style="margin-bottom: 24px;">
-        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-          Social History & Lifestyle Habits
-        </h3>
-        <div class="profile-grid">
-          <div>
-            <p style="margin-bottom: 8px;"><strong>Tobacco Habit:</strong> <span id="pat-tobacco-habit" style="text-transform: capitalize;">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Tobacco Frequency:</strong> <span id="pat-tobacco-freq">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Tobacco Duration:</strong> <span id="pat-tobacco-dur">Loading...</span></p>
-            <p><strong>Betel Quid Nut Chewing:</strong> <span id="pat-betel-nut" style="text-transform: capitalize; font-weight: 600;">Loading...</span></p>
+        <!-- Demographics -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7 7 0 0 1 13 0"/></svg>
+            </span>
+            <h2 class="info-card-title">Demographics</h2>
           </div>
-          <div>
-            <p style="margin-bottom: 8px;"><strong>Alcohol Consumption:</strong> <span id="pat-alcohol-habit" style="text-transform: capitalize;">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Alcohol Frequency:</strong> <span id="pat-alcohol-freq">Loading...</span></p>
-            <p style="margin-bottom: 8px;"><strong>Alcohol Duration:</strong> <span id="pat-alcohol-dur">Loading...</span></p>
-            <p><strong>Family History of Oral Cancer:</strong> <span id="pat-family-history" style="text-transform: capitalize; font-weight: 600;">Loading...</span></p>
-          </div>
+          <dl class="info-fields">
+            <div class="field-row">
+              <dt>Date of Birth</dt>
+              <dd id="pat-dob"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Gender</dt>
+              <dd id="pat-gender"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Phone</dt>
+              <dd id="pat-phone"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Email</dt>
+              <dd id="pat-email"><span class="skeleton-line medium"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Address</dt>
+              <dd id="pat-address"><span class="skeleton-line medium"></span></dd>
+            </div>
+          </dl>
         </div>
-      </div>
 
-      <!-- Action Tabs / Details -->
+        <!-- Clinical Info -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon icon-red">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </span>
+            <h2 class="info-card-title">Clinical Profile</h2>
+          </div>
+          <dl class="info-fields">
+            <div class="field-row">
+              <dt>Lesion Site</dt>
+              <dd id="pat-lesion-location"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Oncology Stage</dt>
+              <dd id="pat-cancer-stage"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Risk Factors</dt>
+              <dd id="pat-risk-factors"><span class="skeleton-line medium"></span></dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Tobacco & Lifestyle -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon icon-amber">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </span>
+            <h2 class="info-card-title">Tobacco Habit</h2>
+          </div>
+          <dl class="info-fields">
+            <div class="field-row">
+              <dt>Habit</dt>
+              <dd id="pat-tobacco-habit"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Frequency</dt>
+              <dd id="pat-tobacco-freq"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Duration</dt>
+              <dd id="pat-tobacco-dur"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Betel Nut</dt>
+              <dd id="pat-betel-nut"><span class="skeleton-line short"></span></dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Alcohol & Family -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon icon-teal">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            <h2 class="info-card-title">Alcohol & Family History</h2>
+          </div>
+          <dl class="info-fields">
+            <div class="field-row">
+              <dt>Alcohol</dt>
+              <dd id="pat-alcohol-habit"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Frequency</dt>
+              <dd id="pat-alcohol-freq"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Duration</dt>
+              <dd id="pat-alcohol-dur"><span class="skeleton-line short"></span></dd>
+            </div>
+            <div class="field-row">
+              <dt>Family History</dt>
+              <dd id="pat-family-history"><span class="skeleton-line short"></span></dd>
+            </div>
+          </dl>
+        </div>
+
+      </div><!-- end info-grid -->
+
+      <!-- Tabbed Records Section -->
       <div class="profile-tabs-container">
         <div class="profile-tabs-header">
-          <button class="profile-tab-btn active" data-tab="checkups">Check-up & Visit Records</button>
-          <button class="profile-tab-btn" data-tab="medications">Active Prescriptions</button>
+          <button class="profile-tab-btn active" data-tab="checkups">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Consultations
+          </button>
+          <button class="profile-tab-btn" data-tab="medications">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Medications
+          </button>
+          <button class="profile-tab-btn" data-tab="symptoms">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Symptom Logs
+          </button>
         </div>
 
-        <!-- Tab 1: Checkups -->
+        <!-- Tab 1: Consultations -->
         <div class="profile-tab-content active" id="tab-checkups">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 15px; font-weight: 600; color: var(--text-dark);">Logged Check-up Visits</h3>
-            <button class="btn btn-primary" style="font-size: 13px; padding: 8px 16px;" id="btn-open-checkup-modal">
-              Log New Check-up
+          <div class="tab-toolbar">
+            <h2 class="tab-section-title">Consultation &amp; Visit Records</h2>
+            <button class="btn btn-primary btn-sm" id="btn-open-visit-modal-2">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Record Visit
             </button>
           </div>
-
-          <!-- Checkups List -->
           <div class="checkups-timeline" id="checkups-list-container">
-            <div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 24px;">
-              Loading check-up records...
+            <!-- Skeleton entries -->
+            <div class="skeleton-timeline-entry">
+              <div class="skeleton-line short" style="margin-bottom:8px;"></div>
+              <div class="skeleton-line medium"></div>
+              <div class="skeleton-line" style="width:55%;"></div>
+            </div>
+            <div class="skeleton-timeline-entry">
+              <div class="skeleton-line short" style="margin-bottom:8px;"></div>
+              <div class="skeleton-line medium"></div>
             </div>
           </div>
         </div>
 
         <!-- Tab 2: Medications -->
         <div class="profile-tab-content" id="tab-medications">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 15px; font-weight: 600; color: var(--text-dark);">Medications List</h3>
-            <button class="btn btn-primary btn-teal" style="font-size: 13px; padding: 8px 16px;" id="btn-open-med-modal">
-              Prescribe Medication
+          <div class="tab-toolbar">
+            <h2 class="tab-section-title">Active Prescriptions</h2>
+            <button class="btn btn-primary btn-sm btn-teal" id="btn-open-med-modal">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Prescribe
             </button>
           </div>
-
-          <!-- Medications Table -->
-          <div class="table-card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 0;">
-            <table class="clinic-table" id="medications-table">
+          <div class="table-wrap">
+            <table class="data-table" id="medications-table">
               <thead>
                 <tr>
-                  <th>Medication Name</th>
+                  <th>Medication</th>
                   <th>Dosage</th>
                   <th>Frequency</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="medications-table-body">
-                <tr>
-                  <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
-                    Loading medications...
-                  </td>
-                </tr>
+                <tr class="skeleton-row"><td colspan="6"><div class="row-skeleton"></div></td></tr>
+                <tr class="skeleton-row"><td colspan="6"><div class="row-skeleton" style="width:70%"></div></td></tr>
               </tbody>
             </table>
           </div>
         </div>
+
+        <!-- Tab 3: Symptoms -->
+        <div class="profile-tab-content" id="tab-symptoms">
+          <div class="tab-toolbar">
+            <h2 class="tab-section-title">Patient Self-Reported Symptoms</h2>
+          </div>
+          <div class="checkups-timeline" id="symptoms-list-container">
+            <div class="skeleton-timeline-entry">
+              <div class="skeleton-line short" style="margin-bottom:8px;"></div>
+              <div class="skeleton-line medium"></div>
+            </div>
+          </div>
+        </div>
       </div>
+
     </section>
   </main>
 
-  <!-- Log Checkup Modal Overlay -->
-  <div class="modal-overlay" id="checkup-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Log Clinical Check-up</h3>
-        <button class="modal-close" id="btn-close-checkup-modal">&times;</button>
-      </div>
-      <form id="checkup-form">
-        <div class="form-group">
-          <label class="form-label" for="checkup_findings">Clinical Findings *</label>
-          <textarea class="form-input" id="checkup_findings" rows="3" placeholder="e.g. Size of lesion reduced by 20%. Staging stable. Normal mucosal color returning." required style="resize: vertical; font-family: var(--font-body);"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="checkup_notes">General Clinic Notes</label>
-          <textarea class="form-input" id="checkup_notes" rows="2" placeholder="General observations or patient comments..." style="resize: vertical; font-family: var(--font-body);"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="checkup_recs">Recommendations</label>
-          <input type="text" class="form-input" id="checkup_recs" placeholder="e.g. Follow-up scan in 3 months, continue oral hygiene routine">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="checkup_date">Check-up Date</label>
-          <input type="datetime-local" class="form-input" id="checkup_date">
-        </div>
-        <div class="alert alert-error" id="checkup-error-alert"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
-          <button type="button" class="btn btn-secondary" id="btn-cancel-checkup">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="btn-submit-checkup">Save Record</button>
-        </div>
-      </form>
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. All rights reserved.</p>
     </div>
-  </div>
+  </footer>
 
-  <!-- Prescribe Medication Modal Overlay -->
+  <!-- ─── MODALS (unchanged IDs, kept intact for JS compatibility) ─── -->
+
+  <!-- Prescribe Medication Modal -->
   <div class="modal-overlay" id="med-modal">
     <div class="modal-card">
       <div class="modal-header">
@@ -209,11 +315,11 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="med_dosage">Dosage *</label>
-            <input type="text" class="form-input" id="med_dosage" placeholder="e.g. 500mg, 1 application" required>
+            <input type="text" class="form-input" id="med_dosage" placeholder="e.g. 500mg" required>
           </div>
           <div class="form-group">
             <label class="form-label" for="med_freq">Frequency *</label>
-            <input type="text" class="form-input" id="med_freq" placeholder="e.g. Twice daily, Once every night" required>
+            <input type="text" class="form-input" id="med_freq" placeholder="e.g. Twice daily" required>
           </div>
         </div>
         <div class="form-row">
@@ -227,23 +333,214 @@
           </div>
         </div>
         <div class="alert alert-error" id="med-error-alert"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 16px;">
+        <div class="modal-footer-actions">
           <button type="button" class="btn btn-secondary" id="btn-cancel-med">Cancel</button>
-          <button type="submit" class="btn btn-primary btn-teal" id="btn-submit-med">Add Prescription</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-med">Add Prescription</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+  <!-- Edit Medication Modal -->
+  <div class="modal-overlay" id="edit-med-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Edit Prescription</h3>
+        <button class="modal-close" id="btn-close-edit-med-modal">&times;</button>
+      </div>
+      <form id="edit-med-form">
+        <input type="hidden" id="edit_med_id">
+        <div class="form-group">
+          <label class="form-label" for="edit_med_name">Medication Name *</label>
+          <input type="text" class="form-input" id="edit_med_name" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="edit_med_dosage">Dosage *</label>
+            <input type="text" class="form-input" id="edit_med_dosage" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_med_freq">Frequency *</label>
+            <input type="text" class="form-input" id="edit_med_freq" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="edit_med_start">Start Date *</label>
+            <input type="date" class="form-input" id="edit_med_start" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_med_end">End Date</label>
+            <input type="date" class="form-input" id="edit_med_end">
+          </div>
+        </div>
+        <div class="alert alert-error" id="edit-med-error-alert" style="display:none; margin-bottom:16px;"></div>
+        <div class="modal-footer-actions split">
+          <button type="button" class="btn btn-danger-outline" id="btn-delete-med-action">Delete</button>
+          <div style="display:flex;gap:10px;">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-edit-med">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-edit-med">Save Changes</button>
+          </div>
+        </div>
+      </form>
     </div>
-  </footer>
+  </div>
 
-  <!-- Scripts -->
+  <!-- Record Consultation Visit Modal -->
+  <div class="modal-overlay" id="visit-modal">
+    <div class="modal-card" style="max-width: 780px;">
+      <div class="modal-header">
+        <h3>Record Consultation Visit</h3>
+        <button class="modal-close" id="btn-close-visit-modal">&times;</button>
+      </div>
+      <form id="visit-form">
+        <div class="modal-section-label">1. Clinical Observations</div>
+        <div class="form-group">
+          <label class="form-label" for="visit_findings">Clinical Findings *</label>
+          <textarea class="form-input" id="visit_findings" rows="3" placeholder="e.g. Size of lesion stable. No signs of secondary infection." required style="resize:vertical; font-family:var(--font-body);"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="visit_notes">Clinic Notes</label>
+            <input type="text" class="form-input" id="visit_notes" placeholder="General observations...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="visit_recs">Recommendations</label>
+            <input type="text" class="form-input" id="visit_recs" placeholder="e.g. Next checkup in 4 weeks">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="visit_date">Visit Date &amp; Time</label>
+          <input type="datetime-local" class="form-input" id="visit_date">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="visit_next_date">Next Check-up Date</label>
+            <input type="date" class="form-input" id="visit_next_date">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="visit_followup_interval">Follow-up Interval</label>
+            <select class="form-input" id="visit_followup_interval">
+              <option value="">None / One-off</option>
+              <option value="Every week">Every week</option>
+              <option value="Every 2 weeks">Every 2 weeks</option>
+              <option value="Every month">Every month</option>
+              <option value="Every 2 months">Every 2 months</option>
+              <option value="Every 3 months">Every 3 months</option>
+              <option value="Every 6 months">Every 6 months</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="visit_followup_notes">Follow-up Notes</label>
+          <input type="text" class="form-input" id="visit_followup_notes" placeholder="e.g. Confirm biopsy results prior to this session">
+        </div>
+
+        <div class="modal-section-label" style="margin-top:20px;">
+          2. Prescribe Medications
+          <button type="button" class="btn btn-secondary btn-xs" id="btn-add-visit-med">+ Add Drug</button>
+        </div>
+        <div id="visit-meds-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+          <div style="font-size:13px; color:#8a94a6; text-align:center; padding:12px; border:1px dashed #e4e8ee; border-radius:8px;" id="no-meds-text">
+            No medications prescribed yet. Click "+ Add Drug" to prescribe.
+          </div>
+        </div>
+
+        <div class="modal-section-label" style="margin-top:16px;">
+          3. Upload Medical Reports
+          <button type="button" class="btn btn-secondary btn-xs" id="btn-add-visit-report">+ Add File</button>
+        </div>
+        <div id="visit-reports-container" style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+          <div style="font-size:13px; color:#8a94a6; text-align:center; padding:12px; border:1px dashed #e4e8ee; border-radius:8px;" id="no-reports-text">
+            No files attached yet. Click "+ Add Report File".
+          </div>
+        </div>
+
+        <div class="alert alert-error" id="visit-error-alert" style="display:none; margin-top:12px;"></div>
+        <div class="modal-footer-actions" style="border-top:1px solid #f0f2f5; padding-top:14px; margin-top:8px;">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-visit">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-visit">Save Consultation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Visit Details Modal -->
+  <div class="modal-overlay" id="visit-details-modal">
+    <div class="modal-card" style="max-width: 680px; padding: 24px;">
+      <div class="modal-header">
+        <h3>Consultation Summary</h3>
+        <button class="modal-close" id="btn-close-visit-details-modal">&times;</button>
+      </div>
+      <div style="max-height:68vh; overflow-y:auto; padding-right:8px;">
+        <div class="detail-meta-row">
+          <div><span class="detail-label">Date</span><span id="popup-visit-date-time" class="detail-val">—</span></div>
+          <div><span class="detail-label">Doctor</span><span id="popup-visit-doctor-name" class="detail-val">—</span></div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-field-label">Clinical Findings</div>
+          <div id="popup-visit-findings" class="detail-text-box">—</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-field-label">Clinic Notes</div>
+          <div id="popup-visit-notes" class="detail-text-box" style="font-style:italic;">—</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-field-label">Recommendations</div>
+          <span id="popup-visit-recs" class="checkup-recs">—</span>
+        </div>
+        <div id="popup-visit-followup-container" style="display:none; border-top:1px solid #f0f2f5; padding-top:14px; margin-top:14px;">
+          <div class="detail-field-label">Next Scheduled Follow-up</div>
+          <div class="followup-box">
+            <div><strong>Date:</strong> <span id="popup-visit-next-date">—</span></div>
+            <div id="popup-visit-interval-wrapper"><strong>Interval:</strong> <span id="popup-visit-interval">—</span></div>
+            <div id="popup-visit-followup-notes-wrapper"><strong>Notes:</strong> <span id="popup-visit-followup-notes">—</span></div>
+          </div>
+        </div>
+
+        <div class="detail-field-label" style="margin-top:18px; margin-bottom:8px;">Prescribed Medications</div>
+        <div class="table-wrap" style="border:1px solid #f0f2f5; border-radius:8px; overflow:hidden; margin-bottom:18px;">
+          <table class="data-table" id="popup-meds-table" style="font-size:13px;">
+            <thead><tr><th>Medication</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr></thead>
+            <tbody id="popup-meds-body"></tbody>
+          </table>
+        </div>
+
+        <div class="detail-field-label" style="margin-bottom:8px;">Reports &amp; Files</div>
+        <div id="popup-reports-list" class="visit-reports-list" style="margin-bottom:18px;"></div>
+
+        <div class="detail-field-label" style="margin-bottom:8px;">Attach Additional Reports</div>
+        <form id="popup-upload-reports-form">
+          <input type="hidden" id="popup_upload_visit_id">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div id="popup-upload-rows-container" style="display:flex; flex-direction:column; gap:8px;">
+              <div class="dynamic-report-row">
+                <input type="file" class="form-input popup-report-file" accept=".pdf,image/*" required style="padding:4px 8px; font-size:12.5px; border:none; background:transparent;">
+                <select class="form-input popup-report-type" required style="padding:6px 8px; font-size:12.5px;">
+                  <option value="Biopsy">Biopsy Report</option>
+                  <option value="Histopathology">Histopathology Report</option>
+                  <option value="Imaging">Imaging (X-Ray, MRI, CT)</option>
+                  <option value="Blood Report">Blood Report</option>
+                  <option value="Other">Other / Clinical Document</option>
+                </select>
+                <div style="width:28px;"></div>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; border-top:1px solid #f0f2f5; padding-top:12px;">
+              <button type="button" class="btn btn-secondary btn-xs" id="btn-popup-add-more-rows">+ Add File</button>
+              <button type="submit" class="btn btn-primary btn-sm" id="btn-popup-submit-upload">Upload Documents</button>
+            </div>
+          </div>
+          <div class="alert alert-error" id="popup-upload-error" style="display:none; margin-top:12px; font-size:12.5px;"></div>
+          <div class="alert alert-success" id="popup-upload-success" style="display:none; margin-top:12px; font-size:12.5px;"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/js/auth.js"></script>
   <script type="module" src="/js/patient_profile_doctor.js"></script>
+
+
 </body>
 </html>

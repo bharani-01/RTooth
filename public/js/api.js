@@ -1,6 +1,23 @@
-/**
- * API Helper and Session Manager
- */
+// Intercept all fetch requests globally to show the header loading bar
+const originalFetch = window.fetch;
+let activeRequestsCount = 0;
+
+window.fetch = async function (...args) {
+  activeRequestsCount++;
+  const header = document.querySelector('header');
+  if (header) header.classList.add('loading');
+  
+  try {
+    return await originalFetch(...args);
+  } finally {
+    activeRequestsCount--;
+    if (activeRequestsCount <= 0) {
+      activeRequestsCount = 0;
+      const header = document.querySelector('header');
+      if (header) header.classList.remove('loading');
+    }
+  }
+};
 
 const API_BASE = '/api/v1';
 

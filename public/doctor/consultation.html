@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultation Hub — RTooth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/consultation.css">
+</head>
+<body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
+
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/doctor/index.html" class="logo" id="header-logo">
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/doctor/profile.html" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="doc-avatar">DR</div>
+            <div class="user-info">
+              <div class="user-name" id="doc-name-badge">Loading...</div>
+              <div class="user-role-label">Oncology Practitioner</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dashboard-layout">
+    <aside class="sidebar" id="sidebar-container">
+      <div style="color:#94a3b8;font-size:13px;">Loading...</div>
+    </aside>
+
+    <section class="dashboard-content">
+
+      <!-- Page header -->
+      <div class="con-topbar">
+        <div>
+          <h1 class="con-title">Consultation Hub</h1>
+          <p class="con-sub">Search for a patient to view clinical history or record a new consultation visit.</p>
+        </div>
+      </div>
+
+      <!-- ── SEARCH ── -->
+      <div class="search-widget-container">
+        <div class="search-input-wrapper">
+          <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" class="search-input-field" id="patient-search-input"
+            placeholder="Search by patient name or ID (e.g. PAT-10001)…" autocomplete="off">
+        </div>
+        <div class="search-dropdown" id="patient-search-dropdown"></div>
+      </div>
+
+      <!-- ── SELECTED PATIENT CARD ── (hidden until patient selected) -->
+      <div id="selected-patient-card" class="con-patient-card" style="display:none;">
+        <div class="con-patient-header">
+          <div class="con-patient-left">
+            <div class="con-pat-avatar" id="con-pat-initials">—</div>
+            <div>
+              <div class="con-pat-name-row">
+                <h2 id="selected-pat-name" class="con-pat-name">—</h2>
+                <span id="selected-pat-code" class="con-pat-code">—</span>
+              </div>
+              <div class="con-pat-meta">
+                <span id="selected-pat-gender"></span>
+                <span class="meta-dot">·</span>
+                <span id="selected-pat-dob"></span>
+                <span class="meta-dot">·</span>
+                <span id="selected-pat-location" class="meta-location"></span>
+                <span class="meta-dot">·</span>
+                <span id="selected-pat-stage" class="con-stage-chip"></span>
+              </div>
+            </div>
+          </div>
+          <button class="con-deselect-btn" id="btn-deselect-patient">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Deselect
+          </button>
+        </div>
+
+        <!-- Action cards -->
+        <div class="options-grid">
+          <div class="option-card-btn btn-teal-theme" id="option-view-history">
+            <div class="option-icon" style="background:#f0fdfa; color:#0d9488;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div>
+              <div class="option-card-title">View Clinical History</div>
+              <div class="option-card-desc">Full visit timeline, prescriptions, demographics and symptom logs.</div>
+            </div>
+            <svg class="option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+
+          <div class="option-card-btn" id="option-record-visit">
+            <div class="option-icon" style="background:#eff6ff; color:#3b82f6;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <div>
+              <div class="option-card-title">Record Consultation Visit</div>
+              <div class="option-card-desc">Log findings, prescribe medications and upload pathology reports.</div>
+            </div>
+            <svg class="option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RECORD VISIT PANEL ── -->
+      <div id="record-visit-panel" class="con-panel" style="display:none;">
+        <div class="con-panel-header">
+          <div>
+            <div class="con-panel-label">Recording visit for</div>
+            <h2 class="con-panel-title" id="visit-form-patient-name">—</h2>
+          </div>
+          <button class="con-back-btn" id="btn-cancel-visit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+        </div>
+
+        <form id="visit-form">
+
+          <!-- Section 1: Clinical Observations -->
+          <div class="con-form-section">
+            <div class="con-section-head">
+              <span class="con-section-num" style="background:#eff6ff;color:#3b82f6;">1</span>
+              <span class="con-section-label">Clinical Observations</span>
+            </div>
+            <div class="con-fields">
+              <div class="con-field">
+                <label for="visit_findings">Clinical Findings <span class="req">*</span></label>
+                <textarea class="con-input con-textarea" id="visit_findings" rows="3"
+                  placeholder="e.g. Size of lesion stable. No signs of secondary infection." required></textarea>
+              </div>
+              <div class="con-field-row">
+                <div class="con-field">
+                  <label for="visit_notes">Clinic Notes</label>
+                  <input type="text" class="con-input" id="visit_notes" placeholder="General observations…">
+                </div>
+                <div class="con-field">
+                  <label for="visit_recs">Recommendations</label>
+                  <input type="text" class="con-input" id="visit_recs" placeholder="e.g. Next checkup in 4 weeks">
+                </div>
+              </div>
+              <div class="con-field">
+                <label for="visit_date">Visit Date &amp; Time</label>
+                <input type="datetime-local" class="con-input" id="visit_date">
+              </div>
+              <div class="con-field-row">
+                <div class="con-field">
+                  <label for="visit_next_date">Next Check-up Date</label>
+                  <input type="date" class="con-input" id="visit_next_date">
+                </div>
+                <div class="con-field">
+                  <label for="visit_followup_interval">Follow-up Interval</label>
+                  <select class="con-input con-select" id="visit_followup_interval">
+                    <option value="">None / One-off</option>
+                    <option value="Every week">Every week</option>
+                    <option value="Every 2 weeks">Every 2 weeks</option>
+                    <option value="Every month">Every month</option>
+                    <option value="Every 2 months">Every 2 months</option>
+                    <option value="Every 3 months">Every 3 months</option>
+                    <option value="Every 6 months">Every 6 months</option>
+                  </select>
+                </div>
+              </div>
+              <div class="con-field">
+                <label for="visit_followup_notes">Follow-up Notes</label>
+                <input type="text" class="con-input" id="visit_followup_notes"
+                  placeholder="e.g. Confirm biopsy results prior to this session">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Prescriptions -->
+          <div class="con-form-section">
+            <div class="con-section-head">
+              <span class="con-section-num" style="background:#f0fdf4;color:#16a34a;">2</span>
+              <span class="con-section-label">Prescribe Medications</span>
+              <button type="button" class="con-add-btn" id="btn-add-visit-med">+ Add Drug</button>
+            </div>
+            <div id="visit-meds-container" class="con-dyn-container">
+              <div id="no-meds-text" class="con-empty-placeholder">
+                No medications prescribed yet. Click "+ Add Drug" to prescribe.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Reports -->
+          <div class="con-form-section">
+            <div class="con-section-head">
+              <span class="con-section-num" style="background:#faf5ff;color:#7c3aed;">3</span>
+              <span class="con-section-label">Upload Medical Reports</span>
+              <button type="button" class="con-add-btn" id="btn-add-visit-report">+ Add File</button>
+            </div>
+            <div id="visit-reports-container" class="con-dyn-container">
+              <div id="no-reports-text" class="con-empty-placeholder">
+                No files attached yet. Click "+ Add Report File" to upload.
+              </div>
+            </div>
+          </div>
+
+          <div id="visit-error-alert"   class="con-alert con-alert-error"   style="display:none;"></div>
+          <div id="visit-success-alert" class="con-alert con-alert-success" style="display:none;"></div>
+
+          <div class="con-form-actions">
+            <button type="button" class="con-btn-secondary" id="btn-cancel-visit-2">Cancel</button>
+            <button type="submit" class="con-btn-primary" id="btn-submit-visit">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Record Consultation Visit
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ── CLINICAL HISTORY PANEL ── -->
+      <div id="clinical-history-panel" class="con-panel" style="display:none;">
+        <div class="con-panel-header">
+          <div>
+            <div class="con-panel-label">Clinical history for</div>
+            <h2 class="con-panel-title" id="history-patient-name">—</h2>
+          </div>
+        </div>
+
+        <!-- Active Medications -->
+        <div class="con-section-card">
+          <div class="con-section-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Active Medications
+          </div>
+          <div class="con-table-wrap">
+            <table class="con-table" id="history-medications-table">
+              <thead>
+                <tr>
+                  <th>Medication</th><th>Dosage</th><th>Frequency</th><th>Start</th><th>End</th>
+                </tr>
+              </thead>
+              <tbody id="history-medications-body">
+                <tr><td colspan="5" class="con-td-empty">No active prescriptions found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Visit Timeline -->
+        <div class="con-section-card">
+          <div class="con-section-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Clinical Visit Timeline
+          </div>
+          <div class="checkups-timeline" id="history-checkups-list-container">
+            <div class="con-empty-center">No clinical visits logged yet.</div>
+          </div>
+        </div>
+
+        <!-- Symptom Logs -->
+        <div class="con-section-card">
+          <div class="con-section-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Self-Reported Symptom Logs
+          </div>
+          <div class="checkups-timeline" id="history-symptoms-list-container">
+            <div class="con-empty-center">No symptom logs submitted yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── VISIT DETAILS PANEL ── -->
+      <div id="visit-details-panel" class="con-panel" style="display:none;">
+        <div class="con-panel-header">
+          <div>
+            <div class="con-panel-label">Consultation record</div>
+            <h2 class="con-panel-title">Visit Details</h2>
+          </div>
+          <button class="con-back-btn" id="btn-back-to-history">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to History
+          </button>
+        </div>
+
+        <!-- Meta row -->
+        <div class="con-meta-strip">
+          <div class="con-meta-item">
+            <span class="con-meta-label">Date</span>
+            <span id="inline-visit-date-time" class="con-meta-val">—</span>
+          </div>
+          <div class="con-meta-item">
+            <span class="con-meta-label">Logged By</span>
+            <span id="inline-visit-doctor-name" class="con-meta-val">—</span>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="con-section-card">
+          <div class="con-detail-block">
+            <div class="con-detail-label">Clinical Findings</div>
+            <div id="inline-visit-findings" class="con-detail-box">—</div>
+          </div>
+          <div class="con-detail-block">
+            <div class="con-detail-label">Clinic Notes</div>
+            <div id="inline-visit-notes" class="con-detail-box" style="font-style:italic;">—</div>
+          </div>
+          <div class="con-detail-block">
+            <div class="con-detail-label">Recommendations</div>
+            <span id="inline-visit-recs" class="con-recs-badge">—</span>
+          </div>
+          <div id="inline-visit-followup-container" style="display:none; margin-top:14px; border-top:1px solid #f1f4f8; padding-top:14px;">
+            <div class="con-detail-label">Next Scheduled Follow-up</div>
+            <div class="con-followup-box">
+              <div><strong>Date:</strong> <span id="inline-visit-next-date">—</span></div>
+              <div id="inline-visit-interval-wrapper"><strong>Interval:</strong> <span id="inline-visit-interval">—</span></div>
+              <div id="inline-visit-followup-notes-wrapper"><strong>Notes:</strong> <span id="inline-visit-followup-notes">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prescribed Medications -->
+        <div class="con-section-card">
+          <div class="con-section-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Prescribed Medications
+          </div>
+          <div class="con-table-wrap">
+            <table class="con-table" id="inline-meds-table">
+              <thead>
+                <tr><th>Medication</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr>
+              </thead>
+              <tbody id="inline-meds-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reports -->
+        <div class="con-section-card">
+          <div class="con-section-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Reports &amp; Files
+          </div>
+          <div id="inline-reports-list" class="con-reports-list"></div>
+
+          <!-- Upload more -->
+          <div class="con-upload-area">
+            <div class="con-upload-title">Attach Additional Reports</div>
+            <form id="inline-upload-reports-form">
+              <input type="hidden" id="inline_upload_visit_id">
+              <div id="inline-upload-rows-container" class="con-upload-rows">
+                <div class="dynamic-report-row con-report-row">
+                  <input type="file" class="con-input inline-report-file" accept=".pdf,image/*" required>
+                  <select class="con-input con-select inline-report-type" required>
+                    <option value="Biopsy">Biopsy Report</option>
+                    <option value="Histopathology">Histopathology Report</option>
+                    <option value="Imaging">Imaging (X-Ray, MRI, CT)</option>
+                    <option value="Blood Report">Blood Report</option>
+                    <option value="Other">Other / Clinical Document</option>
+                  </select>
+                  <div style="width:24px;"></div>
+                </div>
+              </div>
+              <div class="con-upload-actions">
+                <button type="button" class="con-add-btn" id="btn-inline-add-more-rows">+ Add File</button>
+                <button type="submit" class="con-btn-primary" id="btn-inline-submit-upload">Upload Documents</button>
+              </div>
+              <div id="inline-upload-error"   class="con-alert con-alert-error"   style="display:none; margin-top:12px;"></div>
+              <div id="inline-upload-success" class="con-alert con-alert-success" style="display:none; margin-top:12px;"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/consultation.js"></script>
+
+  <!-- Wire cancel button 2 → same as cancel button 1 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const b2 = document.getElementById('btn-cancel-visit-2');
+      const b1 = document.getElementById('btn-cancel-visit');
+      if (b2 && b1) b2.addEventListener('click', () => b1.click());
+    });
+  </script>
+</body>
+</html>

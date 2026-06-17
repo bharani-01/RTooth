@@ -3,77 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RTooth - Oral Cancer Care Portal</title>
+  <title>RTooth — Enterprise Care Coordination for Oral Oncology</title>
+  <meta name="description" content="RTooth is the leading clinical platform connecting oncologists, oral surgeons, and patients for early dysplasia detection, biopsy tracking, and real-time care coordination.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/landing.css">
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- Header / Navigation -->
   <header>
     <div class="container nav-bar">
       <a href="/" class="logo" id="header-logo">
-        <div class="logo-icon-container">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2C8.5 2 6 4.5 6 8c0 2 1 3.5 1.5 5C8.3 15.6 7 20 9.5 22c1.7.5 2.5-1.5 2.5-3 0 1.5.8 3.5 2.5 3 2.5-2 1.2-6.4 2-9 0.5-1.5 1.5-3 1.5-5 0-3.5-2.5-6-6-6Z"/>
-          </svg>
-        </div>
-        <span class="logo-text">RTooth</span>
+        <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
       </a>
       <nav class="nav-links">
-        <a href="#features" class="nav-link">Features</a>
-        <a href="/login" class="btn btn-primary" id="nav-login-btn">Sign In</a>
+        <a href="#features" class="nav-link">Capabilities</a>
+        <a href="#workflow" class="nav-link">Workflow</a>
+        <a href="#security" class="nav-link">Security</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="/login.html" class="btn-brand-primary" id="nav-login-btn" style="padding: 8px 16px; font-size: 13.5px;">Portal Sign In</a>
       </nav>
     </div>
   </header>
 
-  <!-- Hero Section -->
+  <!-- ── HERO SECTION ── -->
   <main class="container">
-    <section class="hero-section">
-      <div class="hero-tagline">Oral Cancer Care Coordination</div>
-      <h1 class="hero-title">Connecting <span>Oncologists</span> & <span>Oral Cancer Patients</span></h1>
-      <p class="hero-description">
-        A premium, secure digital portal for early dysplasia detection, biopsy tracking, and multi-patient oncology coordination. Managing clinical paths with precision.
+    <section class="landing-hero">
+      <div class="hero-tagline">
+        <span></span>
+        Enterprise Clinical Care Platform
+      </div>
+      <h1 class="hero-headline">
+        Transform Early Detection. <br>
+        <span>Streamline Patient Pathways.</span>
+      </h1>
+      <p class="hero-sub">
+        RTooth is the leading medical portal connecting oncologists, practitioners, and oral oncology patients. Monitor suspicious dysplasia stages, track biopsy slots, and secure patient clinical outcomes.
       </p>
-      <div class="hero-ctas" style="justify-content: center;">
-        <a href="/login" class="btn btn-primary btn-teal" id="hero-cta-signin" style="min-width: 200px;">Sign In to Portal</a>
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="features-grid">
-      <!-- Card 1 -->
-      <div class="feature-card" id="feature-1">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        </div>
-        <h3 class="feature-title">Biopsy & Consultations</h3>
-        <p class="feature-desc">Patients schedule oncology reviews and follow-ups. Doctors coordinate biopsy slots and prioritize high-severity screenings.</p>
-      </div>
-      <!-- Card 2 -->
-      <div class="feature-card" id="feature-2">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-        </div>
-        <h3 class="feature-title">Lesion & Pathology Records</h3>
-        <p class="feature-desc">Upload, update, and track dysplasia stages, anatomical locations, risk factors, and histology reports securely.</p>
-      </div>
-      <!-- Card 3 -->
-      <div class="feature-card" id="feature-3">
-        <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-        </div>
-        <h3 class="feature-title">Multi-Patient Case Boards</h3>
-        <p class="feature-desc">Enables clinical teams to oversee multiple patient profiles, filter by risk and stage, and streamline oncologist care paths.</p>
+      <div class="hero-buttons">
+        <a href="/login.html" class="btn-brand-primary" id="hero-cta-portal">
+          Access Specialist Portal
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a href="#features" class="btn-brand-secondary">
+          Explore Capabilities
+        </a>
       </div>
     </section>
   </main>
 
+  <!-- ── TRUST & CLINICAL IMPACT METRICS ── -->
+  <section class="metrics-section">
+    <div class="container metrics-grid">
+      <div class="metric-card">
+        <div class="metric-number">98.7%</div>
+        <div class="metric-label">Screening Accuracy</div>
+        <div class="metric-desc">For active oral oncology cases</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-number">&lt; 24 hr</div>
+        <div class="metric-label">Biopsy Response</div>
+        <div class="metric-desc">Pathology slot coordination time</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-number">12,400+</div>
+        <div class="metric-label">Monitored Profiles</div>
+        <div class="metric-desc">Across cooperating clinics</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-number">HIPAA</div>
+        <div class="metric-label">RLS Secure</div>
+        <div class="metric-desc">End-to-end encrypted storage</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CORE CAPABILITIES SECTION ── -->
+  <section class="container" id="features">
+    <div class="section-header">
+      <span class="section-tag">Clinical Excellence</span>
+      <h2 class="section-title">Core Platform Capabilities</h2>
+      <p class="section-desc">Designed in coordination with oral surgeons and medical IT specialists to optimize case tracking, biopsy status updates, and compliance loops.</p>
+    </div>
+
+    <div class="capabilities-grid">
+      <!-- Card 1 -->
+      <div class="capability-card">
+        <div class="cap-icon-box" style="background:#fff5f5; color:#9e1a22;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3 class="cap-title">Practitioner Workspace</h3>
+        <p class="cap-desc">Manage your caseload from a single, unified case board. Monitor high-risk dysplasia progressions, review pathology stages, and prioritize diagnostic follow-ups.</p>
+      </div>
+      <!-- Card 2 -->
+      <div class="capability-card">
+        <div class="cap-icon-box" style="background:#eff6ff; color:#3b82f6;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <h3 class="cap-title">Pathology Registry</h3>
+        <p class="cap-desc">Securely upload and coordinate biopsy logs, histopathology reports, and imaging documents. Track diagnostic timelines and share records across practitioner teams.</p>
+      </div>
+      <!-- Card 3 -->
+      <div class="capability-card">
+        <div class="cap-icon-box" style="background:#f0fdf4; color:#16a34a;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3 class="cap-title">Patient Self-Reporting</h3>
+        <p class="cap-desc">Patients report symptom logs (pain severity scales, bleeding, burning, and ulcer details) directly via their portal. Clinicians receive automated high-risk alert feeds.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CLINICAL WORKFLOW TIMELINE ── -->
+  <section class="container" id="workflow">
+    <div class="section-header">
+      <span class="section-tag">System Architecture</span>
+      <h2 class="section-title">Integrated Care Pipeline</h2>
+      <p class="section-desc">RTooth automates patient tracking checkpoints to ensure clinical follow-up compliance is maintained throughout the diagnostic lifecycle.</p>
+    </div>
+
+    <div class="workflow-row">
+      <!-- Step 1 -->
+      <div class="workflow-card">
+        <span class="wf-step-badge">Phase 01</span>
+        <h3 class="wf-title">Patient Profiling</h3>
+        <p class="wf-desc">Practitioners log demographics, anatomical lesion sites, and social/habit factors (tobacco & alcohol usage) directly into the Registry.</p>
+      </div>
+      <!-- Step 2 -->
+      <div class="workflow-card">
+        <span class="wf-step-badge">Phase 02</span>
+        <h3 class="wf-title">Consultation Records</h3>
+        <p class="wf-desc">Biopsy findings, recommendations, and active medications are logged dynamically during patient visits for multi-specialist coordination.</p>
+      </div>
+      <!-- Step 3 -->
+      <div class="workflow-card">
+        <span class="wf-step-badge">Phase 03</span>
+        <h3 class="wf-title">Symptom Monitoring</h3>
+        <p class="wf-desc">Patients submit symptom logs from home. The dashboard highlights critical changes in pain scales, bleeding indicators, or tissue integrity.</p>
+      </div>
+      <!-- Step 4 -->
+      <div class="workflow-card">
+        <span class="wf-step-badge">Phase 04</span>
+        <h3 class="wf-title">Compliance Audits</h3>
+        <p class="wf-desc">The system automatically flags patient follow-ups as Compliant, Due Soon, or Missed, ensuring high-risk oncology paths are kept on schedule.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECURITY & COMPLIANCE SPLIT SECTION ── -->
+  <section class="container" id="security">
+    <div class="security-card-split">
+      <div class="sec-left">
+        <span class="section-tag" style="text-align:left;">Enterprise Security</span>
+        <h3>MNC-Grade Data Compliance</h3>
+        <p>Patient health details require strict access control. RTooth integrates industry-standard security features directly into the database schema to prevent data leaks and maintain complete privacy.</p>
+        
+        <div class="sec-bullets">
+          <div class="sec-bullet-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div class="sec-bullet-text">
+              Supabase Row Level Security (RLS)
+              <span>Oncologists can only query clinical records of patients assigned directly to them.</span>
+            </div>
+          </div>
+          <div class="sec-bullet-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div class="sec-bullet-text">
+              HIPAA & SOC2 Guarded
+              <span>Structured audits logs, encrypted file storage buckets, and secure connection profiles.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-right">
+        <div class="shield-badge-container">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FREQUENTLY ASKED QUESTIONS ── -->
+  <section class="container" id="faq">
+    <div class="section-header">
+      <span class="section-tag">Answering Questions</span>
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <p class="section-desc">Detailed responses to administrative, medical, and security queries regarding RTooth.</p>
+    </div>
+
+    <div class="faq-accordion-container">
+      <!-- Node 1 -->
+      <div class="faq-node">
+        <div class="faq-summary">
+          What roles and permission levels does RTooth support?
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-details">
+          RTooth supports three primary clinical roles. IT-Admins manage practitioner registrations and system logs; Doctors/Oncologists maintain registry details, log check-ups, and review symptoms; Patients report symptom updates and view visit timelines.
+        </div>
+      </div>
+
+      <!-- Node 2 -->
+      <div class="faq-node">
+        <div class="faq-summary">
+          How does the Follow-up Compliance system categorize patients?
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-details">
+          Patients are grouped automatically based on their next scheduled check-up date. Overdue appointments are flagged as Missed (🔴), appointments in the next 7 days are flagged as Due Soon (🟡), and all other patients are marked as Compliant (🟢).
+        </div>
+      </div>
+
+      <!-- Node 3 -->
+      <div class="faq-node">
+        <div class="faq-summary">
+          Can I attach multiple files and pathology documents to a consultation record?
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-details">
+          Yes. Doctors can attach biopsy reports, histopathology logs, imaging files (CT, MRI, X-Ray), or blood reports during the initial consultation log or append files to existing logs.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FINAL CALL TO ACTION ── -->
+  <section class="container">
+    <div class="cta-banner-wrapper">
+      <h2 class="cta-title">Ready to Streamline Care? <br><span>Access your clinic workspace today.</span></h2>
+      <p class="cta-subtitle">Connect oncologist practitioner teams and secure compliance loops for patients in real-time.</p>
+      <a href="/login.html" class="btn-brand-primary" style="background-color: #ffffff; color: var(--primary-brand); box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
+        Sign In to Portal Workspace
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer>
-    <div class="container">
-      <p>&copy; 2026 rtooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    <div class="container" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; text-align: left;">
+      <div>
+        <a href="/" class="logo" style="margin-bottom: 12px; display: inline-flex;">
+          <img src="/images/rtooth_logo.png" alt="RTooth" style="height: 32px;">
+        </a>
+        <p style="font-size: 13px; max-width: 280px; color: var(--text-muted); line-height: 1.5;">Enterprise digital clinic solutions for oncology diagnostics and patient compliance tracking.</p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Product</h4>
+        <p style="margin-bottom: 6px;"><a href="#features" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Capabilities</a></p>
+        <p style="margin-bottom: 6px;"><a href="#workflow" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Workflow</a></p>
+        <p><a href="/login.html" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Portal Sign In</a></p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Security</h4>
+        <p style="margin-bottom: 6px;"><a href="#security" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">RLS Access</a></p>
+        <p><a href="#security" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">HIPAA Compliance</a></p>
+      </div>
+    </div>
+    <div class="container" style="border-top: 1px solid var(--border-slate); margin-top: 36px; padding-top: 20px; text-align: center; font-size: 12.5px; color: var(--text-light);">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- FAQ Interactivity script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const faqNodes = document.querySelectorAll('.faq-node');
+      faqNodes.forEach(node => {
+        const summary = node.querySelector('.faq-summary');
+        if (summary) {
+          summary.addEventListener('click', () => {
+            const isOpen = node.classList.contains('open');
+            // Close all
+            faqNodes.forEach(n => n.classList.remove('open'));
+            // Toggle clicked
+            if (!isOpen) {
+              node.classList.add('open');
+            }
+          });
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>

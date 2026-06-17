@@ -1,4 +1,5 @@
 @import url("/css/style.css");
+@import url("/css/doctor_patient_profile.css");
 
 /* Patient Dashboard Overview Specific Styles */
 .stats-grid {

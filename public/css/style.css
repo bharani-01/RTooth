@@ -113,6 +113,18 @@ header {
   color: var(--text-dark);
 }
 
+.logo-img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  transition: var(--transition-smooth);
+}
+
+.logo:hover .logo-img {
+  transform: scale(1.02);
+}
+
 .logo-text {
   background: linear-gradient(120deg, var(--primary) 0%, var(--accent-teal) 35%, #38bdf8 70%, var(--primary) 100%);
   background-size: 200% auto;
@@ -1022,4 +1034,50 @@ footer {
     letter-spacing: 0.05em;
     margin-right: 16px;
   }
+}
+
+/* ─────────────────────────────────────────
+   DOCTOR PORTAL MNC RED BRAND THEME
+───────────────────────────────────────── */
+body.dashboard-body {
+  --primary: #9e1a22; /* Premium MNC Red */
+  --primary-hover: #80141a;
+  --primary-light: #fff5f5; /* Light rose background for hover / active elements */
+  --accent-teal: #be123c;
+  --accent-teal-light: #ffe4e6;
+  --border-focus: #be123c;
+}
+
+body.dashboard-body header {
+  background-color: #ffffff;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px rgba(158, 26, 34, 0.04);
+  overflow: hidden;
+}
+
+body.dashboard-body header.loading::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -30%;
+  height: 3px;
+  width: 30%;
+  background: linear-gradient(to right, rgba(158, 26, 34, 0) 0%, #9e1a22 50%, rgba(158, 26, 34, 0) 100%);
+  animation: header-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes header-pulse {
+  0% { left: -30%; }
+  100% { left: 100%; }
+}
+
+body.dashboard-body .user-avatar {
+  background-color: #ffe4e6;
+  color: #9e1a22;
+}
+
+body.dashboard-body .logo-icon-container {
+  background-color: #ffe4e6;
+  color: #9e1a22;
+  box-shadow: 0 4px 10px rgba(158, 26, 34, 0.1);
 }

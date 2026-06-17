@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dentist Dashboard - RTooth Portal</title>
+  <title>Doctor Dashboard — RTooth Portal</title>
+  <meta name="description" content="RTooth Doctor Dashboard — Manage your oral oncology patients, follow-ups, and symptom monitoring.">
   <link rel="stylesheet" href="/css/doctor_index.css">
 </head>
 <body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
@@ -12,18 +13,11 @@
   <header>
     <div class="nav-bar">
       <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
       </button>
       <div class="header-brand-area">
         <a href="/doctor/index.html" class="logo" id="header-logo">
-          <div class="logo-icon-container">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C8.5 2 6 4.5 6 8c0 2 1 3.5 1.5 5C8.3 15.6 7 20 9.5 22c1.7.5 2.5-1.5 2.5-3 0 1.5.8 3.5 2.5 3 2.5-2 1.2-6.4 2-9 0.5-1.5 1.5-3 1.5-5 0-3.5-2.5-6-6-6Z"/>
-            </svg>
-          </div>
-          <span class="logo-text">RTooth</span>
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
         </a>
       </div>
       <nav class="nav-links">
@@ -31,7 +25,7 @@
           <div class="user-badge">
             <div class="user-avatar" id="doc-avatar">DR</div>
             <div class="user-info">
-              <div class="user-name" id="doc-name-badge">Doctor Loading...</div>
+              <div class="user-name" id="doc-name-badge">Loading...</div>
               <div class="user-role-label">Oncology Practitioner</div>
             </div>
           </div>
@@ -42,99 +36,201 @@
 
   <!-- Dashboard Layout -->
   <main class="dashboard-layout">
-    
-    <!-- Dynamic Sidebar Container -->
+
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar-container">
-      <div style="color: var(--text-muted); font-size: 13px;">Loading navigation menu...</div>
+      <div style="color: var(--text-muted); font-size: 13px;">Loading...</div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <section class="dashboard-content">
-      <div class="dashboard-header">
-        <div>
-          <h2 id="doc-welcome-title">Welcome Back, Dr.</h2>
-          <p style="color: var(--text-muted); font-size: 14px;">Here is your oral oncology summary for today.</p>
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 id="doc-welcome-title">Dashboard</h1>
+          <p class="page-subtitle">Your oral oncology summary for today.</p>
+        </div>
+        <div class="page-header-right">
+          <span class="date-chip" id="today-date"></span>
         </div>
       </div>
 
-      <!-- Stats Grid -->
+      <!-- Stats Row -->
       <div class="stats-grid">
-        <div class="stat-card">
+        <div class="stat-card" id="stat-card-cases">
           <div class="stat-label">Active Oncology Cases</div>
-          <div class="stat-value" id="stat-cases-count">Loading...</div>
-          <div class="stat-desc">Total registered cases</div>
+          <div class="stat-value" id="stat-cases-count"><span class="skeleton-line tall" style="width: 60%; display: block;"></span></div>
+          <div class="stat-desc" id="stat-cases-desc"><span class="skeleton-line short" style="width: 80%; display: block;"></span></div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" id="stat-card-biopsies">
           <div class="stat-label">Pending Biopsies</div>
-          <div class="stat-value" id="stat-pending-biopsies">Loading...</div>
+          <div class="stat-value" id="stat-pending-biopsies"><span class="skeleton-line tall" style="width: 60%; display: block;"></span></div>
           <div class="stat-desc">Awaiting pathology reports</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" id="stat-card-risk">
           <div class="stat-label">High-Risk Patients</div>
-          <div class="stat-value" id="stat-high-risk">Loading...</div>
+          <div class="stat-value" id="stat-high-risk"><span class="skeleton-line tall" style="width: 60%; display: block;"></span></div>
           <div class="stat-desc">Stage III / IV / Dysplasia</div>
         </div>
       </div>
 
-      <!-- Appointments Table -->
-      <div class="table-card">
-        <div class="table-title-area">
-          <h3>Today's Oncology Screening Queue</h3>
+      <!-- Screening Queue -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="panel-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </span>
+            <h2 class="panel-title">Today's Screening Queue</h2>
+          </div>
         </div>
-        <table class="clinic-table">
-          <thead>
-            <tr>
-              <th>Patient</th>
-              <th>Time</th>
-              <th>Lesion Site</th>
-              <th>Staging</th>
-              <th>Pathology Status</th>
-            </tr>
-          </thead>
-          <tbody id="screening-queue-body">
-            <tr>
-              <td data-label="Patient"><strong>Rahul Sharma</strong></td>
-              <td data-label="Time">10:00 AM</td>
-              <td data-label="Lesion Site">Lateral Tongue</td>
-              <td data-label="Staging"><span style="font-weight: 600; color: var(--danger);">Stage II</span></td>
-              <td data-label="Pathology Status"><span class="status-pill status-confirmed">Confirmed</span></td>
-            </tr>
-            <tr>
-              <td data-label="Patient"><strong>Priya Patel</strong></td>
-              <td data-label="Time">11:30 AM</td>
-              <td data-label="Lesion Site">Floor of Mouth</td>
-              <td data-label="Staging"><span style="font-weight: 600; color: var(--accent-teal);">Stage I</span></td>
-              <td data-label="Pathology Status"><span class="status-pill status-confirmed">Confirmed</span></td>
-            </tr>
-            <tr>
-              <td data-label="Patient"><strong>Amit Verma</strong></td>
-              <td data-label="Time">02:00 PM</td>
-              <td data-label="Lesion Site">Buccal Mucosa</td>
-              <td data-label="Staging"><span style="font-weight: 600; color: var(--warning);">High-Risk Dysplasia</span></td>
-              <td data-label="Pathology Status"><span class="status-pill status-pending">Pending Biopsy</span></td>
-            </tr>
-            <tr>
-              <td data-label="Patient"><strong>Sneha Gupta</strong></td>
-              <td data-label="Time">03:30 PM</td>
-              <td data-label="Lesion Site">Hard Palate</td>
-              <td data-label="Staging"><span style="font-weight: 600; color: var(--text-muted);">Suspicious Lesion</span></td>
-              <td data-label="Pathology Status"><span class="status-pill status-confirmed">Confirmed</span></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Time</th>
+                <th>Lesion Site</th>
+                <th>Staging</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="screening-queue-body">
+              <!-- Skeleton rows -->
+              <tr class="skeleton-row"><td colspan="5"><div class="table-skeleton"></div></td></tr>
+              <tr class="skeleton-row"><td colspan="5"><div class="table-skeleton"></div></td></tr>
+              <tr class="skeleton-row"><td colspan="5"><div class="table-skeleton" style="width: 70%;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      <!-- Two-column lower section -->
+      <div class="dual-panel-grid">
+
+        <!-- Follow-up Compliance -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="panel-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                </svg>
+              </span>
+              <h2 class="panel-title">Follow-up Compliance</h2>
+            </div>
+            <span class="panel-badge badge-blue">SCHEDULING</span>
+          </div>
+
+          <!-- Compliance Tabs -->
+          <div class="compliance-tabs">
+            <button class="compliance-tab-btn active" id="btn-tab-overdue" data-status="overdue">
+              <span class="tab-dot dot-red"></span>
+              Missed
+              <span class="compliance-badge" id="badge-overdue">—</span>
+            </button>
+            <button class="compliance-tab-btn" id="btn-tab-due_soon" data-status="due_soon">
+              <span class="tab-dot dot-amber"></span>
+              Due Soon
+              <span class="compliance-badge" id="badge-due-soon">—</span>
+            </button>
+            <button class="compliance-tab-btn" id="btn-tab-compliant" data-status="compliant">
+              <span class="tab-dot dot-green"></span>
+              Compliant
+              <span class="compliance-badge" id="badge-compliant">—</span>
+            </button>
+          </div>
+
+          <!-- Compliance Panels -->
+          <div class="compliance-content">
+            <div class="compliance-panel" id="panel-overdue">
+              <table class="data-table compact-table">
+                <thead><tr><th>Patient</th><th>Missed Date</th><th>Interval</th></tr></thead>
+                <tbody id="compliance-overdue-body">
+                  <tr class="skeleton-row"><td colspan="3"><div class="table-skeleton"></div></td></tr>
+                  <tr class="skeleton-row"><td colspan="3"><div class="table-skeleton" style="width: 60%;"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="compliance-panel" id="panel-due-soon" style="display:none;">
+              <table class="data-table compact-table">
+                <thead><tr><th>Patient</th><th>Upcoming</th><th>Interval</th></tr></thead>
+                <tbody id="compliance-due-soon-body">
+                  <tr class="skeleton-row"><td colspan="3"><div class="table-skeleton"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="compliance-panel" id="panel-compliant" style="display:none;">
+              <table class="data-table compact-table">
+                <thead><tr><th>Patient</th><th>Next Visit</th><th>Interval</th></tr></thead>
+                <tbody id="compliance-compliant-body">
+                  <tr class="skeleton-row"><td colspan="3"><div class="table-skeleton"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Symptom Feed -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="panel-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+              </span>
+              <h2 class="panel-title">Symptom Monitor</h2>
+            </div>
+            <span class="panel-badge badge-red">
+              <span class="live-dot"></span>
+              LIVE
+            </span>
+          </div>
+          <div class="feed-scroll">
+            <div class="checkups-timeline" id="live-symptom-feed">
+              <!-- Skeleton feed items -->
+              <div class="feed-skeleton-item">
+                <div class="skeleton-line short" style="margin-bottom: 8px;"></div>
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line medium" style="width: 50%;"></div>
+              </div>
+              <div class="feed-skeleton-item">
+                <div class="skeleton-line short" style="margin-bottom: 8px;"></div>
+                <div class="skeleton-line medium"></div>
+                <div class="skeleton-line medium" style="width: 65%;"></div>
+              </div>
+              <div class="feed-skeleton-item">
+                <div class="skeleton-line short" style="margin-bottom: 8px;"></div>
+                <div class="skeleton-line medium" style="width: 80%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end dual-panel-grid -->
+
     </section>
   </main>
 
   <!-- Footer -->
   <footer>
     <div class="container">
-      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+      <p>&copy; 2026 RTooth Clinic Management Software. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script type="module" src="/js/auth.js"></script>
   <script type="module" src="/js/doctor.js"></script>
+  <script>
+    // Set today's date chip
+    const chip = document.getElementById('today-date');
+    if (chip) {
+      chip.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+  </script>
 </body>
 </html>

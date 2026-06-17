@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultation Visit Details - RTooth Portal</title>
+  <link rel="stylesheet" href="/css/doctor_patient_profile.css">
+</head>
+<body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/doctor/index.html" class="logo" id="header-logo">
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/doctor/profile.html" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="doc-avatar">DR</div>
+            <div class="user-info">
+              <div class="user-name" id="doc-name-badge">Doctor Loading...</div>
+              <div class="user-role-label">Oncology Practitioner</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <main class="dashboard-layout">
+    
+    <!-- Dynamic Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container">
+      <div style="color: var(--text-muted); font-size: 13px;">Loading navigation menu...</div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="dashboard-content">
+      <div class="dashboard-header" style="border-bottom: none; margin-bottom: 16px; padding-bottom: 0;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <a href="#" class="btn btn-secondary" id="btn-back-to-patient" style="padding: 6px 12px; font-size: 12px;">
+            &larr; Back to Patient Profile
+          </a>
+          <div>
+            <h2 id="visit-details-title" style="display: inline-block;">Consultation Visit Details</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Demographics Card -->
+      <div class="profile-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 15px; color: var(--primary); margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          Patient Staging & Demographics
+        </h3>
+        <div class="profile-grid">
+          <div>
+            <p style="margin-bottom: 4px;"><strong>Full Name:</strong> <span id="pat-full-name">Loading...</span></p>
+            <p style="margin-bottom: 4px;"><strong>Biological Gender:</strong> <span id="pat-gender">Loading...</span></p>
+            <p><strong>Date of Birth:</strong> <span id="pat-dob">Loading...</span></p>
+          </div>
+          <div>
+            <p style="margin-bottom: 4px;"><strong>Lesion Site Location:</strong> <span id="pat-lesion-location" style="font-weight: 600;">Loading...</span></p>
+            <p><strong>Oncology Staging:</strong> <span id="pat-cancer-stage" style="color: var(--danger); font-weight: 600;">Loading...</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visit Clinical Record Details -->
+      <div class="profile-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          Clinical Observations
+        </h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px;">
+          <div><strong>Consultation Date:</strong> <span id="visit-date-time" style="color: var(--text-dark); font-weight: 500;">Loading...</span></div>
+          <div><strong>Logged By:</strong> <span id="visit-doctor-name" style="color: var(--text-dark); font-weight: 500;">Loading...</span></div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 12px;">
+          <div>
+            <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 4px;">Clinical Findings:</div>
+            <div id="visit-findings" style="background-color: var(--bg-subtle); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 14px; line-height: 1.6;">Loading...</div>
+          </div>
+          <div>
+            <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 4px;">General Clinic Notes:</div>
+            <div id="visit-notes" style="background-color: var(--bg-subtle); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 14px; line-height: 1.6; font-style: italic;">No notes logged.</div>
+          </div>
+          <div>
+            <div style="font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">Recommendations:</div>
+            <div>
+              <span id="visit-recs" class="checkup-recs">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prescribed Medications Card -->
+      <div class="profile-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          Prescribed Medications
+        </h3>
+        <div class="table-card" style="box-shadow: none; border: 1px solid var(--border-color); margin-bottom: 0;">
+          <table class="clinic-table" id="medications-table">
+            <thead>
+              <tr>
+                <th>Medication Name</th>
+                <th>Dosage</th>
+                <th>Frequency</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+              </tr>
+            </thead>
+            <tbody id="medications-table-body">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 16px;">
+                  No medications prescribed during this visit.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Associated Reports Card -->
+      <div class="profile-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          Associated Reports & Documents
+        </h3>
+        <div id="visit-reports-list" class="visit-reports-list" style="margin-top: 0;">
+          <div style="color: var(--text-muted); font-size: 13.5px; padding: 12px; border: 1px dashed var(--border-color); text-align: center; border-radius: var(--radius-sm); width: 100%;" id="no-reports-text">
+            No report files attached to this visit.
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Additional Reports Card -->
+      <div class="profile-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          Upload Additional Consultation Reports (PDF / Image)
+        </h3>
+        <form id="upload-additional-reports-form">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div id="reports-upload-rows-container" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Dynamic rows will go here -->
+              <div class="dynamic-report-row" style="grid-template-columns: 2.5fr 2fr auto;">
+                <input type="file" class="form-input report-file" accept=".pdf,image/*" required style="padding: 6px 10px;">
+                <select class="form-input report-type" required style="padding: 8px 10px;">
+                  <option value="Biopsy">Biopsy Report</option>
+                  <option value="Histopathology">Histopathology Report</option>
+                  <option value="Imaging">Imaging Report (X-Ray, MRI, CT)</option>
+                  <option value="Blood Report">Blood Report</option>
+                  <option value="Other">Other / Clinical Document</option>
+                </select>
+                <div style="width: 28px;"></div> <!-- Placeholder to align layout since first row cannot be deleted -->
+              </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 16px;">
+              <button type="button" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" id="btn-add-more-upload-rows">
+                + Add Another File
+              </button>
+              <button type="submit" class="btn btn-primary" id="btn-submit-upload-reports">
+                Upload & Attach Documents
+              </button>
+            </div>
+          </div>
+          <div class="alert alert-error" id="upload-error-alert" style="display: none; margin-top: 16px;"></div>
+          <div class="alert alert-success" id="upload-success-alert" style="display: none; margin-top: 16px;"></div>
+        </form>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/visit_detail_doctor.js"></script>
+</body>
+</html>

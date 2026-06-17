@@ -1,6 +1,159 @@
 @import url("/css/style.css");
 
-/* Doctor Profile Page Specific Styles */
-.table-card {
-  animation: fadeIn 0.35s ease-out;
+/* ══════════════════════════════════════════
+   PRACTITIONER PROFILE — doctor_profile.css
+   Modern, elegant layout with HSL colors
+   and responsive grids.
+   ══════════════════════════════════════════ */
+
+.practitioner-profile-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  margin-top: 24px;
+  animation: fadeUp 0.35s ease-out both;
+}
+
+.practitioner-hero-card {
+  background: #ffffff;
+  border: 1px solid #e8ecf1;
+  border-radius: 14px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(15,23,42,.04);
+  height: fit-content;
+}
+
+.practitioner-avatar-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #fff5f5;
+  color: #9e1a22;
+  font-size: 32px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 14px rgba(158, 26, 34, 0.12), 0 0 0 2px #ffe4e6;
+  letter-spacing: -0.01em;
+}
+
+.practitioner-hero-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.practitioner-hero-badge {
+  display: inline-block;
+  background: #fff5f5;
+  color: #9e1a22;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border: 1px solid #ffe4e6;
+  margin-bottom: 20px;
+}
+
+.practitioner-hero-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #5a6478;
+  font-weight: 500;
+  border-top: 1px solid #f1f4f8;
+  width: 100%;
+  padding-top: 16px;
+  justify-content: center;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: #16a34a;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 2px #dcfce7, 0 0 6px #16a34a;
+  animation: pulseIndicator 2s infinite;
+}
+
+@keyframes pulseIndicator {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.5); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
+
+/* Right Details Grid */
+.practitioner-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  height: fit-content;
+}
+
+.credential-item-card {
+  background: #ffffff;
+  border: 1px solid #e8ecf1;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 1px 3px rgba(15,23,42,.03);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.credential-item-card:hover {
+  transform: translateY(-2px);
+  border-color: #9e1a22;
+  box-shadow: 0 4px 18px rgba(158, 26, 34, 0.05);
+}
+
+.cred-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cred-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #8a94a6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.cred-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  word-break: break-all;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .practitioner-profile-container {
+    grid-template-columns: 1fr;
+  }
 }

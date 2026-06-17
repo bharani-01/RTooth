@@ -140,6 +140,31 @@ const patientsToSeed = [
     cancerStage: "High-Risk Dysplasia",
     lesionLocation: "Buccal Mucosa",
     riskFactors: "Heavy smoking & alcohol intake"
+  },
+  {
+    doctorEmail: "emily@rtooth.in",
+    email: "vikram@rtooth.in",
+    password: "PatientPassword123",
+    firstName: "Vikram",
+    lastName: "Singh",
+    phone: "+91 99112 23344",
+    dateOfBirth: "1960-03-24",
+    gender: "Male",
+    address: "42 Galaxy Towers, Delhi",
+    status: "active",
+    // Habits
+    tobaccoHabit: "smoking",
+    tobaccoFrequency: "2 cigarettes/day",
+    tobaccoDuration: "10 years",
+    alcoholHabit: "none",
+    alcoholFrequency: "",
+    alcoholDuration: "",
+    betelNut: "no",
+    familyHistory: "no",
+    // Medical Record
+    cancerStage: "Stage III",
+    lesionLocation: "Buccal Mucosa",
+    riskFactors: "Smoking"
   }
 ];
 
@@ -322,7 +347,10 @@ async function seedData() {
             checkup_date: new Date("2026-06-12T11:30:00Z").toISOString(),
             findings: "Post-biopsy follow-up. Lesion size stable. Mild discomfort reporting.",
             notes: "Sutures healing well.",
-            recommendations: "Follow-up scan in 3 months."
+            recommendations: "Follow-up scan in 3 months.",
+            next_checkup_date: new Date("2026-06-15T11:30:00Z").toISOString(),
+            followup_interval: "3 days",
+            followup_notes: "Urgent post-biopsy review for lesion evaluation."
           }
         ]);
       } else if (pat.email === "priya@rtooth.in") {
@@ -346,7 +374,25 @@ async function seedData() {
             checkup_date: new Date("2026-06-10T11:30:00Z").toISOString(),
             findings: "Small red area on floor of mouth. Looks like early stage erythroplakia.",
             notes: "Patient is non-smoker, occasional alcohol drinker.",
-            recommendations: "Regular follow-up in 2 weeks to check regression."
+            recommendations: "Regular follow-up in 2 weeks to check regression.",
+            next_checkup_date: new Date("2026-06-20T11:30:00Z").toISOString(),
+            followup_interval: "2 weeks",
+            followup_notes: "Lesion site status verification."
+          }
+        ]);
+      } else if (pat.email === "vikram@rtooth.in") {
+        console.log(`  Seeding checkups for Vikram...`);
+        await supabaseAdmin.from('checkups').insert([
+          {
+            patient_id: userId,
+            doctor_id: doctorId,
+            checkup_date: new Date("2026-06-15T09:30:00Z").toISOString(),
+            findings: "Stage III lesion, stable progress post radiation therapy.",
+            notes: "No new lesion boundaries detected.",
+            recommendations: "Routine follow-up in 1 month.",
+            next_checkup_date: new Date("2026-07-15T09:30:00Z").toISOString(),
+            followup_interval: "1 month",
+            followup_notes: "Routine post-radiation checkup."
           }
         ]);
       }

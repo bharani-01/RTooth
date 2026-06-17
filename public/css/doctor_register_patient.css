@@ -20,3 +20,113 @@
     grid-column: span 1;
   }
 }
+
+/* Tab Buttons Container */
+.tabs-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition-smooth);
+  position: relative;
+  outline: none;
+}
+
+.tab-btn:hover {
+  color: var(--primary);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tab-icon {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+/* Badge for count */
+.drafts-badge {
+  background-color: var(--warning);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  transition: var(--transition-smooth);
+}
+
+.drafts-badge.empty {
+  background-color: var(--text-light);
+  opacity: 0.7;
+}
+
+/* Tab contents animation */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.35s ease-out;
+}
+
+/* Action button inside tables */
+.btn-action-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  border: none;
+}
+
+.btn-action-sm.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-action-sm.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-action-sm.btn-secondary {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-dark);
+}
+
+.btn-action-sm.btn-secondary:hover {
+  background-color: #e2e8f0;
+}
+

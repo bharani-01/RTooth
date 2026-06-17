@@ -3,27 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patient List - RTooth Portal</title>
-  <link rel="stylesheet" href="/css/doctor_patients.css">
+  <title>Patient Registry — RTooth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/patients_registry.css">
 </head>
 <body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
 
-  <!-- Header -->
   <header>
     <div class="nav-bar">
       <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
       </button>
       <div class="header-brand-area">
         <a href="/doctor/index.html" class="logo" id="header-logo">
-          <div class="logo-icon-container">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C8.5 2 6 4.5 6 8c0 2 1 3.5 1.5 5C8.3 15.6 7 20 9.5 22c1.7.5 2.5-1.5 2.5-3 0 1.5.8 3.5 2.5 3 2.5-2 1.2-6.4 2-9 0.5-1.5 1.5-3 1.5-5 0-3.5-2.5-6-6-6Z"/>
-            </svg>
-          </div>
-          <span class="logo-text">RTooth</span>
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
         </a>
       </div>
       <nav class="nav-links">
@@ -31,7 +26,7 @@
           <div class="user-badge">
             <div class="user-avatar" id="doc-avatar">DR</div>
             <div class="user-info">
-              <div class="user-name" id="doc-name-badge">Doctor Loading...</div>
+              <div class="user-name" id="doc-name-badge">Loading...</div>
               <div class="user-role-label">Oncology Practitioner</div>
             </div>
           </div>
@@ -40,56 +35,267 @@
     </div>
   </header>
 
-  <!-- Dashboard Layout -->
   <main class="dashboard-layout">
-    
-    <!-- Dynamic Sidebar Container -->
     <aside class="sidebar" id="sidebar-container">
-      <div style="color: var(--text-muted); font-size: 13px;">Loading navigation menu...</div>
+      <div style="color:#94a3b8; font-size:13px;">Loading...</div>
     </aside>
 
-    <!-- Main Content Area -->
     <section class="dashboard-content">
-      <div class="dashboard-header">
+
+      <!-- Top bar -->
+      <div class="reg-topbar">
         <div>
-          <h2>Clinical Oncology Patient Database</h2>
-          <p style="color: var(--text-muted); font-size: 14px;">View and track registered patient files and dysplasia parameters.</p>
+          <h1 class="reg-title">Patient Registry</h1>
+          <p class="reg-sub">All registered oral oncology patients</p>
+        </div>
+        <a href="/doctor/register_patient.html" class="reg-new-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Patient
+        </a>
+      </div>
+
+      <!-- Stat chips -->
+      <div class="stat-strip">
+        <div class="stat-chip">
+          <div class="stat-chip-icon" style="background:#f0f9ff; color:#0369a1;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="stat-chip-val" id="stat-total">—</div>
+            <div class="stat-chip-lbl">Total Patients</div>
+          </div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip-icon" style="background:#fef2f2; color:#dc2626;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <div class="stat-chip-val" id="stat-high-risk" style="color:#dc2626;">—</div>
+            <div class="stat-chip-lbl">High Risk</div>
+          </div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip-icon" style="background:#f0fdf4; color:#16a34a;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div class="stat-chip-val" id="stat-active" style="color:#16a34a;">—</div>
+            <div class="stat-chip-lbl">Active Cases</div>
+          </div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip-icon" style="background:#fffbeb; color:#d97706;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div>
+            <div class="stat-chip-val" id="stat-draft" style="color:#d97706;">—</div>
+            <div class="stat-chip-lbl">Draft Records</div>
+          </div>
         </div>
       </div>
-      <div class="table-card">
-        <div class="table-title-area">
-          <h3>Active Patient Cases</h3>
+
+      <!-- Toolbar -->
+      <div class="reg-toolbar">
+        <div class="reg-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="patient-search" type="text" placeholder="Search name, ID, or phone…" autocomplete="off">
+          <button id="search-clear" class="search-clear-btn" style="display:none;" title="Clear">✕</button>
         </div>
-        <table class="clinic-table">
+        <div class="reg-filters">
+          <select id="filter-stage" class="reg-select">
+            <option value="">All Stages</option>
+            <option value="stage i">Stage I</option>
+            <option value="stage ii">Stage II</option>
+            <option value="stage iii">Stage III</option>
+            <option value="stage iv">Stage IV</option>
+            <option value="dysplasia">Dysplasia</option>
+            <option value="suspicious">Suspicious Lesion</option>
+          </select>
+          <select id="filter-status" class="reg-select">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+        <span class="reg-count" id="result-count"></span>
+      </div>
+
+      <!-- Table -->
+      <div class="reg-table-card">
+        <table class="reg-table" id="patients-table">
           <thead>
             <tr>
-              <th>Patient Name</th>
-              <th>Gender/Age</th>
-              <th>Dysplasia Stage</th>
-              <th>Anatomical Location</th>
-              <th>Primary Risks</th>
+              <th>Patient</th>
+              <th>Age / Gender</th>
+              <th>Stage</th>
+              <th>Lesion Site</th>
               <th>Contact</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody id="patients-table-body">
-            <tr>
-              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading patient registry...</td>
-            </tr>
+            <tr class="skel-row"><td><div class="skel" style="width:55%"></div></td><td><div class="skel" style="width:70%"></div></td><td><div class="skel" style="width:60%"></div></td><td><div class="skel" style="width:65%"></div></td><td><div class="skel" style="width:60%"></div></td><td><div class="skel" style="width:50%"></div></td></tr>
+            <tr class="skel-row"><td><div class="skel" style="width:72%"></div></td><td><div class="skel" style="width:55%"></div></td><td><div class="skel" style="width:50%"></div></td><td><div class="skel" style="width:70%"></div></td><td><div class="skel" style="width:65%"></div></td><td><div class="skel" style="width:45%"></div></td></tr>
+            <tr class="skel-row"><td><div class="skel" style="width:60%"></div></td><td><div class="skel" style="width:65%"></div></td><td><div class="skel" style="width:55%"></div></td><td><div class="skel" style="width:60%"></div></td><td><div class="skel" style="width:60%"></div></td><td><div class="skel" style="width:50%"></div></td></tr>
+            <tr class="skel-row"><td><div class="skel" style="width:80%"></div></td><td><div class="skel" style="width:50%"></div></td><td><div class="skel" style="width:65%"></div></td><td><div class="skel" style="width:55%"></div></td><td><div class="skel" style="width:60%"></div></td><td><div class="skel" style="width:45%"></div></td></tr>
           </tbody>
         </table>
+
+        <!-- Empty state -->
+        <div id="empty-state" class="reg-empty" style="display:none;">
+          <div class="reg-empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+          <p>No patients match your filters</p>
+          <button onclick="clearFilters()" class="reg-clear-btn">Clear filters</button>
+        </div>
       </div>
+
     </section>
   </main>
 
-  <!-- Footer -->
   <footer>
     <div class="container">
-      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+      <p>&copy; 2026 RTooth Clinic Management Software. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script type="module" src="/js/auth.js"></script>
   <script type="module" src="/js/doctor.js"></script>
+
+  <script>
+    let allPatients = [];
+
+    window.__patientsLoaded = function(patients) {
+      allPatients = patients;
+      updateStats(patients);
+      renderTable();
+    };
+
+    function updateStats(list) {
+      const total  = list.length;
+      const high   = list.filter(p => { const s=(p.cancer_stage||'').toLowerCase(); return s.includes('stage iii')||s.includes('stage iv'); }).length;
+      const active = list.filter(p => p.status !== 'draft').length;
+      const draft  = list.filter(p => p.status === 'draft').length;
+      set('stat-total', total);
+      set('stat-high-risk', high);
+      set('stat-active', active);
+      set('stat-draft', draft);
+    }
+
+    function set(id, val) { const e = document.getElementById(id); if(e) e.textContent = val; }
+
+    function renderTable() {
+      const q      = (document.getElementById('patient-search')?.value || '').toLowerCase().trim();
+      const stage  = (document.getElementById('filter-stage')?.value || '').toLowerCase();
+      const status = (document.getElementById('filter-status')?.value || '').toLowerCase();
+
+      const filtered = allPatients.filter(p => {
+        const name    = `${p.first_name} ${p.last_name}`.toLowerCase();
+        const code    = (p.patient_code || '').toLowerCase();
+        const contact = (p.phone || p.email || '').toLowerCase();
+        const matchQ  = !q || name.includes(q) || code.includes(q) || contact.includes(q);
+        const matchSt = !stage  || (p.cancer_stage||'').toLowerCase().includes(stage);
+        const matchSt2= !status || (status==='draft' ? p.status==='draft' : p.status!=='draft');
+        return matchQ && matchSt && matchSt2;
+      });
+
+      const countEl = document.getElementById('result-count');
+      if (countEl) countEl.textContent = filtered.length === allPatients.length
+        ? `${filtered.length} patients`
+        : `${filtered.length} of ${allPatients.length}`;
+
+      const tbody = document.getElementById('patients-table-body');
+      const empty = document.getElementById('empty-state');
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        if (empty) empty.style.display = 'flex';
+        return;
+      }
+      if (empty) empty.style.display = 'none';
+
+      tbody.innerHTML = filtered.map(p => {
+        const age = calcAge(p.date_of_birth);
+        const ageStr = age !== 'N/A' ? `${age} yrs` : '—';
+        const genderStr = p.gender || '—';
+        const stageMeta = getStageMeta(p.cancer_stage);
+        const isActive  = p.status !== 'draft';
+        const initials  = ((p.first_name||'')[0]||'').toUpperCase() + ((p.last_name||'')[0]||'').toUpperCase();
+
+        return `<tr class="reg-row" onclick="window.location='/doctor/patient_profile?id=${p.patient_code}'">
+          <td data-label="Patient">
+            <div class="pat-cell">
+              <div class="pat-avatar" style="background:${stageMeta.bg}; color:${stageMeta.color};">${initials}</div>
+              <div>
+                <div class="pat-name">${p.first_name} ${p.last_name}</div>
+                <div class="pat-code">${p.patient_code || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td data-label="Age / Gender" class="td-secondary">${genderStr} · ${ageStr}</td>
+          <td data-label="Stage">
+            <span class="stage-badge" style="color:${stageMeta.color}; background:${stageMeta.bg}; border-color:${stageMeta.border};">
+              ${p.cancer_stage || 'Unknown'}
+            </span>
+          </td>
+          <td data-label="Lesion Site" class="td-secondary">${p.lesion_location || '—'}</td>
+          <td data-label="Contact" class="td-secondary td-nowrap">${p.phone || p.email || '—'}</td>
+          <td data-label="Status">
+            <span class="status-pill-reg ${isActive ? 'pill-active' : 'pill-draft'}">
+              ${isActive ? 'Active' : 'Draft'}
+            </span>
+          </td>
+        </tr>`;
+
+      }).join('');
+    }
+
+    function getStageMeta(stage) {
+      const s = (stage||'').toLowerCase();
+      if (s.includes('stage iv')||s.includes('stage iii')) return { color:'#dc2626', bg:'#fef2f2', border:'#fecaca' };
+      if (s.includes('stage ii'))  return { color:'#ea580c', bg:'#fff7ed', border:'#fed7aa' };
+      if (s.includes('stage i'))   return { color:'#0d9488', bg:'#f0fdfa', border:'#99f6e4' };
+      if (s.includes('dysplasia')) return { color:'#d97706', bg:'#fffbeb', border:'#fde68a' };
+      return { color:'#64748b', bg:'#f8fafc', border:'#e2e8f0' };
+    }
+
+    function calcAge(dob) {
+      if (!dob) return 'N/A';
+      try {
+        const d = new Date(dob);
+        if (isNaN(d)) return 'N/A';
+        return Math.abs(new Date(Date.now()-d).getUTCFullYear()-1970);
+      } catch { return 'N/A'; }
+    }
+
+    window.clearFilters = function() {
+      document.getElementById('patient-search').value = '';
+      document.getElementById('filter-stage').value = '';
+      document.getElementById('filter-status').value = '';
+      document.getElementById('search-clear').style.display = 'none';
+      renderTable();
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const search = document.getElementById('patient-search');
+      const clear  = document.getElementById('search-clear');
+      const stage  = document.getElementById('filter-stage');
+      const status = document.getElementById('filter-status');
+
+      search?.addEventListener('input', () => {
+        clear.style.display = search.value ? 'flex' : 'none';
+        renderTable();
+      });
+      clear?.addEventListener('click', () => {
+        search.value = '';
+        clear.style.display = 'none';
+        renderTable();
+      });
+      stage?.addEventListener('change', renderTable);
+      status?.addEventListener('change', renderTable);
+    });
+  </script>
 </body>
 </html>

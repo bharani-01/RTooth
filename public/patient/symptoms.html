@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Symptom Tracker - Patient Portal</title>
+  <link rel="stylesheet" href="/css/patient_index.css">
+  <style>
+    .radio-scale-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .radio-scale-item {
+      flex: 1;
+      text-align: center;
+    }
+    .radio-scale-item label {
+      display: block;
+      padding: 10px 6px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: var(--transition-smooth);
+      background-color: var(--bg-subtle);
+    }
+    .radio-scale-item input[type="radio"] {
+      display: none;
+    }
+    .radio-scale-item input[type="radio"]:checked + label {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .radio-scale-item-pain label {
+      background-color: white;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+    }
+    .radio-scale-item-pain input[type="radio"]:checked + label {
+      background-color: var(--danger);
+      color: white;
+      border-color: var(--danger);
+    }
+    .toggle-container {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .toggle-item {
+      flex: 1;
+    }
+    .toggle-item label {
+      display: block;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      text-align: center;
+      transition: var(--transition-smooth);
+      background-color: white;
+    }
+    .toggle-item input[type="radio"] {
+      display: none;
+    }
+    .toggle-item input[type="radio"]:checked + label {
+      background-color: var(--teal);
+      color: white;
+      border-color: var(--teal);
+    }
+    .toggle-item-bleeding input[type="radio"]:checked + label {
+      background-color: var(--danger);
+      color: white;
+      border-color: var(--danger);
+    }
+  </style>
+</head>
+<body data-auth-required="true" data-allowed-roles="patient" class="dashboard-body">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/patient" class="logo" id="header-logo">
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/patient/profile" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="patient-avatar">PT</div>
+            <div class="user-info">
+              <div class="user-name" id="patient-name-badge">Patient Loading...</div>
+              <div class="user-role-label">Registered Patient</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <main class="dashboard-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-menu">
+        <a href="/patient" class="sidebar-item">
+          <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          Home Portal
+        </a>
+        <a href="/patient/symptoms" class="sidebar-item active">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          Symptom Tracker
+        </a>
+      </div>
+      
+      <button class="btn btn-danger-outline" style="width: 100%; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px;" id="patient-logout-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; flex-shrink: 0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        <span>Logout Session</span>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="dashboard-content">
+      <div class="dashboard-header">
+        <div>
+          <h2>Daily Symptom Tracker</h2>
+          <p style="color: var(--text-muted); font-size: 14px;">Log and monitor your clinical symptoms to help your attending oncologist track your oral health.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start;">
+        
+        <!-- Log Symptoms Card -->
+        <div class="profile-section-card" style="margin-bottom: 0;">
+          <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+            Report New Symptoms
+          </h3>
+          <form id="symptom-log-form">
+            
+            <!-- Pain Scale 0-10 -->
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-label">Pain Severity Scale (0 - 10) *</label>
+              <div class="radio-scale-container">
+                <!-- Pain radio buttons -->
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-0" value="0" required>
+                  <label for="pain-0">0</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-1" value="1">
+                  <label for="pain-1">1</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-2" value="2">
+                  <label for="pain-2">2</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-3" value="3">
+                  <label for="pain-3">3</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-4" value="4">
+                  <label for="pain-4">4</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-5" value="5">
+                  <label for="pain-5">5</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-6" value="6">
+                  <label for="pain-6">6</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-7" value="7">
+                  <label for="pain-7">7</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-8" value="8">
+                  <label for="pain-8">8</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-9" value="9">
+                  <label for="pain-9">9</label>
+                </div>
+                <div class="radio-scale-item radio-scale-item-pain">
+                  <input type="radio" name="pain_scale" id="pain-10" value="10">
+                  <label for="pain-10">10</label>
+                </div>
+              </div>
+              <span style="font-size: 11px; color: var(--text-muted);">0 = No pain, 10 = Severe/Exhausting pain</span>
+            </div>
+
+            <!-- Burning Sensation -->
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-label">Burning Sensation in Mouth *</label>
+              <div class="radio-scale-container">
+                <div class="radio-scale-item">
+                  <input type="radio" name="burning_sensation" id="burning-none" value="None" required>
+                  <label for="burning-none">None</label>
+                </div>
+                <div class="radio-scale-item">
+                  <input type="radio" name="burning_sensation" id="burning-mild" value="Mild">
+                  <label for="burning-mild">Mild</label>
+                </div>
+                <div class="radio-scale-item">
+                  <input type="radio" name="burning_sensation" id="burning-mod" value="Moderate">
+                  <label for="burning-mod">Moderate</label>
+                </div>
+                <div class="radio-scale-item">
+                  <input type="radio" name="burning_sensation" id="burning-sev" value="Severe">
+                  <label for="burning-sev">Severe</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Difficulty Opening Mouth -->
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-label">Difficulty Opening Mouth *</label>
+              <div class="radio-scale-container">
+                <div class="radio-scale-item">
+                  <input type="radio" name="difficulty_mouth" id="mouth-none" value="None" required>
+                  <label for="mouth-none">None</label>
+                </div>
+                <div class="radio-scale-item">
+                  <input type="radio" name="difficulty_mouth" id="mouth-mild" value="Mild">
+                  <label for="mouth-mild">Mild</label>
+                </div>
+                <div class="radio-scale-item">
+                  <input type="radio" name="difficulty_mouth" id="mouth-mod" value="Moderate">
+                  <label for="mouth-mod">Moderate</label>
+                </div>
+                <div class="radio-scale-item">
+                  <input type="radio" name="difficulty_mouth" id="mouth-sev" value="Severe">
+                  <label for="mouth-sev">Severe</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ulcer Duration & Bleeding -->
+            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; margin-bottom: 24px;">
+              <div class="form-group">
+                <label class="form-label" for="ulcer_duration">Ulcer Duration (Days) *</label>
+                <input type="number" class="form-input" id="ulcer_duration" min="0" value="0" required style="padding: 10px;">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Active Bleeding? *</label>
+                <div class="toggle-container">
+                  <div class="toggle-item">
+                    <input type="radio" name="bleeding" id="bleed-no" value="false" checked required>
+                    <label for="bleed-no">No Bleeding</label>
+                  </div>
+                  <div class="toggle-item toggle-item-bleeding">
+                    <input type="radio" name="bleeding" id="bleed-yes" value="true">
+                    <label for="bleed-yes">Yes, Bleeding</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-error" id="symptom-error" style="display: none; margin-bottom: 16px;"></div>
+            <div class="alert alert-success" id="symptom-success" style="display: none; margin-bottom: 16px;"></div>
+
+            <button type="submit" class="btn btn-primary" id="btn-submit-symptom" style="width: 100%; padding: 12px;">
+              Log Symptom Record
+            </button>
+          </form>
+        </div>
+
+        <!-- Past Logs Timeline Card -->
+        <div class="profile-section-card" style="margin-bottom: 0;">
+          <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+            My Symptom Logs History
+          </h3>
+          <div class="checkups-timeline" id="symptoms-timeline-container" style="max-height: 480px; overflow-y: auto; padding-right: 6px;">
+            <div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 24px;">
+              Loading symptom logs...
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/symptoms_patient.js"></script>
+</body>
+</html>

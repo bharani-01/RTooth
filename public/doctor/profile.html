@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Practitioner Profile - RTooth Portal</title>
+  <title>Practitioner Profile — RTooth</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/doctor_profile.css">
 </head>
 <body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
@@ -12,18 +15,11 @@
   <header>
     <div class="nav-bar">
       <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
+        <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
       </button>
       <div class="header-brand-area">
         <a href="/doctor/index.html" class="logo" id="header-logo">
-          <div class="logo-icon-container">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C8.5 2 6 4.5 6 8c0 2 1 3.5 1.5 5C8.3 15.6 7 20 9.5 22c1.7.5 2.5-1.5 2.5-3 0 1.5.8 3.5 2.5 3 2.5-2 1.2-6.4 2-9 0.5-1.5 1.5-3 1.5-5 0-3.5-2.5-6-6-6Z"/>
-            </svg>
-          </div>
-          <span class="logo-text">RTooth</span>
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
         </a>
       </div>
       <nav class="nav-links">
@@ -50,24 +46,83 @@
 
     <!-- Main Content Area -->
     <section class="dashboard-content">
-      <div class="dashboard-header">
+      <div class="dashboard-header" style="border-bottom: 1px solid #f1f4f8; padding-bottom: 20px; margin-bottom: 24px;">
         <div>
-          <h2>Oncology Practitioner Profile</h2>
-          <p style="color: var(--text-muted); font-size: 14px;">Review your clinical registration details and specialization credentials.</p>
+          <h2 style="font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 4px;">Practitioner Profile</h2>
+          <p style="color: var(--text-muted); font-size: 13.5px; margin: 0;">Review your clinic access credentials and medical registration details.</p>
         </div>
       </div>
 
-      <!-- Practitioner Details Card -->
-      <div class="table-card" style="margin-bottom: 24px; max-width: 600px;">
-        <div class="table-title-area">
-          <h3>Medical Staff Credentials</h3>
+      <!-- Practitioner Profile Layout Grid -->
+      <div class="practitioner-profile-container">
+        
+        <!-- Left: Hero Card -->
+        <div class="practitioner-hero-card">
+          <div class="practitioner-avatar-circle" id="profile-avatar-large">DR</div>
+          <h2 class="practitioner-hero-name" id="profile-full-name">Loading...</h2>
+          <span class="practitioner-hero-badge" id="profile-specialization-badge">Loading...</span>
+          <div class="practitioner-hero-status">
+            <span class="status-indicator"></span>
+            <span>Active Specialist</span>
+          </div>
         </div>
-        <div style="padding: 24px; font-size: 14px; line-height: 1.8;">
-          <p style="margin-bottom: 8px;"><strong>Full Name:</strong> <span id="profile-full-name">Loading...</span></p>
-          <p style="margin-bottom: 8px;"><strong>Email Contact:</strong> <span id="profile-email">Loading...</span></p>
-          <p style="margin-bottom: 8px;"><strong>Phone Contact:</strong> <span id="profile-phone">Loading...</span></p>
-          <p style="margin-bottom: 8px;"><strong>Medical License ID:</strong> <span id="profile-license">Loading...</span></p>
-          <p><strong>Clinical Specialization:</strong> <span id="profile-specialization">Loading...</span></p>
+
+        <!-- Right: Detail Credentials -->
+        <div class="practitioner-details-grid">
+          
+          <!-- Clinical Specialization -->
+          <div class="credential-item-card">
+            <div class="cred-icon-wrapper" style="background: #fff5f5; color: #9e1a22;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </div>
+            <div>
+              <div class="cred-label">Specialization</div>
+              <div class="cred-value" id="profile-specialization">Loading...</div>
+            </div>
+          </div>
+
+          <!-- License ID -->
+          <div class="credential-item-card">
+            <div class="cred-icon-wrapper" style="background: #fffbeb; color: #d97706;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="cred-label">Medical License ID</div>
+              <div class="cred-value" id="profile-license">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="credential-item-card">
+            <div class="cred-icon-wrapper" style="background: #eff6ff; color: #3b82f6;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div>
+              <div class="cred-label">Email Contact</div>
+              <div class="cred-value" id="profile-email">Loading...</div>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="credential-item-card">
+            <div class="cred-icon-wrapper" style="background: #f0fdf4; color: #16a34a;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="cred-label">Phone Contact</div>
+              <div class="cred-value" id="profile-phone">Loading...</div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -83,5 +138,21 @@
   <!-- Scripts -->
   <script type="module" src="/js/auth.js"></script>
   <script type="module" src="/js/doctor.js"></script>
+  
+  <!-- Inline script to hook and populate large avatar initials and specialization badge from profile auth-verified event -->
+  <script>
+    document.addEventListener('auth-verified', (e) => {
+      const profile = e.detail;
+      if (profile) {
+        const badge = document.getElementById('profile-specialization-badge');
+        if (badge) badge.innerText = profile.specialization || 'Oral Oncology Specialist';
+        
+        const avatar = document.getElementById('profile-avatar-large');
+        if (avatar && profile.first_name && profile.last_name) {
+          avatar.innerText = `${profile.first_name[0].toUpperCase()}${profile.last_name[0].toUpperCase()}`;
+        }
+      }
+    });
+  </script>
 </body>
 </html>
