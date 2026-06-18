@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RTooth — Enterprise Care Coordination for Oral Oncology</title>
+  <script>
+    // Automatically redirect users carrying a Supabase recovery hash token to the reset password view
+    if (window.location.hash && (window.location.hash.indexOf('access_token=') !== -1 || window.location.hash.indexOf('type=recovery') !== -1)) {
+      window.location.replace('/reset_password.html' + window.location.hash);
+    }
+  </script>
   <meta name="description" content="RTooth is the leading clinical platform connecting oncologists, oral surgeons, and patients for early dysplasia detection, biopsy tracking, and real-time care coordination.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
