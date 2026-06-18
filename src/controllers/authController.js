@@ -242,3 +242,13 @@ export const getAuditLogs = async (req, res, next) => {
   }
 };
 
+export const debugStorage = async (req, res, next) => {
+  try {
+    const result = await authService.debugStorage();
+    return sendResponse(res, 200, 'Debug storage info.', result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+

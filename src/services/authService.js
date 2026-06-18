@@ -411,7 +411,14 @@ export const listDoctors = async () => {
  * Sign in user and retrieve their session + profile details.
  */
 export const signInUser = async (email, password) => {
-  const client = supabaseAdmin || supabase;
+  // Use a temporary client for login to prevent polluting the global supabaseAdmin client state.
+  // We still use the service role key if available to bypass GoTrue rate limits.
+  const client = process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+        auth: { persistSession: false, autoRefreshToken: false }
+      })
+    : supabase;
+
   const { data: authData, error: authError } = await client.auth.signInWithPassword({
     email,
     password,
@@ -849,4 +856,68 @@ export const getDoctorProfileWithStats = async (doctorId) => {
     reports: reportsWithSizes
   };
 };
+
+export const debugStorage = async () => {
+  const { data: reports, error: dbError } = await supabaseAdmin
+    .from('patient_reports')
+    .select('patient_id, file_url')
+    .limit(5);
+
+  if (dbError) throw dbError;
+  if (!reports || reports.length === 0) {
+    return { success: true, message: 'No reports found in database' };
+  }
+
+  const patientId = reports[0].patient_id;
+  const { data, error } = await supabaseAdmin.storage.from('patient-reports').list(patientId);
+  const { data: buckets, error: bucketsError } = await supabaseAdmin.storage.listBuckets();
+
+  let rawBucketsResult = null;
+  try {
+    const rawRes = await fetch(`${process.env.SUPABASE_URL}/storage/v1/bucket`, {
+      headers: {
+        'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+      }
+    });
+    rawBucketsResult = {
+      status: rawRes.status,
+      ok: rawRes.ok,
+      body: await rawRes.json()
+    };
+  } catch (err) {
+    rawBucketsResult = { error: err.message };
+  }
+
+  return {
+    success: true,
+    patientId,
+    env: {
+      SUPABASE_URL_defined: !!process.env.SUPABASE_URL,
+      SUPABASE_SERVICE_ROLE_KEY_defined: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      SUPABASE_ANON_KEY_defined: !!process.env.SUPABASE_ANON_KEY,
+      SUPABASE_SERVICE_ROLE_KEY_len: process.env.SUPABASE_SERVICE_ROLE_KEY ? process.env.SUPABASE_SERVICE_ROLE_KEY.length : 0,
+      SUPABASE_ANON_KEY_len: process.env.SUPABASE_ANON_KEY ? process.env.SUPABASE_ANON_KEY.length : 0,
+      SUPABASE_SERVICE_ROLE_KEY_suffix: process.env.SUPABASE_SERVICE_ROLE_KEY ? process.env.SUPABASE_SERVICE_ROLE_KEY.substring(process.env.SUPABASE_SERVICE_ROLE_KEY.length - 15) : 'none',
+      SUPABASE_ANON_KEY_suffix: process.env.SUPABASE_ANON_KEY ? process.env.SUPABASE_ANON_KEY.substring(process.env.SUPABASE_ANON_KEY.length - 15) : 'none',
+      keys_match: process.env.SUPABASE_SERVICE_ROLE_KEY === process.env.SUPABASE_ANON_KEY
+    },
+    clientInfo: {
+      supabaseAdmin_defined: !!supabaseAdmin,
+      supabaseAdmin_url: supabaseAdmin ? supabaseAdmin.supabaseUrl : null,
+      supabaseAdmin_key_matches_anon: supabaseAdmin ? (supabaseAdmin.supabaseKey === process.env.SUPABASE_ANON_KEY) : null,
+      supabaseAdmin_key_matches_service: supabaseAdmin ? (supabaseAdmin.supabaseKey === process.env.SUPABASE_SERVICE_ROLE_KEY) : null
+    },
+    bucketsInfo: {
+      error: bucketsError ? { message: bucketsError.message } : null,
+      buckets
+    },
+    rawBucketsResult,
+    error: error ? { message: error.message, status: error.status } : null,
+    filesCount: data ? data.length : 0,
+    data
+  };
+};
+
+
 
