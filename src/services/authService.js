@@ -991,5 +991,95 @@ export const debugStorage = async () => {
   };
 };
 
+/**
+ * Triggers a password reset recovery email from Supabase
+ */
+export const sendForgotPasswordEmail = async (email, redirectUrl) => {
+  const client = supabaseAdmin || supabase;
+  const { data, error } = await client.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectUrl
+  });
+  if (error) throw error;
+  return data;
+};
+
+/**
+ * Updates user's password using the access token parsed from the email link
+ */
+export const resetPasswordWithToken = async (token, newPassword) => {
+  const client = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { headers: { Authorization: `Bearer ${token}` } }
+  });
+  const { data, error } = await client.auth.updateUser({ password: newPassword });
+  if (error) throw error;
+  return data;
+};
+
+/**
+ * Admin triggers password reset email for a practitioner
+ */
+export const sendAdminResetLink = async (doctorId, redirectUrl) => {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase Admin client is not configured.');
+  }
+  const { data: profile, error: profileError } = await supabaseAdmin
+    .from('profiles')
+    .select('email')
+    .eq('id', doctorId)
+    .maybeSingle();
+
+  if (profileError || !profile) {
+    throw profileError || new Error('Doctor profile not found.');
+  }
+
+  const { data, error } = await supabaseAdmin.auth.resetPasswordForEmail(profile.email, {
+    redirectTo: redirectUrl
+  });
+  if (error) throw error;
+  return data;
+};
+
+/**
+ * Sends a passwordless OTP verification code to the user's email
+ */
+export const sendOtpCode = async (email) => {
+  const client = supabaseAdmin || supabase;
+  const { data, error } = await client.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: false
+    }
+  });
+  if (error) throw error;
+  return data;
+};
+
+/**
+ * Verifies 6-digit OTP code and signs in user
+ */
+export const verifyOtpCode = async (email, token) => {
+  const client = supabaseAdmin || supabase;
+  const { data, error } = await client.auth.verifyOtp({
+    email,
+    token,
+    type: 'email'
+  });
+  if (error) throw error;
+
+  const profile = await getResolvedProfile(data.user.id);
+  
+  if (profile.role === 'patient' && profile.status === 'draft') {
+    throw new Error('Your portal registration is currently pending completion (Draft status).');
+  }
+
+  return {
+    session: data.session,
+    user: data.user,
+    profile
+  };
+};
+
+
 
 

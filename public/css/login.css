@@ -297,3 +297,32 @@
   }
 }
 
+/* Auth method tabs styles */
+.auth-tab:hover {
+  color: var(--text) !important;
+  border-bottom-color: rgba(2, 132, 199, 0.4) !important;
+}
+.auth-tab.active {
+  color: var(--text) !important;
+  border-bottom-color: var(--primary) !important;
+  font-weight: 600 !important;
+}
+
+/* Forgot password link hover */
+.forgot-link:hover {
+  color: var(--primary-dark) !important;
+  text-decoration: underline !important;
+}
+
+/* Send OTP Button states */
+#btn-send-otp:hover {
+  background-color: var(--border-color) !important;
+  border-color: var(--text-muted) !important;
+}
+
+#btn-send-otp:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+

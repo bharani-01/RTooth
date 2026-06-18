@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else if (path.endsWith('/doctor_profile') || path.endsWith('doctor_profile.html')) {
     initDoctorProfilePage();
   }
+
+  // 4. Initialize Admin Reset Password Link Handlers
+  initAdminResetLinkHandlers();
 });
 
 /**
@@ -202,7 +205,10 @@ function renderDoctorDirectoryTable(doctorsList) {
         <td data-label="Patients Assigned" style="font-weight: 600; text-align: center;">${patientCount}</td>
         <td data-label="Storage Occupied" style="font-family: monospace;">${storageText}</td>
         <td data-label="Actions" style="text-align: center;">
-          <a href="/admin/doctor_profile?id=${doc.id}" class="btn-info-action">View Profile</a>
+          <div style="display: inline-flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap;">
+            <a href="/admin/doctor_profile?id=${doc.id}" class="btn-info-action" style="padding: 6px 12px; font-size: 13px; font-weight: 600;">View Profile</a>
+            <button type="button" class="btn-reset-action send-reset-link-btn" data-id="${doc.id}" data-name="Dr. ${doc.first_name} ${doc.last_name}" style="background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger); border-radius: 4px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: var(--font-heading);">Reset Pass</button>
+          </div>
         </td>
       </tr>
     `;
@@ -1384,3 +1390,67 @@ async function initDoctorProfilePage() {
     window.location.href = '/admin/doctors';
   }
 }
+
+/**
+ * Initialize Admin Reset Link Handlers for Directory & Profile Pages
+ */
+function initAdminResetLinkHandlers() {
+  // 1. Table-based delegation for Doctors Directory
+  const tableBody = document.getElementById('doctors-table-body');
+  if (tableBody) {
+    tableBody.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.send-reset-link-btn');
+      if (btn) {
+        const id = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name');
+        
+        const confirmed = await window.showConfirmModal(
+          `Are you sure you want to trigger a recovery reset password email for ${name}?`,
+          'Trigger Password Reset'
+        );
+        
+        if (confirmed) {
+          try {
+            const res = await apiRequest(`/doctors/${id}/send-reset-link`, {
+              method: 'POST'
+            });
+            if (res.success) {
+              window.showAlertModal(`Recovery email sent successfully to ${name} via Supabase.`, 'Success');
+            }
+          } catch (err) {
+            window.showAlertModal(`Failed to send recovery email: ${err.message}`, 'Error');
+          }
+        }
+      }
+    });
+  }
+
+  // 2. Direct click for Doctor Profile Page
+  const profileResetBtn = document.getElementById('btn-profile-send-reset');
+  if (profileResetBtn) {
+    profileResetBtn.addEventListener('click', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const name = document.getElementById('doctor-full-name').innerText;
+      
+      const confirmed = await window.showConfirmModal(
+        `Are you sure you want to trigger a recovery reset password email for ${name}?`,
+        'Trigger Password Reset'
+      );
+      
+      if (confirmed) {
+        try {
+          const res = await apiRequest(`/doctors/${id}/send-reset-link`, {
+            method: 'POST'
+          });
+          if (res.success) {
+            window.showAlertModal(`Recovery email sent successfully to ${name} via Supabase.`, 'Success');
+          }
+        } catch (err) {
+          window.showAlertModal(`Failed to send recovery email: ${err.message}`, 'Error');
+        }
+      }
+    });
+  }
+}
+

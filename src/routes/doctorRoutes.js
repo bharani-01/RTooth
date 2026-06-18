@@ -19,5 +19,7 @@ router.get('/:id', requireAuth, requireRole(['admin']), authController.getDoctor
 // Register a new oncology practitioner (IT-Admin only)
 router.post('/', requireAuth, requireRole(['admin']), authController.registerDoctor);
 
+// Trigger reset link for doctor (IT-Admin only)
+router.post('/:id/send-reset-link', requireAuth, requireRole(['admin']), authController.sendDoctorResetLink);
 
 export default router;

@@ -244,11 +244,94 @@ export const getAuditLogs = async (req, res, next) => {
 
 export const debugStorage = async (req, res, next) => {
   try {
-    const result = await authService.debugStorage();
-    return sendResponse(res, 200, 'Debug storage info.', result);
+     const result = await authService.debugStorage();
+     return sendResponse(res, 200, 'Debug storage info.', result);
   } catch (error) {
     next(error);
   }
 };
+
+/**
+ * Handle public forgot password request
+ */
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new BadRequestError('Email address is required.');
+    }
+    const redirectUrl = `${req.protocol}://${req.get('host')}/reset_password.html`;
+    await authService.sendForgotPasswordEmail(email, redirectUrl);
+    return sendResponse(res, 200, 'Password reset link sent successfully to your email.');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Handle password update using token
+ */
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+      throw new BadRequestError('Authorization token and new password are required.');
+    }
+    await authService.resetPasswordWithToken(token, newPassword);
+    return sendResponse(res, 200, 'Your password has been reset successfully.');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Send passwordless login OTP
+ */
+export const sendOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new BadRequestError('Email address is required.');
+    }
+    await authService.sendOtpCode(email);
+    return sendResponse(res, 200, 'One-time login code sent successfully to your email.');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Verify OTP and authenticate user
+ */
+export const verifyOtp = async (req, res, next) => {
+  try {
+    const { email, token } = req.body;
+    if (!email || !token) {
+      throw new BadRequestError('Email and 6-digit verification code are required.');
+    }
+    const result = await authService.verifyOtpCode(email, token);
+    return sendResponse(res, 200, 'OTP verified. Sign in successful.', {
+      session: result.session,
+      profile: result.profile,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Admin triggers password reset recovery email for a doctor
+ */
+export const sendDoctorResetLink = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const redirectUrl = `${req.protocol}://${req.get('host')}/reset_password.html`;
+    await authService.sendAdminResetLink(id, redirectUrl);
+    return sendResponse(res, 200, 'Recovery reset password link sent to practitioner successfully.');
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 
