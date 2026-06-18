@@ -308,6 +308,85 @@ export const listDoctors = async () => {
 
   const docMap = new Map((doctors || []).map(d => [d.id, d]));
 
+  // 1. Fetch patient counts per doctor
+  const { data: patients, error: patientError } = await supabase
+    .from('patients')
+    .select('id, doctor_id');
+  
+  if (patientError) throw patientError;
+  
+  const patientCountMap = new Map();
+  (patients || []).forEach(p => {
+    if (p.doctor_id) {
+      patientCountMap.set(p.doctor_id, (patientCountMap.get(p.doctor_id) || 0) + 1);
+    }
+  });
+
+  // 2. Fetch precise file sizes per doctor
+  const { data: reports, error: reportsError } = await supabase
+    .from('patient_reports')
+    .select('patient_id, doctor_id, file_url');
+  
+  if (reportsError) throw reportsError;
+  
+  const doctorSizeMap = new Map(); // doctor_id -> size in bytes
+  
+  if (reports && reports.length > 0) {
+    // Collect all unique patient folders
+    const patientFilesMap = new Map();
+    reports.forEach(r => {
+      const parts = r.file_url.split('/patient-reports/');
+      if (parts.length < 2) return;
+      const pathAndName = parts[1];
+      const pathParts = pathAndName.split('/');
+      if (pathParts.length < 2) return;
+      const pid = pathParts[0];
+      const fileName = pathParts[1];
+      
+      if (!patientFilesMap.has(pid)) {
+        patientFilesMap.set(pid, new Set());
+      }
+      patientFilesMap.get(pid).add(fileName);
+    });
+
+    const patientIds = Array.from(patientFilesMap.keys());
+    const listPromises = patientIds.map(pid => 
+      supabaseAdmin.storage.from('patient-reports').list(pid)
+    );
+    
+    const listResults = await Promise.all(listPromises);
+    
+    // Map filename to size for each patient
+    const fileSizeMap = new Map(); // "patient_id/filename" -> size
+    patientIds.forEach((pid, index) => {
+      const res = listResults[index];
+      const allowedNames = patientFilesMap.get(pid);
+      if (res.data) {
+        res.data.forEach(file => {
+          if (allowedNames.has(file.name) && file.metadata && file.metadata.size) {
+            fileSizeMap.set(`${pid}/${file.name}`, file.metadata.size);
+          }
+        });
+      }
+    });
+
+    // Sum sizes per doctor
+    reports.forEach(r => {
+      const parts = r.file_url.split('/patient-reports/');
+      if (parts.length < 2) return;
+      const pathAndName = parts[1];
+      const pathParts = pathAndName.split('/');
+      if (pathParts.length < 2) return;
+      const pid = pathParts[0];
+      const fileName = pathParts[1];
+      
+      const size = fileSizeMap.get(`${pid}/${fileName}`) || 0;
+      if (r.doctor_id) {
+        doctorSizeMap.set(r.doctor_id, (doctorSizeMap.get(r.doctor_id) || 0) + size);
+      }
+    });
+  }
+
   return profiles.map(p => {
     const docData = docMap.get(p.id) || {};
     return {
@@ -318,7 +397,9 @@ export const listDoctors = async () => {
       email: p.email,
       phone: p.phone,
       specialization: docData.specialization || 'General Dentistry',
-      license_number: docData.license_number || 'N/A'
+      license_number: docData.license_number || 'N/A',
+      patient_count: patientCountMap.get(p.id) || 0,
+      total_file_size_bytes: doctorSizeMap.get(p.id) || 0
     };
   });
 };
@@ -587,3 +668,177 @@ export const listPatients = async (doctorId) => {
     };
   });
 };
+
+/**
+ * Retrieves detailed doctor profile data, patient counts, checkups logged, and storage file sizes.
+ * @param {string} doctorId - Doctor's UUID
+ */
+export const getDoctorProfileWithStats = async (doctorId) => {
+  // 1. Fetch base profile fields
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', doctorId)
+    .maybeSingle();
+
+  if (profileError) throw profileError;
+  if (!profile || profile.role !== 'doctor') {
+    throw new Error('Doctor profile not found.');
+  }
+
+  // 2. Fetch doctor specific details
+  const { data: doctor, error: docError } = await supabase
+    .from('doctors')
+    .select('*')
+    .eq('id', doctorId)
+    .maybeSingle();
+
+  if (docError) throw docError;
+
+  // 3. Fetch patients assigned to this doctor
+  const { data: patients, error: patientError } = await supabase
+    .from('patients')
+    .select('*')
+    .eq('doctor_id', doctorId);
+
+  if (patientError) throw patientError;
+
+  const patientIds = (patients || []).map(p => p.id);
+  let patientProfiles = [];
+  const recordsMap = new Map();
+
+  if (patientIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('id', patientIds);
+    patientProfiles = profiles || [];
+
+    const { data: records } = await supabase
+      .from('medical_records')
+      .select('*')
+      .in('patient_id', patientIds);
+
+    (records || []).forEach(r => {
+      if (!recordsMap.has(r.patient_id)) {
+        recordsMap.set(r.patient_id, r);
+      }
+    });
+  }
+
+  // 4. Fetch count of checkups (visits) logged by this doctor
+  const { count: checkupCount, error: checkupError } = await supabase
+    .from('checkups')
+    .select('*', { count: 'exact', head: true })
+    .eq('doctor_id', doctorId);
+
+  if (checkupError) throw checkupError;
+
+  // 5. Fetch uploaded reports and resolve sizes
+  const { data: reports, error: reportsError } = await supabase
+    .from('patient_reports')
+    .select('*')
+    .eq('doctor_id', doctorId)
+    .order('uploaded_at', { ascending: false });
+
+  if (reportsError) throw reportsError;
+
+  let totalSize = 0;
+  let reportsWithSizes = [];
+
+  if (reports && reports.length > 0) {
+    const patientFilesMap = new Map();
+    reports.forEach(r => {
+      const parts = r.file_url.split('/patient-reports/');
+      if (parts.length < 2) return;
+      const pathAndName = parts[1];
+      const pathParts = pathAndName.split('/');
+      if (pathParts.length < 2) return;
+      const pid = pathParts[0];
+      const fileName = pathParts[1];
+
+      if (!patientFilesMap.has(pid)) {
+        patientFilesMap.set(pid, new Set());
+      }
+      patientFilesMap.get(pid).add(fileName);
+    });
+
+    const patientIdsWithFiles = Array.from(patientFilesMap.keys());
+    const listPromises = patientIdsWithFiles.map(pid =>
+      supabaseAdmin.storage.from('patient-reports').list(pid)
+    );
+    const listResults = await Promise.all(listPromises);
+
+    const fileSizeMap = new Map();
+    patientIdsWithFiles.forEach((pid, index) => {
+      const res = listResults[index];
+      if (res.data) {
+        const allowedNames = patientFilesMap.get(pid);
+        res.data.forEach(file => {
+          if (allowedNames.has(file.name) && file.metadata && file.metadata.size) {
+            fileSizeMap.set(`${pid}/${file.name}`, file.metadata.size);
+          }
+        });
+      }
+    });
+
+    reportsWithSizes = reports.map(r => {
+      const parts = r.file_url.split('/patient-reports/');
+      let size = 0;
+      if (parts.length >= 2) {
+        const pathAndName = parts[1];
+        const pathParts = pathAndName.split('/');
+        if (pathParts.length >= 2) {
+          size = fileSizeMap.get(`${pathParts[0]}/${pathParts[1]}`) || 0;
+        }
+      }
+      totalSize += size;
+      
+      // Also resolve patient name for reports table
+      const pat = patientProfiles.find(p => p.id === r.patient_id) || {};
+      const patientName = pat.first_name ? `${pat.first_name} ${pat.last_name}` : 'Unknown Patient';
+
+      return {
+        ...r,
+        file_size_bytes: size,
+        patient_name: patientName
+      };
+    });
+  }
+
+  return {
+    profile: {
+      id: profile.id,
+      doctor_code: doctor?.doctor_code,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      email: profile.email,
+      phone: profile.phone,
+      specialization: doctor?.specialization || 'General Dentistry',
+      license_number: doctor?.license_number || 'N/A'
+    },
+    stats: {
+      patient_count: patients?.length || 0,
+      total_file_size_bytes: totalSize,
+      checkup_count: checkupCount || 0
+    },
+    patients: (patients || []).map(p => {
+      const patProfile = patientProfiles.find(prof => prof.id === p.id) || {};
+      const record = recordsMap.get(p.id) || {};
+      return {
+        id: p.id,
+        patient_code: p.patient_code,
+        first_name: patProfile.first_name || '',
+        last_name: patProfile.last_name || '',
+        email: patProfile.email || '',
+        phone: patProfile.phone || '',
+        date_of_birth: p.date_of_birth,
+        gender: p.gender,
+        status: p.status,
+        cancer_stage: record.cancer_stage || 'N/A'
+      };
+    }),
+    reports: reportsWithSizes
+  };
+};
+

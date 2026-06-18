@@ -52,57 +52,120 @@
         </div>
       </div>
 
-      <div class="auth-card" style="max-width: 650px; margin: 0; backdrop-filter: none; background-color: white; padding: 32px;">
-        <div class="alert alert-error" id="error-alert"></div>
-        <div class="alert alert-success" id="success-alert"></div>
+      <div class="registration-grid">
+        <!-- Form Column -->
+        <div class="form-column animate-fadeIn">
+          <div class="auth-card" style="margin: 0; backdrop-filter: none; background-color: white; padding: 32px; width: 100%; max-width: 100%;">
+            <div class="alert alert-error" id="error-alert"></div>
+            <div class="alert alert-success" id="success-alert"></div>
 
-        <form id="register-doctor-form">
-          <!-- Name (Row) -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="doc_first_name" class="form-label">First Name</label>
-              <input type="text" id="doc_first_name" class="form-input" placeholder="e.g. Emily" required>
+            <form id="register-doctor-form">
+              <!-- Group 1: Personal & Contact Details -->
+              <div class="form-section">
+                <h3 class="section-title">Personal & Contact Details</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="doc_first_name" class="form-label">First Name</label>
+                    <input type="text" id="doc_first_name" class="form-input" placeholder="e.g. Emily" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="doc_last_name" class="form-label">Last Name</label>
+                    <input type="text" id="doc_last_name" class="form-input" placeholder="e.g. Smith" required>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="doc_email" class="form-label">Email Address</label>
+                    <input type="email" id="doc_email" class="form-input" placeholder="doctor@rtooth.com" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="doc_phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="doc_phone" class="form-input" placeholder="+91 99887 76655" required>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Group 2: Professional Credentials -->
+              <div class="form-section">
+                <h3 class="section-title">Professional Credentials</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="doc_specialization" class="form-label">Oncology Specialization</label>
+                    <input type="text" id="doc_specialization" class="form-input" placeholder="e.g. Oral Oncologist, Oral Surgeon" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="doc_license_number" class="form-label">Medical License ID</label>
+                    <input type="text" id="doc_license_number" class="form-input" placeholder="e.g. MDS-109283" required>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Group 3: System Security & Access -->
+              <div class="form-section">
+                <h3 class="section-title">System Security & Access</h3>
+                <div class="form-group">
+                  <label for="doc_password" class="form-label">Default Password</label>
+                  <div class="password-wrapper">
+                    <input type="password" id="doc_password" class="form-input password-input" placeholder="At least 6 characters" minlength="6" required>
+                    <button type="button" id="toggle-password-visibility" class="password-toggle-btn" aria-label="Toggle Password Visibility">
+                      <svg class="eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div style="margin-top: -10px; margin-bottom: 20px;">
+                  <button type="button" id="btn-generate-password" class="btn btn-secondary" style="font-size: 12px; padding: 8px 14px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; gap: 6px;">
+                    <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m-5 9h6m-6-3h6m-6-3h6m-12 1L8 8l-1.79 1.79a2 2 0 00-.79 1.58V17a2 2 0 002 2h3a2 2 0 002-2v-1.12a2 2 0 00-.58-1.42L8 12.5z"/>
+                    </svg>
+                    Generate Secure Password
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-teal" style="width: 100%; height: 48px; font-size: 15px; margin-top: 12px;">
+                Register Oncologist
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Guide Column -->
+        <div class="guide-column animate-fadeIn">
+          <div class="guide-card">
+            <div class="guide-header">
+              <div class="guide-icon-wrapper">
+                <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              <h3 class="guide-title">Provider Rights &amp; Policy</h3>
             </div>
-            <div class="form-group">
-              <label for="doc_last_name" class="form-label">Last Name</label>
-              <input type="text" id="doc_last_name" class="form-input" placeholder="e.g. Smith" required>
+            
+            <div class="guide-content">
+              <div class="guide-item">
+                <div class="guide-item-title">Clinical Access Rights</div>
+                <p class="guide-item-desc">Oncologist accounts can create new patients, log screening checkups, analyze oral cancer lesion symptoms, and upload files.</p>
+              </div>
+              
+              <div class="guide-item">
+                <div class="guide-item-title">Storage Allocation Limit</div>
+                <p class="guide-item-desc">Individual diagnostic report file uploads are capped at 10MB per file. Accepted document types are PDF, PNG, JPG, and JPEG.</p>
+              </div>
+              
+              <div class="guide-item">
+                <div class="guide-item-title">Compliance Auditing</div>
+                <p class="guide-item-desc">Under HIPAA compliance rules, all clinical actions (patient registration, report upload, and symptom evaluation) are recorded in the audit trail.</p>
+              </div>
+              
+              <div class="guide-item">
+                <div class="guide-item-title">Doctor Code Generation</div>
+                <p class="guide-item-desc">Upon successful database creation, the system automatically allocates a unique identification Doctor Code (e.g. DOC-XXXXX).</p>
+              </div>
             </div>
           </div>
-
-          <!-- Contacts (Row) -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="doc_email" class="form-label">Email Address</label>
-              <input type="email" id="doc_email" class="form-input" placeholder="doctor@rtooth.com" required>
-            </div>
-            <div class="form-group">
-              <label for="doc_phone" class="form-label">Phone Number</label>
-              <input type="tel" id="doc_phone" class="form-input" placeholder="+91 99887 76655" required>
-            </div>
-          </div>
-
-          <!-- Password -->
-          <div class="form-group">
-            <label for="doc_password" class="form-label">Default Password</label>
-            <input type="password" id="doc_password" class="form-input" placeholder="At least 6 characters" minlength="6" required>
-          </div>
-
-          <!-- Credentials (Row) -->
-          <div class="form-row">
-            <div class="form-group">
-              <label for="doc_specialization" class="form-label">Oncology Specialization</label>
-              <input type="text" id="doc_specialization" class="form-input" placeholder="e.g. Oral Oncologist, Oral Surgeon" required>
-            </div>
-            <div class="form-group">
-              <label for="doc_license_number" class="form-label">Medical License ID</label>
-              <input type="text" id="doc_license_number" class="form-input" placeholder="e.g. MDS-109283" required>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-teal" style="width: 100%; height: 48px; font-size: 15px; margin-top: 12px;">
-            Register Oncologist
-          </button>
-        </form>
+        </div>
       </div>
     </section>
   </main>

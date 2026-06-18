@@ -1,15 +1,7 @@
 import { apiRequest, getUserProfile, logoutUser } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Bind Logout Button
-  const logoutBtn = document.getElementById('patient-logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      if (confirm('Are you sure you want to end your patient portal session?')) {
-        await logoutUser();
-      }
-    });
-  }
+
 
   // Pre-load from localStorage if available
   const initialProfile = getUserProfile();

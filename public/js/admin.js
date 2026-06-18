@@ -30,8 +30,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (registerDocForm) {
       registerDocForm.addEventListener('submit', handleDoctorRegister);
     }
+    initRegisterDoctorFeatures();
   } else if (path.endsWith('/audit_logs') || path.endsWith('audit_logs.html')) {
     initAuditLogsPage();
+  } else if (path.endsWith('/doctor_profile') || path.endsWith('doctor_profile.html')) {
+    initDoctorProfilePage();
   }
 });
 
@@ -63,15 +66,7 @@ async function loadAdminSidebar() {
       }
     });
 
-    // Re-bind Logout Button since it's dynamically loaded now!
-    const logoutBtn = document.getElementById('admin-logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', async () => {
-        if (confirm('Are you sure you want to end your IT-Admin session?')) {
-          await logoutUser();
-        }
-      });
-    }
+
 
     if (window.initMobileMenu) {
       window.initMobileMenu();
@@ -118,6 +113,8 @@ async function loadDoctorsCount() {
   }
 }
 
+let allDoctors = [];
+
 /**
  * Query the backend for all registered doctors
  */
@@ -128,34 +125,189 @@ async function loadDoctorDirectory() {
   try {
     const response = await apiRequest('/doctors');
     if (response.success) {
-      const doctors = response.data.doctors;
+      allDoctors = response.data.doctors || [];
       
-      if (doctors.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No doctors registered in the system.</td>
-          </tr>
-        `;
-        return;
-      }
-
-      tableBody.innerHTML = doctors.map(doc => `
-        <tr>
-          <td data-label="Doctor"><strong>Dr. ${doc.first_name} ${doc.last_name}</strong></td>
-          <td data-label="Specialization"><span style="font-weight: 500; color: var(--primary);">${doc.specialization}</span></td>
-          <td data-label="License Number"><code>${doc.license_number}</code></td>
-          <td data-label="Email">${doc.email}</td>
-          <td data-label="Phone">${doc.phone || 'N/A'}</td>
-        </tr>
-      `).join('');
+      calculateAndRenderDirectoryStats(allDoctors);
+      populateSpecializationFilter(allDoctors);
+      renderDoctorDirectoryTable(allDoctors);
+      setupDirectoryEventListeners();
     }
   } catch (error) {
     console.error('Error loading doctor list:', error.message);
     tableBody.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align: center; color: var(--danger); padding: 24px;">Failed to load doctor directory.</td>
+        <td colspan="8" style="text-align: center; color: var(--danger); padding: 24px;">Failed to load doctor directory.</td>
       </tr>
     `;
+  }
+}
+
+function calculateAndRenderDirectoryStats(doctors) {
+  const specEl = document.getElementById('stat-total-specialists');
+  const patEl = document.getElementById('stat-total-assigned-patients');
+  const storeEl = document.getElementById('stat-total-storage-utilized');
+
+  if (specEl) specEl.innerText = doctors.length;
+  
+  if (patEl) {
+    const totalPatients = doctors.reduce((sum, doc) => sum + (doc.patient_count || 0), 0);
+    patEl.innerText = totalPatients;
+  }
+
+  if (storeEl) {
+    const totalStorage = doctors.reduce((sum, doc) => sum + (doc.total_file_size_bytes || 0), 0);
+    storeEl.innerText = formatBytes(totalStorage);
+  }
+}
+
+function populateSpecializationFilter(doctors) {
+  const filter = document.getElementById('specialization-filter');
+  if (!filter) return;
+
+  filter.innerHTML = '<option value="">All Specializations</option>';
+
+  const specs = [...new Set(doctors.map(doc => doc.specialization).filter(Boolean))].sort();
+  specs.forEach(spec => {
+    const option = document.createElement('option');
+    option.value = spec;
+    option.innerText = spec;
+    filter.appendChild(option);
+  });
+}
+
+function renderDoctorDirectoryTable(doctorsList) {
+  const tableBody = document.getElementById('doctors-table-body');
+  if (!tableBody) return;
+
+  if (doctorsList.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">No doctors match the active filters.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tableBody.innerHTML = doctorsList.map(doc => {
+    const patientCount = doc.patient_count || 0;
+    const storageText = formatBytes(doc.total_file_size_bytes || 0);
+
+    return `
+      <tr>
+        <td data-label="Doctor"><strong>Dr. ${doc.first_name} ${doc.last_name}</strong></td>
+        <td data-label="Specialization"><span style="font-weight: 500; color: var(--primary);">${doc.specialization}</span></td>
+        <td data-label="License Number"><code>${doc.license_number}</code></td>
+        <td data-label="Email">${doc.email}</td>
+        <td data-label="Phone">${doc.phone || 'N/A'}</td>
+        <td data-label="Patients Assigned" style="font-weight: 600; text-align: center;">${patientCount}</td>
+        <td data-label="Storage Occupied" style="font-family: monospace;">${storageText}</td>
+        <td data-label="Actions" style="text-align: center;">
+          <a href="/admin/doctor_profile?id=${doc.id}" class="btn-info-action">View Profile</a>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function setupDirectoryEventListeners() {
+  const searchInput = document.getElementById('doctor-search');
+  const specFilter = document.getElementById('specialization-filter');
+  const sortFilter = document.getElementById('sort-filter');
+
+  const applyFilters = () => {
+    let result = [...allDoctors];
+
+    if (searchInput) {
+      const query = searchInput.value.toLowerCase().trim();
+      if (query) {
+        result = result.filter(doc => 
+          `${doc.first_name} ${doc.last_name}`.toLowerCase().includes(query) ||
+          doc.specialization.toLowerCase().includes(query) ||
+          doc.license_number.toLowerCase().includes(query) ||
+          doc.email.toLowerCase().includes(query)
+        );
+      }
+    }
+
+    if (specFilter) {
+      const selectedSpec = specFilter.value;
+      if (selectedSpec) {
+        result = result.filter(doc => doc.specialization === selectedSpec);
+      }
+    }
+
+    if (sortFilter) {
+      const sortVal = sortFilter.value;
+      if (sortVal === 'name-asc') {
+        result.sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`));
+      } else if (sortVal === 'name-desc') {
+        result.sort((a, b) => `${b.first_name} ${b.last_name}`.localeCompare(`${a.first_name} ${a.last_name}`));
+      } else if (sortVal === 'patients-desc') {
+        result.sort((a, b) => (b.patient_count || 0) - (a.patient_count || 0));
+      } else if (sortVal === 'storage-desc') {
+        result.sort((a, b) => (b.total_file_size_bytes || 0) - (a.total_file_size_bytes || 0));
+      }
+    }
+
+    renderDoctorDirectoryTable(result);
+  };
+
+  if (searchInput) {
+    searchInput.removeEventListener('input', applyFilters);
+    searchInput.addEventListener('input', applyFilters);
+  }
+  if (specFilter) {
+    specFilter.removeEventListener('change', applyFilters);
+    specFilter.addEventListener('change', applyFilters);
+  }
+  if (sortFilter) {
+    sortFilter.removeEventListener('change', applyFilters);
+    sortFilter.addEventListener('change', applyFilters);
+  }
+}
+
+function initRegisterDoctorFeatures() {
+  const generateBtn = document.getElementById('btn-generate-password');
+  const passwordInput = document.getElementById('doc_password');
+  const toggleVisibilityBtn = document.getElementById('toggle-password-visibility');
+
+  if (generateBtn && passwordInput) {
+    generateBtn.addEventListener('click', () => {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+      let password = "";
+      for (let i = 0; i < 12; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      passwordInput.value = password;
+      passwordInput.type = 'text';
+      updateEyeIcon(true);
+    });
+  }
+
+  if (toggleVisibilityBtn && passwordInput) {
+    toggleVisibilityBtn.addEventListener('click', () => {
+      const isVisible = passwordInput.type === 'text';
+      passwordInput.type = isVisible ? 'password' : 'text';
+      updateEyeIcon(!isVisible);
+    });
+  }
+
+  function updateEyeIcon(showText) {
+    if (!toggleVisibilityBtn) return;
+    if (showText) {
+      toggleVisibilityBtn.innerHTML = `
+        <svg class="eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+        </svg>
+      `;
+    } else {
+      toggleVisibilityBtn.innerHTML = `
+        <svg class="eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      `;
+    }
   }
 }
 
@@ -1072,4 +1224,153 @@ function initOverviewLiveWidgets() {
       ws.close();
     }
   });
+}
+
+/**
+ * Format bytes helper for storage sizes
+ */
+function formatBytes(bytes, decimals = 1) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+/**
+ * Initialize Doctor Detailed Profile view for IT-Admin
+ */
+async function initDoctorProfilePage() {
+  const params = new URLSearchParams(window.location.search);
+  const doctorId = params.get('id');
+  if (!doctorId) {
+    window.location.href = '/admin/doctors';
+    return;
+  }
+
+  // Bind Tab Click Handlers
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+      btn.classList.add('active');
+      const paneId = btn.getAttribute('data-tab');
+      document.getElementById(paneId).classList.add('active');
+    });
+  });
+
+  try {
+    const response = await apiRequest(`/doctors/${doctorId}`);
+    if (response.success) {
+      const { profile, stats, patients, reports } = response.data;
+      
+      // Populate Hero Cards
+      document.getElementById('doctor-full-name').innerText = `Dr. ${profile.first_name} ${profile.last_name}`;
+      document.getElementById('doctor-code-badge').innerText = profile.doctor_code || 'DOC-xxxxx';
+      document.getElementById('doctor-specialization-label').innerText = profile.specialization;
+      document.getElementById('doctor-license-number').innerText = profile.license_number;
+      document.getElementById('doctor-email').innerText = profile.email;
+      document.getElementById('doctor-phone').innerText = profile.phone || 'N/A';
+      document.getElementById('doctor-hero-avatar').innerText = `${profile.first_name[0].toUpperCase()}${profile.last_name[0].toUpperCase()}`;
+
+      // Populate Stats Cards
+      document.getElementById('stat-patients-count').innerText = stats.patient_count;
+      document.getElementById('stat-visits-count').innerText = stats.checkup_count;
+      document.getElementById('stat-storage-size').innerText = formatBytes(stats.total_file_size_bytes);
+
+      // Populate Tab Count Badges
+      document.getElementById('tab-patients-count').innerText = stats.patient_count;
+      document.getElementById('tab-files-count').innerText = reports.length;
+
+      // Render Patients List
+      const patientsTableBody = document.getElementById('doctor-patients-table-body');
+      let allPatientsData = patients || [];
+
+      const renderPatients = (filtered) => {
+        if (filtered.length === 0) {
+          patientsTableBody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No patients found matching this search.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        patientsTableBody.innerHTML = filtered.map(pat => `
+          <tr>
+            <td data-label="Patient Code"><strong>${pat.patient_code}</strong></td>
+            <td data-label="Full Name"><strong>${pat.first_name} ${pat.last_name}</strong></td>
+            <td data-label="Gender & Age">${pat.gender} (DOB: ${pat.date_of_birth || 'N/A'})</td>
+            <td data-label="Cancer Stage">
+              <span class="doctor-code-badge" style="background:#fff7ed;color:#ea580c;border:1px solid #ffedd5;">${pat.cancer_stage}</span>
+            </td>
+            <td data-label="Clinical Status">
+              <span class="status-pill ${pat.status === 'active' ? 'status-active' : 'status-pending'}">
+                ${pat.status === 'active' ? 'Active' : 'Draft'}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      };
+
+      renderPatients(allPatientsData);
+
+      // Setup Search Listener
+      const patientSearchInput = document.getElementById('patient-search');
+      if (patientSearchInput) {
+        patientSearchInput.addEventListener('input', (e) => {
+          const val = e.target.value.toLowerCase().trim();
+          const filtered = allPatientsData.filter(pat => 
+            pat.patient_code.toLowerCase().includes(val) ||
+            `${pat.first_name} ${pat.last_name}`.toLowerCase().includes(val) ||
+            pat.cancer_stage.toLowerCase().includes(val)
+          );
+          renderPatients(filtered);
+        });
+      }
+
+      // Render Uploaded Diagnostic Files
+      const filesTableBody = document.getElementById('doctor-files-table-body');
+      if (reports && reports.length > 0) {
+        filesTableBody.innerHTML = reports.map(file => {
+          const sizeText = formatBytes(file.file_size_bytes || 0);
+          const uploadDateStr = new Date(file.uploaded_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+          return `
+            <tr>
+              <td data-label="Uploaded Date">${uploadDateStr}</td>
+              <td data-label="File Name">
+                <div style="display:flex; flex-direction:column;">
+                  <strong>${file.file_name}</strong>
+                  <span style="font-size:11px; color:var(--text-muted); margin-top:2px;">Patient: ${file.patient_name} (${file.patient_id.substring(0,8)}...)</span>
+                </div>
+              </td>
+              <td data-label="Report Type">
+                <span class="status-pill status-pending" style="padding:2px 8px; font-size:11px;">${file.report_type}</span>
+              </td>
+              <td data-label="File Size" style="font-family: monospace;">${sizeText}</td>
+              <td data-label="Actions" style="text-align: center;">
+                <a href="${file.file_url}" target="_blank" class="btn-download-file">
+                  <svg style="width:12px; height:12px; margin-right:4px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  Download
+                </a>
+               </td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        filesTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No diagnostic reports uploaded by this specialist.</td>
+          </tr>
+        `;
+      }
+    }
+  } catch (err) {
+    console.error('Error loading doctor detailed profile details:', err);
+    alert('Failed to retrieve doctor detailed statistics. Returning to directory.');
+    window.location.href = '/admin/doctors';
+  }
 }

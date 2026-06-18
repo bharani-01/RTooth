@@ -65,14 +65,7 @@ async function loadDoctorSidebar() {
     });
 
     // Re-bind Logout Button
-    const logoutBtn = document.getElementById('doctor-logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', async () => {
-        if (confirm('Are you sure you want to end your oncologist portal session?')) {
-          await logoutUser();
-        }
-      });
-    }
+
 
     if (window.initMobileMenu) {
       window.initMobileMenu();
@@ -678,7 +671,8 @@ function initModals(patientId) {
   if (deleteMedActionBtn) {
     deleteMedActionBtn.addEventListener('click', async () => {
       const medId = document.getElementById('edit_med_id').value;
-      if (!confirm('Are you sure you want to permanently delete this medication prescription?')) {
+      const confirmed = await showConfirmModal('Are you sure you want to permanently delete this medication prescription?');
+      if (!confirmed) {
         return;
       }
 

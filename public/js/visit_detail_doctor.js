@@ -64,14 +64,7 @@ async function loadDoctorSidebar() {
       }
     });
 
-    const logoutBtn = document.getElementById('doctor-logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', async () => {
-        if (confirm('Are you sure you want to end your oncologist portal session?')) {
-          await logoutUser();
-        }
-      });
-    }
+
 
     if (window.initMobileMenu) {
       window.initMobileMenu();

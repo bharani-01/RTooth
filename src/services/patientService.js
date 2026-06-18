@@ -221,21 +221,25 @@ export const createMedication = async (patientId, medData) => {
  * Add a checkup record for a patient.
  */
 export const createCheckup = async (patientId, doctorId, checkupData) => {
+  const insertPayload = {
+    patient_id: patientId,
+    doctor_id: doctorId,
+    findings: checkupData.findings,
+    notes: checkupData.notes || null,
+    recommendations: checkupData.recommendations || null,
+    checkup_date: checkupData.checkup_date || new Date().toISOString(),
+    next_checkup_date: checkupData.next_checkup_date || null,
+    followup_interval: checkupData.followup_interval || null,
+    followup_notes: checkupData.followup_notes || null
+  };
+
+  if (checkupData.id) {
+    insertPayload.id = checkupData.id;
+  }
+
   const { data, error } = await supabase
     .from('checkups')
-    .insert([
-      {
-        patient_id: patientId,
-        doctor_id: doctorId,
-        findings: checkupData.findings,
-        notes: checkupData.notes || null,
-        recommendations: checkupData.recommendations || null,
-        checkup_date: checkupData.checkup_date || new Date().toISOString(),
-        next_checkup_date: checkupData.next_checkup_date || null,
-        followup_interval: checkupData.followup_interval || null,
-        followup_notes: checkupData.followup_notes || null
-      }
-    ])
+    .insert([insertPayload])
     .select()
     .single();
 
@@ -350,6 +354,7 @@ export const updatePatientProfile = async (patientId, updateData) => {
 export const createVisit = async (patientId, doctorId, visitData) => {
   // 1. Create the checkup (visit header)
   const checkup = await createCheckup(patientId, doctorId, {
+    id: visitData.id || null,
     findings: visitData.findings,
     notes: visitData.notes,
     recommendations: visitData.recommendations,

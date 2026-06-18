@@ -36,8 +36,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve Static Frontend Files with clean URLs support
-app.use(express.static(path.join(__dirname, '../public'), { extensions: ['html'] }));
+// Serve Static Frontend Files with clean URLs support and disabled caching
+app.use(express.static(path.join(__dirname, '../public'), {
+  extensions: ['html'],
+  setHeaders: (res, path) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+}));
 
 // Versioned API Routes (v1)
 app.use('/api/v1/auth', authRoutes);

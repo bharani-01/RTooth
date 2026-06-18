@@ -2,6 +2,8 @@ import * as patientService from '../services/patientService.js';
 import { sendResponse } from '../utils/response.js';
 import { BadRequestError, ForbiddenError } from '../utils/errors.js';
 import { supabase, supabaseAdmin } from '../config/supabase.js';
+import crypto from 'crypto';
+
 
 /**
  * Get the full profile data of a specific patient by ID or custom patient code.
@@ -181,6 +183,9 @@ export const createPatientVisit = async (req, res, next) => {
     // Resolve internal UUID
     const patientId = await patientService.getPatientIdByIdOrCode(id);
     const doctorId = req.profile.id;
+    const patientProfile = await patientService.getPatientProfileById(patientId);
+    const cleanPatientName = `${patientProfile.first_name}_${patientProfile.last_name}`.replace(/[^a-zA-Z0-9_]/g, '');
+    const checkupId = crypto.randomUUID();
 
     // Parse prescriptions JSON if sent
     let parsedPrescriptions = [];
@@ -224,7 +229,10 @@ export const createPatientVisit = async (req, res, next) => {
 
         // Generate unique name
         const fileExt = file.originalname.split('.').pop();
-        const uniqueFileName = `${patientId}/${Date.now()}-${Math.random().toString(36).substring(2, 10)}.${fileExt}`;
+        const cleanReportType = reportType.replace(/[^a-zA-Z0-9_]/g, '_');
+        const formattedDate = new Date().toISOString().slice(0, 19).replace(/T/, '_').replace(/:/g, '-');
+        const uniqueFileName = `${patientId}/${cleanPatientName}-${cleanReportType}-${formattedDate}-Visit-${checkupId}.${fileExt}`;
+        const newFileName = `${cleanPatientName}-${cleanReportType}-${formattedDate}-Visit-${checkupId.substring(0, 8)}.${fileExt}`;
 
         // Upload to bucket (using admin client to bypass storage RLS constraints)
         const storageClient = supabaseAdmin || supabase;
@@ -247,13 +255,14 @@ export const createPatientVisit = async (req, res, next) => {
 
         uploadedReports.push({
           report_type: reportType,
-          file_name: file.originalname,
+          file_name: newFileName,
           file_url: publicUrl
         });
       }
     }
 
     const visitData = {
+      id: checkupId,
       findings,
       notes: notes || null,
       recommendations: recommendations || null,
@@ -288,6 +297,8 @@ export const addVisitReports = async (req, res, next) => {
     // Resolve internal UUID
     const patientId = await patientService.getPatientIdByIdOrCode(id);
     const doctorId = req.profile.id;
+    const patientProfile = await patientService.getPatientProfileById(patientId);
+    const cleanPatientName = `${patientProfile.first_name}_${patientProfile.last_name}`.replace(/[^a-zA-Z0-9_]/g, '');
 
     // Parse report types JSON if sent
     let parsedReportTypes = [];
@@ -321,7 +332,10 @@ export const addVisitReports = async (req, res, next) => {
 
       // Generate unique name
       const fileExt = file.originalname.split('.').pop();
-      const uniqueFileName = `${patientId}/${Date.now()}-${Math.random().toString(36).substring(2, 10)}.${fileExt}`;
+      const cleanReportType = reportType.replace(/[^a-zA-Z0-9_]/g, '_');
+      const formattedDate = new Date().toISOString().slice(0, 19).replace(/T/, '_').replace(/:/g, '-');
+      const uniqueFileName = `${patientId}/${cleanPatientName}-${cleanReportType}-${formattedDate}-Visit-${visitId}.${fileExt}`;
+      const newFileName = `${cleanPatientName}-${cleanReportType}-${formattedDate}-Visit-${visitId.substring(0, 8)}.${fileExt}`;
 
       // Upload to bucket (using admin client to bypass storage RLS constraints)
       const storageClient = supabaseAdmin || supabase;
@@ -351,7 +365,7 @@ export const addVisitReports = async (req, res, next) => {
             doctor_id: doctorId,
             checkup_id: visitId,
             report_type: reportType,
-            file_name: file.originalname,
+            file_name: newFileName,
             file_url: publicUrl
           }
         ])

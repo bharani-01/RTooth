@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Profile - RTooth Portal</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin_doctor_profile.css">
+</head>
+<body data-auth-required="true" data-allowed-roles="admin" class="dashboard-body">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/admin/index.html" class="logo" id="header-logo">
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/admin/profile.html" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="admin-avatar">AD</div>
+            <div class="user-info">
+              <div class="user-name" id="admin-name-badge">Admin Loading...</div>
+              <div class="user-role-label">System IT-Admin</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <main class="dashboard-layout">
+    
+    <!-- Dynamic Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container">
+      <div style="color: var(--text-muted); font-size: 13px;">Loading navigation menu...</div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="dashboard-content animate-fadeIn">
+      
+      <!-- Back Link & Page Title -->
+      <div class="breadcrumb-container">
+        <a href="/admin/doctors" class="back-link-btn">
+          <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Directory
+        </a>
+      </div>
+
+      <!-- Doctor Hero Card -->
+      <div class="profile-hero-card">
+        <div class="profile-hero-avatar" id="doctor-hero-avatar">DOC</div>
+        <div class="profile-hero-details">
+          <div class="doctor-badge-row">
+            <h2 id="doctor-full-name">Dr. Loading...</h2>
+            <span class="doctor-code-badge" id="doctor-code-badge">DOC-xxxxx</span>
+          </div>
+          <p class="doctor-specialty-label" id="doctor-specialization-label">Specialist</p>
+          <div class="doctor-meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">License Number</span>
+              <code class="meta-value" id="doctor-license-number">Loading...</code>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Email Contact</span>
+              <span class="meta-value" id="doctor-email">Loading...</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Phone Contact</span>
+              <span class="meta-value" id="doctor-phone">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live KPI Cards -->
+      <div class="stats-grid" style="margin-top: 24px;">
+        <!-- Card 1: Registered Patients -->
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Assigned Patients</span>
+            <div class="stat-icon-wrapper blue">
+              <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-patients-count">0</div>
+          <div class="stat-desc">Active diagnostic profiles</div>
+        </div>
+
+        <!-- Card 2: Consultation Checkups Logged -->
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Consultations Logged</span>
+            <div class="stat-icon-wrapper teal">
+              <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-visits-count">0</div>
+          <div class="stat-desc">Completed clinical visits</div>
+        </div>
+
+        <!-- Card 3: Storage Size Occupied -->
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Storage Utilized</span>
+            <div class="stat-icon-wrapper green">
+              <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-storage-size">0 Bytes</div>
+          <div class="stat-desc">Diagnostics & radiology files</div>
+        </div>
+      </div>
+
+      <!-- Tab View & Detail Tables -->
+      <div class="detail-card">
+        <div class="detail-tabs-header">
+          <button class="tab-btn active" data-tab="patients-tab-content">
+            Assigned Patients
+            <span class="tab-count-badge" id="tab-patients-count">0</span>
+          </button>
+          <button class="tab-btn" data-tab="files-tab-content">
+            Uploaded Diagnostic Files
+            <span class="tab-count-badge" id="tab-files-count">0</span>
+          </button>
+        </div>
+
+        <div class="detail-tabs-body">
+          <!-- Patients Tab -->
+          <div class="tab-pane active" id="patients-tab-content">
+            <div class="tab-search-bar">
+              <input type="text" id="patient-search" class="tab-search-input" placeholder="Search assigned patients (by code, name, or cancer stage)...">
+            </div>
+            <div class="table-wrap">
+              <table class="clinic-table">
+                <thead>
+                  <tr>
+                    <th>Patient Code</th>
+                    <th>Full Name</th>
+                    <th>Gender & Age</th>
+                    <th>Cancer Stage</th>
+                    <th>Clinical Status</th>
+                  </tr>
+                </thead>
+                <tbody id="doctor-patients-table-body">
+                  <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No patients assigned.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Files Tab -->
+          <div class="tab-pane" id="files-tab-content">
+            <div class="table-wrap">
+              <table class="clinic-table">
+                <thead>
+                  <tr>
+                    <th>Uploaded Date</th>
+                    <th>File Name</th>
+                    <th>Report Type</th>
+                    <th>File Size</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="doctor-files-table-body">
+                  <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No report files uploaded.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/admin.js"></script>
+</body>
+</html>

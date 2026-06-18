@@ -1081,3 +1081,263 @@ body.dashboard-body .logo-icon-container {
   color: var(--primary);
   box-shadow: 0 4px 10px rgba(0, 102, 255, 0.15);
 }
+
+/* Smooth desktop sidebar transition system */
+.sidebar,
+.dashboard-content,
+.header-brand-area,
+.mobile-menu-toggle,
+.logo-img,
+footer {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Desktop Sidebar Toggle & Collapse System */
+@media(min-width: 993px) {
+  body.dashboard-body .nav-bar {
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  body.dashboard-body .nav-links {
+    order: 3;
+    margin-left: auto;
+  }
+
+  /* Logo on the left */
+  body.dashboard-body .header-brand-area {
+    order: 1;
+    width: 200px;
+    padding: 0 20px;
+    border-right: none; /* Border is moved to toggle button */
+  }
+
+  /* Show toggle button on desktop, to the right of logo, serving as 260px boundary */
+  body.dashboard-body .mobile-menu-toggle {
+    order: 2;
+    display: flex !important;
+    height: 72px;
+    width: 60px;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--border-color);
+    margin-left: 0;
+    border-radius: 0;
+    cursor: pointer;
+    background: transparent;
+  }
+
+  /* Make toggle button smaller and floating visually using a pseudo-element container */
+  body.dashboard-body .mobile-menu-toggle {
+    position: relative;
+  }
+
+  body.dashboard-body .mobile-menu-toggle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-secondary);
+    box-shadow: var(--shadow-sm);
+    z-index: 1;
+    transition: var(--transition-smooth);
+  }
+
+  body.dashboard-body .mobile-menu-toggle svg {
+    position: relative;
+    z-index: 2;
+    width: 18px;
+    height: 18px;
+    color: var(--primary);
+    transition: var(--transition-smooth);
+  }
+
+  body.dashboard-body .mobile-menu-toggle:hover::before {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+  }
+
+  body.dashboard-body .mobile-menu-toggle:hover svg {
+    color: var(--primary);
+    transform: scale(1.08);
+  }
+
+  /* COLLAPSED STATE */
+  body.sidebar-collapsed .sidebar {
+    width: 80px;
+    padding: 24px 12px;
+  }
+
+  body.sidebar-collapsed .dashboard-content {
+    margin-left: 80px;
+  }
+
+  body.sidebar-collapsed .dashboard-layout ~ footer {
+    margin-left: 80px;
+  }
+
+  body.sidebar-collapsed .mobile-menu-toggle {
+    width: 80px;
+    border-right: 1px solid var(--border-color);
+  }
+
+  body.sidebar-collapsed .header-brand-area {
+    display: none !important;
+  }
+
+  /* Sidebar item adjustments when collapsed */
+  body.sidebar-collapsed .sidebar-item {
+    justify-content: center;
+    padding: 12px;
+    gap: 0;
+    position: relative;
+  }
+
+  /* Hide the text labels inside sidebar items */
+  body.sidebar-collapsed .sidebar-item {
+    font-size: 0 !important;
+    color: transparent !important;
+  }
+
+  body.sidebar-collapsed .sidebar-item svg {
+    margin-right: 0 !important;
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  /* Center logout button icon */
+  body.sidebar-collapsed #admin-logout-btn,
+  body.sidebar-collapsed #doctor-logout-btn {
+    padding: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  body.sidebar-collapsed #admin-logout-btn span,
+  body.sidebar-collapsed #doctor-logout-btn span {
+    display: none !important;
+  }
+
+  body.sidebar-collapsed #admin-logout-btn svg,
+  body.sidebar-collapsed #doctor-logout-btn svg {
+    margin-right: 0 !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+/* Custom Premium HTML Modal Overlay */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.custom-modal-card {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: modalScaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes modalScaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.custom-modal-overlay.animate-fadeOut {
+  animation: fadeOut 0.18s ease forwards;
+}
+
+.custom-modal-overlay.animate-fadeOut .custom-modal-card {
+  animation: modalScaleOut 0.18s ease forwards;
+}
+
+@keyframes modalScaleOut {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0.96); opacity: 0; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.custom-modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.custom-modal-icon.warning {
+  background-color: var(--danger-light);
+  color: var(--danger);
+}
+
+.custom-modal-icon.info {
+  background-color: var(--primary-light);
+  color: var(--primary);
+}
+
+.custom-modal-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.custom-modal-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+.custom-modal-message {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+.custom-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.custom-modal-actions.single {
+  grid-template-columns: 1fr;
+  max-width: 150px;
+  margin: 0 auto;
+}
+
+.custom-modal-actions .btn {
+  height: 40px;
+  font-size: 13.5px;
+  border-radius: var(--radius-sm);
+}
+

@@ -203,6 +203,19 @@ export const getDoctors = async (req, res, next) => {
 };
 
 /**
+ * Get detailed profile and statistics of a specific doctor (IT-Admin only)
+ */
+export const getDoctorProfile = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const profileData = await authService.getDoctorProfileWithStats(id);
+    return sendResponse(res, 200, 'Doctor detailed profile retrieved successfully.', profileData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Get all registered patients (Doctor/Admin only)
  */
 export const getPatients = async (req, res, next) => {

@@ -1,4 +1,4 @@
-import { apiRequest, setSessionToken, setUserProfile, getSessionToken, getUserProfile } from './api.js';
+import { apiRequest, setSessionToken, setUserProfile, getSessionToken, getUserProfile, logoutUser } from './api.js';
 
 // Setup event listeners for forms when DOM loads
 document.addEventListener('DOMContentLoaded', () => {
@@ -234,6 +234,11 @@ function setLoading(button, isLoading, text) {
   }
 }
 
+// Apply collapsed state on page load if saved in localStorage
+if (localStorage.getItem('sidebar-collapsed') === 'true' && window.innerWidth > 992) {
+  document.body.classList.add('sidebar-collapsed');
+}
+
 /**
  * Initialize Mobile Menu Toggler & Backdrop
  */
@@ -254,8 +259,14 @@ export function initMobileMenu() {
   // Toggle events
   toggleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    sidebar.classList.toggle('open');
-    backdrop.classList.toggle('visible');
+    if (window.innerWidth > 992) {
+      document.body.classList.toggle('sidebar-collapsed');
+      const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+      localStorage.setItem('sidebar-collapsed', isCollapsed ? 'true' : 'false');
+    } else {
+      sidebar.classList.toggle('open');
+      backdrop.classList.toggle('visible');
+    }
   });
 
   // Close events
@@ -276,3 +287,105 @@ export function initMobileMenu() {
 
 // Bind to window for easy global access across modular scripts
 window.initMobileMenu = initMobileMenu;
+
+export function showConfirmModal(message, title = 'Confirm Action') {
+  return new Promise((resolve) => {
+    // 1. Create overlay container
+    const overlay = document.createElement('div');
+    overlay.className = 'custom-modal-overlay';
+    
+    // 2. Create card content
+    overlay.innerHTML = `
+      <div class="custom-modal-card">
+        <div class="custom-modal-icon warning">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="custom-modal-title">${title}</h3>
+        <p class="custom-modal-message">${message}</p>
+        <div class="custom-modal-actions">
+          <button class="btn btn-secondary modal-cancel-btn">Cancel</button>
+          <button class="btn btn-primary btn-teal modal-confirm-btn">Confirm</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const cleanup = (value) => {
+      overlay.classList.add('animate-fadeOut');
+      overlay.addEventListener('animationend', () => {
+        overlay.remove();
+      });
+      resolve(value);
+    };
+
+    overlay.querySelector('.modal-cancel-btn').addEventListener('click', () => cleanup(false));
+    overlay.querySelector('.modal-confirm-btn').addEventListener('click', () => cleanup(true));
+  });
+}
+
+export function showAlertModal(message, title = 'Notification') {
+  const existing = document.querySelector('.custom-modal-overlay');
+  if (existing) {
+    existing.remove();
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'custom-modal-overlay';
+  
+  overlay.innerHTML = `
+    <div class="custom-modal-card">
+      <div class="custom-modal-icon info">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="custom-modal-title">${title}</h3>
+      <p class="custom-modal-message">${message}</p>
+      <div class="custom-modal-actions single">
+        <button class="btn btn-primary modal-ok-btn">OK</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const cleanup = () => {
+    overlay.classList.add('animate-fadeOut');
+    overlay.addEventListener('animationend', () => {
+      overlay.remove();
+    });
+  };
+
+  overlay.querySelector('.modal-ok-btn').addEventListener('click', cleanup);
+}
+
+window.showConfirmModal = showConfirmModal;
+window.showAlertModal = showAlertModal;
+
+// Override native window.alert globally
+window.alert = function(message) {
+  showAlertModal(message);
+};
+
+// Override native window.confirm globally as a fallback to prevent native popups
+window.confirm = function(message) {
+  showAlertModal(message, 'Action Required');
+  return false;
+};
+
+// Delegate Logout Button Click Handler globally
+document.addEventListener('click', async (e) => {
+  const logoutBtn = e.target.closest('#admin-logout-btn, #doctor-logout-btn, #patient-logout-btn');
+  if (logoutBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const roleName = logoutBtn.id.includes('admin') ? 'IT-Admin' : logoutBtn.id.includes('doctor') ? 'Oncologist' : 'Patient';
+    const confirmed = await showConfirmModal(`Are you sure you want to end your ${roleName} session?`, 'Confirm Logout');
+    if (confirmed) {
+      await logoutUser();
+    }
+  }
+});

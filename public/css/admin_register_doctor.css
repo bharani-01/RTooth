@@ -1,6 +1,167 @@
 @import url("/css/style.css");
 
 /* Admin Register Doctor Form Specific Styles */
-#register-doctor-form {
-  animation: fadeIn 0.35s ease-out;
+.registration-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  align-items: start;
+  margin-top: 12px;
+}
+
+@media(max-width: 992px) {
+  .registration-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.form-section {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-heading);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  padding-right: 48px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  transition: var(--transition-smooth);
+  border-radius: 50%;
+  outline: none;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary);
+  background-color: var(--bg-subtle);
+}
+
+.eye-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Guide Sidebar Card */
+.guide-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 96px;
+  transition: var(--transition-smooth);
+}
+
+.guide-card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(13, 148, 136, 0.2);
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--accent-teal-light);
+  padding-bottom: 16px;
+}
+
+.guide-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  background-color: var(--accent-teal-light);
+  color: var(--accent-teal);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+  font-family: var(--font-heading);
+}
+
+.guide-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.guide-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.guide-item-title {
+  font-family: var(--font-heading);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.guide-item-title::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--accent-teal);
+  border-radius: 50%;
+}
+
+.guide-item-desc {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding-left: 14px;
 }

@@ -83,15 +83,7 @@ async function loadDoctorSidebar() {
       }
     });
 
-    // Re-bind Logout Button since it's dynamically loaded now!
-    const logoutBtn = document.getElementById('doctor-logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', async () => {
-        if (confirm('Are you sure you want to end your oncologist portal session?')) {
-          await logoutUser();
-        }
-      });
-    }
+
 
     if (window.initMobileMenu) {
       window.initMobileMenu();
@@ -589,7 +581,8 @@ async function loadDraftsData() {
  * Promote a draft patient to active (register them in the portal)
  */
 async function handlePromoteDraft(patientId, patientCode, buttonEl) {
-  if (!confirm(`Are you sure you want to promote patient ${patientCode} to active? This will allow them to log in to the portal.`)) {
+  const confirmed = await showConfirmModal(`Are you sure you want to promote patient ${patientCode} to active? This will allow them to log in to the portal.`);
+  if (!confirmed) {
     return;
   }
 
