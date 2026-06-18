@@ -30,7 +30,8 @@ CREATE TABLE public.profiles (
   last_name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   role user_role NOT NULL DEFAULT 'patient',
-  phone TEXT
+  phone TEXT,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'draft', 'banned'))
 );
 
 -- 4. Create Doctors table

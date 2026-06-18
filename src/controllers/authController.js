@@ -348,5 +348,127 @@ export const sendDoctorResetLink = async (req, res, next) => {
   }
 };
 
+/**
+ * Handle password reset using an OTP code
+ */
+export const resetPasswordOtp = async (req, res, next) => {
+  try {
+    const { email, code, newPassword } = req.body;
+    if (!email || !code || !newPassword) {
+      throw new BadRequestError('Email, OTP code, and new password are required.');
+    }
+    await authService.resetPasswordWithOtp(email, code, newPassword);
+    return sendResponse(res, 200, 'Your password has been reset successfully.');
+  } catch (error) {
+    console.error('[OTP Password Reset Exception]', error);
+    next(error);
+  }
+};
+
+/**
+ * Get list of all users in the system (IT-Admin only)
+ */
+export const adminListUsers = async (req, res, next) => {
+  try {
+    const users = await authService.listAllUsers();
+    return sendResponse(res, 200, 'Users list retrieved successfully.', { users });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Update user details by ID (IT-Admin only)
+ */
+export const adminUpdateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { first_name, last_name, email, phone, role } = req.body;
+
+    if (!first_name || !last_name || !email || !role) {
+      throw new BadRequestError('Missing required fields: first_name, last_name, email, and role are required.');
+    }
+
+    const updatedProfile = await authService.updateUserAdmin(id, {
+      first_name,
+      last_name,
+      email,
+      phone,
+      role
+    });
+
+    return sendResponse(res, 200, 'User updated successfully.', { profile: updatedProfile });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Delete a user by ID (IT-Admin only)
+ */
+export const adminDeleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    // Prevent admin from deleting themselves
+    if (id === req.profile.id) {
+      throw new BadRequestError('You cannot delete your own admin account.');
+    }
+
+    await authService.deleteUserAdmin(id);
+    return sendResponse(res, 200, 'User deleted successfully.');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Ban or unban a user by ID (IT-Admin only)
+ */
+export const adminBanUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { isBanned } = req.body;
+
+    if (isBanned === undefined) {
+      throw new BadRequestError('isBanned flag (boolean) is required.');
+    }
+
+    // Prevent admin from banning themselves
+    if (id === req.profile.id && isBanned) {
+      throw new BadRequestError('You cannot suspend/ban your own admin account.');
+    }
+
+    const updatedProfile = await authService.banUserAdmin(id, isBanned);
+    const action = isBanned ? 'suspended' : 'activated';
+    return sendResponse(res, 200, `User account has been successfully ${action}.`, { profile: updatedProfile });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Create a new user account (IT-Admin only)
+ */
+export const adminCreateUser = async (req, res, next) => {
+  try {
+    const { email, password, first_name, last_name, role } = req.body;
+
+    if (!email || !password || !first_name || !last_name || !role) {
+      throw new BadRequestError('Missing required fields: email, password, first_name, last_name, and role are required.');
+    }
+
+    const result = await authService.createUserAdmin(req.body);
+
+    return sendResponse(res, 201, 'User created successfully.', {
+      user: result.user,
+      profile: result.profile
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
 

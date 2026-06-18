@@ -112,6 +112,10 @@ async function handleLoginSubmit(event) {
       }
     }
   } catch (error) {
+    if (error.message && (error.message.toLowerCase().includes('suspended') || error.message.toLowerCase().includes('banned'))) {
+      window.location.href = '/banned.html';
+      return;
+    }
     showAlert(errorAlert, error.message);
   } finally {
     setLoading(submitBtn, false, isOtpActive ? 'Verify & Sign In' : 'Sign In');
@@ -225,6 +229,13 @@ async function initPageGuard() {
     document.dispatchEvent(new CustomEvent('auth-verified', { detail: response.data.profile }));
   } catch (error) {
     console.error('Session guard verification failed:', error.message);
+    if (error.message && (error.message.toLowerCase().includes('suspended') || error.message.toLowerCase().includes('banned'))) {
+      try {
+        logoutUser();
+      } catch (e) {}
+      window.location.href = '/banned.html';
+      return;
+    }
     window.location.href = '/login';
   }
 }
@@ -534,57 +545,161 @@ function initLoginFeatures() {
       const submitBtn = document.getElementById('forgot-submit-btn');
 
       hideAlerts();
-      setLoading(submitBtn, true, 'Sending link...');
+      setLoading(submitBtn, true, 'Sending code...');
 
       try {
-        const response = await apiRequest('/auth/forgot-password', {
+        const response = await apiRequest('/auth/otp/send', {
           method: 'POST',
           body: { email }
         });
         if (response.success) {
-          showAlert(successAlert, 'Recovery link sent! Check your inbox for Supabase email.');
+          showAlert(successAlert, 'Verification code sent! Redirecting to password reset...');
           document.getElementById('forgot-email').value = '';
+          setTimeout(() => {
+            window.location.href = `/reset_password.html?email=${encodeURIComponent(email)}`;
+          }, 1500);
         }
       } catch (err) {
         showAlert(errorAlert, err.message);
       } finally {
-        setLoading(submitBtn, false, 'Send Reset Link');
+        setLoading(submitBtn, false, 'Send Verification Code');
       }
     });
   }
 }
 
 function initResetPasswordPage() {
+  const otpRequestForm = document.getElementById('otp-request-form');
+  const resetOtpForm = document.getElementById('reset-otp-form');
   const resetForm = document.getElementById('reset-password-form');
+  
   const tokenStatus = document.getElementById('token-status');
   const errorAlert = document.getElementById('reset-error-alert');
   const successAlert = document.getElementById('reset-success-alert');
   const redirectContainer = document.getElementById('login-redirect-container');
-  const submitBtn = document.getElementById('reset-submit-btn');
 
   // Extract access token from URL hash fragment (#access_token=...&refresh_token=...)
   const hash = window.location.hash || '';
   const params = new URLSearchParams(hash.substring(1));
   const token = params.get('access_token');
 
-  if (!token) {
+  // Check if we have a redirect hash token
+  if (token) {
     if (tokenStatus) {
-      tokenStatus.innerText = 'No valid recovery token was found in the URL. Please trigger a new password reset link from the login page.';
-      tokenStatus.style.color = 'var(--danger)';
+      tokenStatus.style.display = 'block';
+      tokenStatus.innerText = 'Verifying security link...';
     }
-    if (redirectContainer) redirectContainer.style.display = 'block';
+    if (otpRequestForm) otpRequestForm.style.display = 'none';
+    if (resetOtpForm) resetOtpForm.style.display = 'none';
+
+    // Token found, show password reset form directly
+    if (tokenStatus) tokenStatus.style.display = 'none';
+    if (resetForm) resetForm.style.display = 'block';
+
+    if (resetForm) {
+      const submitBtn = document.getElementById('reset-submit-btn');
+      resetForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (newPassword !== confirmPassword) {
+          showAlert(errorAlert, 'Passwords do not match.');
+          return;
+        }
+
+        if (errorAlert) errorAlert.style.display = 'none';
+        if (successAlert) successAlert.style.display = 'none';
+        setLoading(submitBtn, true, 'Updating password...');
+
+        try {
+          const response = await apiRequest('/auth/reset-password', {
+            method: 'POST',
+            body: { token, newPassword }
+          });
+          if (response.success) {
+            showAlert(successAlert, 'Password updated successfully! You can now sign in.');
+            resetForm.style.display = 'none';
+            if (redirectContainer) redirectContainer.style.display = 'block';
+          }
+        } catch (err) {
+          showAlert(errorAlert, err.message);
+        } finally {
+          setLoading(submitBtn, false, 'Update Password');
+        }
+      });
+    }
     return;
   }
 
-  // Token found, allow updating
+  // Dual mode: No token found. Stay in OTP flow.
   if (tokenStatus) tokenStatus.style.display = 'none';
-  if (resetForm) resetForm.style.display = 'block';
 
-  if (resetForm) {
-    resetForm.addEventListener('submit', async (e) => {
+  // Check if email was pre-filled via query parameter (from login page forgot password trigger)
+  const urlParams = new URLSearchParams(window.location.search);
+  const prefilledEmail = urlParams.get('email');
+
+  if (prefilledEmail) {
+    if (otpRequestForm) otpRequestForm.style.display = 'none';
+    if (resetOtpForm) {
+      resetOtpForm.style.display = 'block';
+      const emailInput = document.getElementById('reset-email');
+      if (emailInput) emailInput.value = prefilledEmail;
+      
+      const msgEl = document.getElementById('otp-message');
+      if (msgEl) {
+        msgEl.innerText = `Enter the 6-digit code sent to ${prefilledEmail} and choose a strong new password.`;
+      }
+    }
+  } else {
+    if (otpRequestForm) otpRequestForm.style.display = 'block';
+    if (resetOtpForm) resetOtpForm.style.display = 'none';
+  }
+
+  // Step 1: Handle OTP Send request
+  if (otpRequestForm) {
+    otpRequestForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const newPassword = document.getElementById('new-password').value;
-      const confirmPassword = document.getElementById('confirm-password').value;
+      const email = document.getElementById('reset-email').value.trim();
+      const submitBtn = document.getElementById('send-otp-btn');
+
+      if (errorAlert) errorAlert.style.display = 'none';
+      if (successAlert) successAlert.style.display = 'none';
+      setLoading(submitBtn, true, 'Sending code...');
+
+      try {
+        const response = await apiRequest('/auth/otp/send', {
+          method: 'POST',
+          body: { email }
+        });
+        if (response.success) {
+          showAlert(successAlert, 'Verification code sent to your email.');
+          otpRequestForm.style.display = 'none';
+          if (resetOtpForm) {
+            resetOtpForm.style.display = 'block';
+            const msgEl = document.getElementById('otp-message');
+            if (msgEl) {
+              msgEl.innerText = `Enter the 6-digit code sent to ${email} and choose a strong new password.`;
+            }
+          }
+        }
+      } catch (err) {
+        showAlert(errorAlert, err.message);
+      } finally {
+        setLoading(submitBtn, false, 'Send Reset Code');
+      }
+    });
+  }
+
+  // Step 2: Handle OTP Verification & Password update
+  if (resetOtpForm) {
+    resetOtpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('reset-email').value.trim();
+      const code = document.getElementById('reset-otp-code').value.trim();
+      const newPassword = document.getElementById('otp-new-password').value;
+      const confirmPassword = document.getElementById('otp-confirm-password').value;
+      const submitBtn = document.getElementById('otp-submit-btn');
 
       if (newPassword !== confirmPassword) {
         showAlert(errorAlert, 'Passwords do not match.');
@@ -593,16 +708,16 @@ function initResetPasswordPage() {
 
       if (errorAlert) errorAlert.style.display = 'none';
       if (successAlert) successAlert.style.display = 'none';
-      setLoading(submitBtn, true, 'Updating password...');
+      setLoading(submitBtn, true, 'Resetting password...');
 
       try {
-        const response = await apiRequest('/auth/reset-password', {
+        const response = await apiRequest('/auth/reset-password-otp', {
           method: 'POST',
-          body: { token, newPassword }
+          body: { email, code, newPassword }
         });
         if (response.success) {
           showAlert(successAlert, 'Password updated successfully! You can now sign in.');
-          resetForm.style.display = 'none';
+          resetOtpForm.style.display = 'none';
           if (redirectContainer) redirectContainer.style.display = 'block';
         }
       } catch (err) {

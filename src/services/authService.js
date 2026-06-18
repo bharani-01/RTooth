@@ -455,6 +455,10 @@ export const signInUser = async (email, password) => {
 
   const profile = await getResolvedProfile(authData.user.id);
 
+  if (profile.status === 'banned') {
+    throw new Error('Your account has been suspended by the IT Administrator.');
+  }
+
   if (profile.role === 'patient' && profile.status === 'draft') {
     throw new Error('Your portal registration is currently pending completion (Draft status).');
   }
@@ -490,6 +494,10 @@ export const getCurrentUserProfile = async (token) => {
   }
 
   const profile = await getResolvedProfile(user.id);
+  
+  if (profile.status === 'banned') {
+    throw new Error('Your account has been suspended by the IT Administrator.');
+  }
 
   return {
     user,
@@ -1069,6 +1077,10 @@ export const verifyOtpCode = async (email, token) => {
 
   const profile = await getResolvedProfile(data.user.id);
   
+  if (profile.status === 'banned') {
+    throw new Error('Your account has been suspended by the IT Administrator.');
+  }
+  
   if (profile.role === 'patient' && profile.status === 'draft') {
     throw new Error('Your portal registration is currently pending completion (Draft status).');
   }
@@ -1079,6 +1091,358 @@ export const verifyOtpCode = async (email, token) => {
     profile
   };
 };
+
+/**
+ * Verifies email OTP and updates the user's password securely
+ */
+export const resetPasswordWithOtp = async (email, token, newPassword) => {
+  const client = supabaseAdmin || supabase;
+  
+  // 1. Verify OTP token
+  const { data, error } = await client.auth.verifyOtp({
+    email,
+    token,
+    type: 'email'
+  });
+  if (error) throw error;
+
+  if (!data.user) {
+    throw new Error('Verification failed: No user resolved.');
+  }
+
+  // 2. Update password via admin client
+  if (!supabaseAdmin) {
+    throw new Error('Supabase Admin client is not configured.');
+  }
+
+  const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(data.user.id, {
+    password: newPassword
+  });
+  if (updateError) throw updateError;
+
+  return { success: true };
+};
+
+/**
+ * Admin: List all user accounts in the system
+ */
+export const listAllUsers = async () => {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase Admin client is not configured.');
+  }
+
+  // 1. Fetch users from Supabase Auth
+  let allAuthUsers = [];
+  let page = 1;
+  const limit = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers({
+      page,
+      perPage: limit
+    });
+    if (error) throw error;
+    allAuthUsers.push(...(users || []));
+    if (!users || users.length < limit) {
+      hasMore = false;
+    } else {
+      page++;
+    }
+  }
+
+  // 2. Fetch all profiles using range pagination to bypass the 1000 row PostgREST limit
+  const profiles = [];
+  let profilesFrom = 0;
+  let hasMoreProfiles = true;
+
+  while (hasMoreProfiles) {
+    const { data: profilesPage, error: profilesError } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .range(profilesFrom, profilesFrom + limit - 1);
+      
+    if (profilesError) throw profilesError;
+    profiles.push(...(profilesPage || []));
+    
+    if (!profilesPage || profilesPage.length < limit) {
+      hasMoreProfiles = false;
+    } else {
+      profilesFrom += limit;
+    }
+  }
+
+  const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+
+  // Merge datasets
+  return allAuthUsers.map(u => {
+    const p = profileMap.get(u.id) || {};
+    return {
+      id: u.id,
+      first_name: p.first_name || u.user_metadata?.first_name || '',
+      last_name: p.last_name || u.user_metadata?.last_name || '',
+      email: u.email || p.email || '',
+      phone: p.phone || u.phone || '',
+      role: p.role || u.user_metadata?.role || 'patient',
+      created_at: u.created_at,
+      last_sign_in_at: u.last_sign_in_at,
+      status: p.status || 'active'
+    };
+  });
+};
+
+/**
+ * Admin: Update user details (Auth & DB profile)
+ */
+export const updateUserAdmin = async (userId, updateData) => {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase Admin client is not configured.');
+  }
+
+  // 1. Update Auth user (email, phone, metadata)
+  const authUpdates = {
+    email: updateData.email,
+    phone: updateData.phone,
+    user_metadata: {
+      first_name: updateData.first_name,
+      last_name: updateData.last_name,
+      role: updateData.role
+    }
+  };
+
+  const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(userId, authUpdates);
+  if (authError) throw authError;
+
+  // 2. Resolve Role changes (clean up old tables, insert into new ones)
+  const { data: oldProfile, error: getOldError } = await supabaseAdmin
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (getOldError) throw getOldError;
+
+  if (oldProfile && oldProfile.role !== updateData.role) {
+    // Delete from old role table
+    if (oldProfile.role === 'doctor') {
+      await supabaseAdmin.from('doctors').delete().eq('id', userId);
+    } else if (oldProfile.role === 'patient') {
+      await supabaseAdmin.from('patients').delete().eq('id', userId);
+      await supabaseAdmin.from('lifestyle_habits').delete().eq('patient_id', userId);
+      await supabaseAdmin.from('medical_records').delete().eq('patient_id', userId);
+    } else if (oldProfile.role === 'admin') {
+      await supabaseAdmin.from('admins').delete().eq('id', userId);
+    }
+
+    // Insert into new role table
+    if (updateData.role === 'doctor') {
+      await supabaseAdmin.from('doctors').insert({
+        id: userId,
+        specialization: updateData.specialization || 'General Dentistry',
+        license_number: updateData.license_number || 'N/A'
+      });
+    } else if (updateData.role === 'patient') {
+      await supabaseAdmin.from('patients').insert({
+        id: userId,
+        date_of_birth: updateData.date_of_birth || '1995-01-01',
+        gender: updateData.gender || 'Not Specified',
+        status: 'active'
+      });
+      await supabaseAdmin.from('lifestyle_habits').insert({
+        patient_id: userId,
+        tobacco_habit: 'none',
+        alcohol_habit: 'none',
+        betel_nut: 'no',
+        family_history: 'no'
+      });
+      await supabaseAdmin.from('medical_records').insert({
+        patient_id: userId,
+        cancer_stage: 'Suspicious Lesion',
+        lesion_location: 'Not Specified'
+      });
+    } else if (updateData.role === 'admin') {
+      await supabaseAdmin.from('admins').insert({ id: userId });
+    }
+  }
+
+  // 3. Update profiles table
+  const { data: updatedProfile, error: profileError } = await supabaseAdmin
+    .from('profiles')
+    .update({
+      first_name: updateData.first_name,
+      last_name: updateData.last_name,
+      email: updateData.email,
+      phone: updateData.phone,
+      role: updateData.role
+    })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (profileError) throw profileError;
+  return updatedProfile;
+};
+
+/**
+ * Admin: Delete user account (cascades automatically)
+ */
+export const deleteUserAdmin = async (userId) => {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase Admin client is not configured.');
+  }
+
+  // Deleting Auth user cascades down to public profiles and other tables
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+  if (error) throw error;
+  return { success: true };
+};
+
+/**
+ * Admin: Ban or Unban user
+ */
+export const banUserAdmin = async (userId, isBanned) => {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase Admin client is not configured.');
+  }
+
+  const banDuration = isBanned ? '87600h' : 'none'; // 10 years or lift ban
+  const status = isBanned ? 'banned' : 'active';
+
+  // 1. Update Auth user ban duration
+  const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    ban_duration: banDuration
+  });
+  if (authError) throw authError;
+
+  // 2. Update DB profile status
+  const { data: profile, error: dbError } = await supabaseAdmin
+    .from('profiles')
+    .update({ status })
+    .eq('id', userId)
+    .select()
+    .single();
+
+  if (dbError) throw dbError;
+  return profile;
+};
+
+/**
+ * Admin: Create a new user account (Admin, Doctor, or Patient)
+ */
+export const createUserAdmin = async (userData) => {
+  if (!supabaseAdmin) {
+    throw new Error('Supabase Admin client is not configured.');
+  }
+
+  const { email, password, first_name, last_name, role, phone } = userData;
+
+  // 1. Create user in Supabase Auth
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: {
+      first_name,
+      last_name,
+      role
+    }
+  });
+
+  if (authError) throw authError;
+
+  const userId = authData.user?.id;
+  if (!userId) {
+    throw new Error('User creation failed: No user ID returned.');
+  }
+
+  try {
+    // 2. Insert into profiles
+    const profileFields = {
+      id: userId,
+      email,
+      role,
+      first_name,
+      last_name,
+      phone: phone || null,
+      status: 'active'
+    };
+
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert([profileFields])
+      .select()
+      .single();
+
+    if (profileError) throw profileError;
+
+    // 3. Insert into role-specific tables
+    if (role === 'doctor') {
+      const { error: docError } = await supabaseAdmin
+        .from('doctors')
+        .insert([{
+          id: userId,
+          specialization: userData.specialization || 'General Dentistry',
+          license_number: userData.license_number || 'N/A'
+        }]);
+      if (docError) throw docError;
+    } else if (role === 'patient') {
+      const { error: patientError } = await supabaseAdmin
+        .from('patients')
+        .insert([{
+          id: userId,
+          date_of_birth: userData.date_of_birth || '1995-01-01',
+          gender: userData.gender || 'Not Specified',
+          status: 'active'
+        }]);
+      if (patientError) throw patientError;
+
+      const { error: habitsError } = await supabaseAdmin
+        .from('lifestyle_habits')
+        .insert([{
+          patient_id: userId,
+          tobacco_habit: 'none',
+          alcohol_habit: 'none',
+          betel_nut: 'no',
+          family_history: 'no'
+        }]);
+      if (habitsError) throw habitsError;
+
+      const { error: recordsError } = await supabaseAdmin
+        .from('medical_records')
+        .insert([{
+          patient_id: userId,
+          cancer_stage: 'Suspicious Lesion',
+          lesion_location: 'Not Specified'
+        }]);
+      if (recordsError) throw recordsError;
+    } else if (role === 'admin') {
+      const { error: adminError } = await supabaseAdmin
+        .from('admins')
+        .insert([{ id: userId }]);
+      if (adminError) throw adminError;
+    }
+
+    return {
+      user: authData.user,
+      profile
+    };
+  } catch (error) {
+    // Clean up on error
+    if (role === 'doctor') {
+      await supabaseAdmin.from('doctors').delete().eq('id', userId);
+    } else if (role === 'patient') {
+      await supabaseAdmin.from('medical_records').delete().eq('patient_id', userId);
+      await supabaseAdmin.from('lifestyle_habits').delete().eq('patient_id', userId);
+      await supabaseAdmin.from('patients').delete().eq('id', userId);
+    } else if (role === 'admin') {
+      await supabaseAdmin.from('admins').delete().eq('id', userId);
+    }
+    await supabaseAdmin.from('profiles').delete().eq('id', userId);
+    await supabaseAdmin.auth.admin.deleteUser(userId);
+    throw error;
+  }
+};
+
 
 
 

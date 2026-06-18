@@ -44,3 +44,7 @@ ALTER TABLE public.checkups ADD COLUMN IF NOT EXISTS next_checkup_date TIMESTAMP
 ALTER TABLE public.checkups ADD COLUMN IF NOT EXISTS followup_interval TEXT;
 ALTER TABLE public.checkups ADD COLUMN IF NOT EXISTS followup_notes TEXT;
 
+-- 7. Add status column to profiles table to track account bans and states
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'draft', 'banned'));
+
+

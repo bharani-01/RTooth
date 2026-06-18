@@ -1,0 +1,280 @@
+@import url("/css/admin_doctors.css");
+
+/* Admin Users Directory Styling extension */
+
+/* Role Badges */
+.badge-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 20px;
+  cursor: default;
+}
+
+.badge-role.admin {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.badge-role.doctor {
+  background-color: var(--accent-teal-light);
+  color: var(--accent-teal);
+  border: 1px solid rgba(13, 148, 136, 0.15);
+}
+
+.badge-role.patient {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid rgba(2, 132, 199, 0.15);
+}
+
+/* Status Badges */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: default;
+}
+
+.badge-status.active {
+  background-color: var(--success-light);
+  color: #059669;
+}
+
+.badge-status.banned {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.badge-status.draft {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+/* User Identity Cell */
+.user-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-initials-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e2e8f0;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.user-initials-avatar.role-admin {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+}
+
+.user-initials-avatar.role-doctor {
+  background-color: var(--accent-teal-light);
+  color: var(--accent-teal);
+}
+
+.user-initials-avatar.role-patient {
+  background-color: var(--primary-light);
+  color: var(--primary);
+}
+
+.user-main-name {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Actions Menu */
+.action-buttons-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-user-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-user-action:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+.btn-user-action.ban:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+  background-color: var(--danger-light);
+}
+
+.btn-user-action.unban:hover {
+  border-color: #059669;
+  color: #059669;
+  background-color: #d1fae5;
+}
+
+.btn-user-action.delete:hover {
+  border-color: var(--danger);
+  color: white;
+  background-color: var(--danger);
+}
+
+/* Modal Window */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 550px;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-light);
+  cursor: pointer;
+  line-height: 1;
+  transition: var(--transition-smooth);
+}
+
+.modal-close:hover {
+  color: var(--text-dark);
+}
+
+.modal-body {
+  padding: 24px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media(max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.form-input {
+  height: 40px;
+  padding: 8px 14px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  color: var(--text-dark);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  background-color: var(--bg-secondary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+select.form-input {
+  cursor: pointer;
+}
+
+.role-fields {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border-color);
+}

@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     initAuditLogsPage();
   } else if (path.endsWith('/doctor_profile') || path.endsWith('doctor_profile.html')) {
     initDoctorProfilePage();
+  } else if (path.endsWith('/users') || path.endsWith('users.html')) {
+    initUsersPage();
   }
 
   // 4. Initialize Admin Reset Password Link Handlers
@@ -1453,4 +1455,515 @@ function initAdminResetLinkHandlers() {
     });
   }
 }
+
+let allUsers = [];
+let filteredUsers = [];
+let currentPage = 1;
+const pageSize = 25;
+
+async function initUsersPage() {
+  const tableBody = document.getElementById('users-table-body');
+  if (!tableBody) return;
+
+  const searchInput = document.getElementById('user-search');
+  const roleFilter = document.getElementById('role-filter');
+  const statusFilter = document.getElementById('status-filter');
+
+  // Pagination elements
+  const prevBtn = document.getElementById('btn-prev-page');
+  const nextBtn = document.getElementById('btn-next-page');
+
+  // Modal elements
+  const editModal = document.getElementById('edit-user-modal');
+  const closeModalBtn = document.getElementById('btn-close-modal');
+  const cancelModalBtn = document.getElementById('btn-cancel-edit');
+  const editForm = document.getElementById('edit-user-form');
+  const editRoleSelect = document.getElementById('edit-role');
+
+  // Load and render users
+  await fetchAndRenderUsers();
+
+  // Filters event listeners
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+  if (roleFilter) {
+    roleFilter.addEventListener('change', applyFilters);
+  }
+  if (statusFilter) {
+    statusFilter.addEventListener('change', applyFilters);
+  }
+
+  // Pagination event listeners
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderUsersPage();
+      }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderUsersPage();
+      }
+    });
+  }
+
+  // Modal open & close
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => hideModal());
+  }
+  if (cancelModalBtn) {
+    cancelModalBtn.addEventListener('click', () => hideModal());
+  }
+
+  // Add User Trigger & Modal Close
+  const addTriggerBtn = document.getElementById('btn-add-user-trigger');
+  if (addTriggerBtn) {
+    addTriggerBtn.addEventListener('click', () => showAddModal());
+  }
+  const closeAddBtn = document.getElementById('btn-close-add-modal');
+  const cancelAddBtn = document.getElementById('btn-cancel-add');
+  if (closeAddBtn) {
+    closeAddBtn.addEventListener('click', () => hideAddModal());
+  }
+  if (cancelAddBtn) {
+    cancelAddBtn.addEventListener('click', () => hideAddModal());
+  }
+
+  // Handle role change display
+  if (editRoleSelect) {
+    editRoleSelect.addEventListener('change', (e) => {
+      toggleRoleSpecificFields(e.target.value);
+    });
+  }
+  const addRoleSelect = document.getElementById('add-role');
+  if (addRoleSelect) {
+    addRoleSelect.addEventListener('change', (e) => {
+      toggleAddRoleFields(e.target.value);
+    });
+  }
+
+  // Handle forms submit
+  if (editForm) {
+    editForm.addEventListener('submit', handleEditFormSubmit);
+  }
+  const addForm = document.getElementById('add-user-form');
+  if (addForm) {
+    addForm.addEventListener('submit', handleAddFormSubmit);
+  }
+
+  // Table buttons action delegation
+  tableBody.addEventListener('click', handleTableActions);
+}
+
+function toggleRoleSpecificFields(role) {
+  const doctorFields = document.getElementById('doctor-fields');
+  const patientFields = document.getElementById('patient-fields');
+
+  if (doctorFields) doctorFields.style.display = role === 'doctor' ? 'block' : 'none';
+  if (patientFields) patientFields.style.display = role === 'patient' ? 'block' : 'none';
+}
+
+function showModal(user) {
+  const editModal = document.getElementById('edit-user-modal');
+  if (!editModal) return;
+
+  // Clear previous alerts
+  const alertEl = document.getElementById('modal-error-alert');
+  if (alertEl) {
+    alertEl.style.display = 'none';
+    alertEl.innerText = '';
+  }
+
+  // Populate fields
+  document.getElementById('edit-user-id').value = user.id;
+  document.getElementById('edit-first-name').value = user.first_name || '';
+  document.getElementById('edit-last-name').value = user.last_name || '';
+  document.getElementById('edit-email').value = user.email || '';
+  document.getElementById('edit-phone').value = user.phone || '';
+  document.getElementById('edit-role').value = user.role || 'patient';
+
+  // Specific fields populate if available
+  toggleRoleSpecificFields(user.role);
+
+  if (user.role === 'doctor') {
+    document.getElementById('edit-specialization').value = user.specialization || '';
+    document.getElementById('edit-license').value = user.license_number || '';
+  } else if (user.role === 'patient') {
+    document.getElementById('edit-dob').value = user.date_of_birth || '';
+    document.getElementById('edit-gender').value = user.gender || 'Not Specified';
+  }
+
+  editModal.classList.add('active');
+}
+
+function hideModal() {
+  const editModal = document.getElementById('edit-user-modal');
+  if (editModal) editModal.classList.remove('active');
+}
+
+async function fetchAndRenderUsers() {
+  const tableBody = document.getElementById('users-table-body');
+  if (!tableBody) return;
+
+  try {
+    const response = await apiRequest('/auth/admin/users');
+    if (response.success) {
+      allUsers = response.data.users || [];
+      renderUsersStats(allUsers);
+      applyFilters(); // Apply initial filter and render first page
+    }
+  } catch (error) {
+    console.error('Error loading users list:', error.message);
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align: center; color: var(--danger); padding: 24px;">Failed to load user directory. Error: ${error.message}</td>
+      </tr>
+    `;
+  }
+}
+
+function renderUsersStats(users) {
+  const totalEl = document.getElementById('stat-total-users');
+  const docsEl = document.getElementById('stat-total-doctors');
+  const patsEl = document.getElementById('stat-total-patients');
+  const suspendedEl = document.getElementById('stat-total-suspended');
+
+  if (totalEl) totalEl.innerText = users.length;
+  if (docsEl) docsEl.innerText = users.filter(u => u.role === 'doctor').length;
+  if (patsEl) patsEl.innerText = users.filter(u => u.role === 'patient').length;
+  if (suspendedEl) suspendedEl.innerText = users.filter(u => u.status === 'banned').length;
+}
+
+function applyFilters() {
+  const searchVal = document.getElementById('user-search').value.toLowerCase().trim();
+  const roleVal = document.getElementById('role-filter').value;
+  const statusVal = document.getElementById('status-filter').value;
+
+  filteredUsers = allUsers.filter(u => {
+    const matchesSearch = !searchVal || 
+      `${u.first_name} ${u.last_name}`.toLowerCase().includes(searchVal) ||
+      u.email.toLowerCase().includes(searchVal) ||
+      (u.phone && u.phone.toLowerCase().includes(searchVal));
+      
+    const matchesRole = !roleVal || u.role === roleVal;
+    
+    const status = u.status || 'active';
+    const matchesStatus = !statusVal || status === statusVal;
+
+    return matchesSearch && matchesRole && matchesStatus;
+  });
+
+  currentPage = 1;
+  renderUsersPage();
+}
+
+function renderUsersPage() {
+  const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
+  if (currentPage < 1) currentPage = 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * pageSize;
+  const end = Math.min(start + pageSize, filteredUsers.length);
+  
+  const pageUsers = filteredUsers.slice(start, end);
+  renderUsersTable(pageUsers);
+
+  // Update UI indicators
+  const startEl = document.getElementById('pagination-start');
+  const endEl = document.getElementById('pagination-end');
+  const totalEl = document.getElementById('pagination-total');
+  const prevBtn = document.getElementById('btn-prev-page');
+  const nextBtn = document.getElementById('btn-next-page');
+
+  if (startEl) startEl.innerText = filteredUsers.length === 0 ? 0 : start + 1;
+  if (endEl) endEl.innerText = end;
+  if (totalEl) totalEl.innerText = filteredUsers.length;
+
+  if (prevBtn) prevBtn.disabled = currentPage === 1;
+  if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+}
+
+function renderUsersTable(usersList) {
+  const tableBody = document.getElementById('users-table-body');
+  if (!tableBody) return;
+
+  if (usersList.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 24px;">No users match the active filters.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tableBody.innerHTML = usersList.map(u => {
+    const initials = `${(u.first_name || 'U')[0].toUpperCase()}${(u.last_name || 'U')[0].toUpperCase()}`;
+    const name = `${u.first_name} ${u.last_name}`;
+    const statusText = u.status === 'banned' ? 'Suspended' : 'Active';
+    const statusClass = u.status === 'banned' ? 'banned' : 'active';
+    const createdDate = new Date(u.created_at).toLocaleDateString([], { dateStyle: 'medium' });
+    const lastLogin = u.last_sign_in_at 
+      ? new Date(u.last_sign_in_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) 
+      : 'Never';
+
+    const currentUserProfile = getUserProfile();
+    const isSelf = currentUserProfile && currentUserProfile.id === u.id;
+
+    const banButtonHtml = isSelf
+      ? `<button class="btn-user-action ban" disabled style="opacity:0.4; cursor:not-allowed;" title="You cannot suspend yourself"><svg style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button>`
+      : u.status === 'banned'
+        ? `<button class="btn-user-action unban btn-ban-toggle" data-id="${u.id}" data-name="${name}" data-action="unban" title="Activate Account"><svg style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></button>`
+        : `<button class="btn-user-action ban btn-ban-toggle" data-id="${u.id}" data-name="${name}" data-action="ban" title="Suspend Account"><svg style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button>`;
+
+    const deleteButtonHtml = isSelf
+      ? `<button class="btn-user-action delete" disabled style="opacity:0.4; cursor:not-allowed;" title="You cannot delete yourself"><svg style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`
+      : `<button class="btn-user-action delete btn-delete-user" data-id="${u.id}" data-name="${name}" title="Delete User"><svg style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
+
+    return `
+      <tr>
+        <td data-label="User Details">
+          <div class="user-identity">
+            <div class="user-initials-avatar role-${u.role}">${initials}</div>
+            <span class="user-main-name">${name}</span>
+          </div>
+        </td>
+        <td data-label="Role">
+          <span class="badge-role ${u.role}">${u.role}</span>
+        </td>
+        <td data-label="Contact Info">
+          <div style="font-size:13px; line-height: 1.4;">
+            <strong>Email:</strong> ${u.email}<br>
+            <strong>Phone:</strong> ${u.phone || 'N/A'}
+          </div>
+        </td>
+        <td data-label="Status">
+          <span class="badge-status ${statusClass}">${statusText}</span>
+        </td>
+        <td data-label="Registered">${createdDate}</td>
+        <td data-label="Last Login">${lastLogin}</td>
+        <td data-label="Actions" style="text-align: center;">
+          <div class="action-buttons-cell">
+            <button class="btn-user-action btn-edit-user" data-id="${u.id}" title="Edit Profile">
+              <svg style="width:14px;height:14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+              </svg>
+            </button>
+            ${banButtonHtml}
+            ${deleteButtonHtml}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function handleEditFormSubmit(event) {
+  event.preventDefault();
+  const id = document.getElementById('edit-user-id').value;
+  const firstName = document.getElementById('edit-first-name').value.trim();
+  const lastName = document.getElementById('edit-last-name').value.trim();
+  const email = document.getElementById('edit-email').value.trim();
+  const phone = document.getElementById('edit-phone').value.trim();
+  const role = document.getElementById('edit-role').value;
+
+  const payload = {
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    phone,
+    role
+  };
+
+  if (role === 'doctor') {
+    payload.specialization = document.getElementById('edit-specialization').value.trim() || 'General Dentistry';
+    payload.license_number = document.getElementById('edit-license').value.trim() || 'N/A';
+  } else if (role === 'patient') {
+    payload.date_of_birth = document.getElementById('edit-dob').value || '1995-01-01';
+    payload.gender = document.getElementById('edit-gender').value;
+  }
+
+  const alertEl = document.getElementById('modal-error-alert');
+  if (alertEl) alertEl.style.display = 'none';
+
+  try {
+    const response = await apiRequest(`/auth/admin/users/${id}`, {
+      method: 'PUT',
+      body: payload
+    });
+
+    if (response.success) {
+      hideModal();
+      await fetchAndRenderUsers();
+      window.showAlertModal('User profile has been successfully updated.', 'Success');
+    }
+  } catch (error) {
+    console.error('Error updating user:', error.message);
+    if (alertEl) {
+      alertEl.innerText = error.message;
+      alertEl.style.display = 'block';
+    } else {
+      window.showAlertModal(`Failed to update user: ${error.message}`, 'Error');
+    }
+  }
+}
+
+async function handleTableActions(event) {
+  const editBtn = event.target.closest('.btn-edit-user');
+  const banToggleBtn = event.target.closest('.btn-ban-toggle');
+  const deleteBtn = event.target.closest('.btn-delete-user');
+
+  if (editBtn) {
+    const id = editBtn.getAttribute('data-id');
+    const user = allUsers.find(u => u.id === id);
+    if (user) {
+      showModal(user);
+    }
+  } else if (banToggleBtn) {
+    const id = banToggleBtn.getAttribute('data-id');
+    const name = banToggleBtn.getAttribute('data-name');
+    const action = banToggleBtn.getAttribute('data-action');
+    const isBanned = action === 'ban';
+
+    const confirmed = await window.showConfirmModal(
+      `Are you sure you want to ${isBanned ? 'SUSPEND (ban)' : 'ACTIVATED (unban)'} user access for ${name}?`,
+      `${isBanned ? 'Suspend' : 'Activate'} User Account`
+    );
+
+    if (confirmed) {
+      try {
+        const response = await apiRequest(`/auth/admin/users/${id}/ban`, {
+          method: 'POST',
+          body: { isBanned }
+        });
+        if (response.success) {
+          await fetchAndRenderUsers();
+          window.showAlertModal(`User account ${isBanned ? 'suspended' : 'activated'} successfully.`, 'Success');
+        }
+      } catch (error) {
+        window.showAlertModal(`Failed to update status: ${error.message}`, 'Error');
+      }
+    }
+  } else if (deleteBtn) {
+    const id = deleteBtn.getAttribute('data-id');
+    const name = deleteBtn.getAttribute('data-name');
+
+    const confirmed1 = await window.showConfirmModal(
+      `WARNING: Are you sure you want to PERMANENTLY DELETE user account for ${name}? This action cannot be undone and will purge all profile metadata.`,
+      'Confirm Permanent Deletion'
+    );
+
+    if (confirmed1) {
+      const confirmed2 = await window.showConfirmModal(
+        `FINAL WARNING: Confirming deletion of ${name}. This deletes their authentication credentials from Supabase completely. Do you want to proceed?`,
+        'Double-Confirmation Required'
+      );
+
+      if (confirmed2) {
+        try {
+          const response = await apiRequest(`/auth/admin/users/${id}`, {
+            method: 'DELETE'
+          });
+          if (response.success) {
+            await fetchAndRenderUsers();
+            window.showAlertModal('User account deleted successfully.', 'Success');
+          }
+        } catch (error) {
+          window.showAlertModal(`Failed to delete user: ${error.message}`, 'Error');
+        }
+      }
+    }
+  }
+}
+
+function showAddModal() {
+  const addModal = document.getElementById('add-user-modal');
+  if (!addModal) return;
+
+  // Clear previous alerts and form values
+  const alertEl = document.getElementById('add-modal-error-alert');
+  if (alertEl) {
+    alertEl.style.display = 'none';
+    alertEl.innerText = '';
+  }
+
+  const form = document.getElementById('add-user-form');
+  if (form) form.reset();
+  
+  toggleAddRoleFields('patient'); // Default role
+
+  addModal.classList.add('active');
+}
+
+function hideAddModal() {
+  const addModal = document.getElementById('add-user-modal');
+  if (addModal) addModal.classList.remove('active');
+}
+
+function toggleAddRoleFields(role) {
+  const doctorFields = document.getElementById('add-doctor-fields');
+  const patientFields = document.getElementById('add-patient-fields');
+
+  if (doctorFields) doctorFields.style.display = role === 'doctor' ? 'block' : 'none';
+  if (patientFields) patientFields.style.display = role === 'patient' ? 'block' : 'none';
+}
+
+async function handleAddFormSubmit(event) {
+  event.preventDefault();
+
+  const firstName = document.getElementById('add-first-name').value.trim();
+  const lastName = document.getElementById('add-last-name').value.trim();
+  const email = document.getElementById('add-email').value.trim();
+  const password = document.getElementById('add-password').value;
+  const phone = document.getElementById('add-phone').value.trim();
+  const role = document.getElementById('add-role').value;
+
+  const payload = {
+    first_name: firstName,
+    last_name: lastName,
+    email,
+    password,
+    phone,
+    role
+  };
+
+  if (role === 'doctor') {
+    payload.specialization = document.getElementById('add-specialization').value.trim() || 'General Dentistry';
+    payload.license_number = document.getElementById('add-license').value.trim() || 'N/A';
+  } else if (role === 'patient') {
+    payload.date_of_birth = document.getElementById('add-dob').value || '1995-01-01';
+    payload.gender = document.getElementById('add-gender').value;
+  }
+
+  const alertEl = document.getElementById('add-modal-error-alert');
+  if (alertEl) alertEl.style.display = 'none';
+
+  try {
+    const response = await apiRequest('/auth/admin/users', {
+      method: 'POST',
+      body: payload
+    });
+
+    if (response.success) {
+      hideAddModal();
+      await fetchAndRenderUsers();
+      window.showAlertModal(`Successfully created new user account for ${firstName} ${lastName}.`, 'Success');
+    }
+  } catch (error) {
+    console.error('Error creating user:', error.message);
+    if (alertEl) {
+      alertEl.innerText = error.message;
+      alertEl.style.display = 'block';
+    } else {
+      window.showAlertModal(`Failed to create user: ${error.message}`, 'Error');
+    }
+  }
+}
+
+
 
