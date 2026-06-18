@@ -386,6 +386,7 @@ function setLoading(button, isLoading, text) {
 ───────────────────────────────────────── */
 let rawAuditLogs = [];
 let filteredLogs = [];
+let dbAuditLogCount = 0;
 let auditPage = 1;
 const auditLimit = 15;
 let lineChartInstance = null;
@@ -505,7 +506,7 @@ function initAuditLogsPage() {
     const methodVal = methodFilter.value;
     const statusVal = statusFilter.value;
 
-    let url = `/doctors/audit-logs?limit=100`;
+    let url = `/doctors/audit-logs?limit=1000`;
     if (searchVal) url += `&search=${encodeURIComponent(searchVal)}`;
     if (methodVal) url += `&method=${encodeURIComponent(methodVal)}`;
     if (statusVal) url += `&status=${encodeURIComponent(statusVal)}`;
@@ -514,6 +515,7 @@ function initAuditLogsPage() {
       const response = await apiRequest(url);
       if (response.success) {
         rawAuditLogs = response.data.logs || [];
+        dbAuditLogCount = response.data.count || 0;
         processData();
       } else {
         throw new Error(response.message || 'Unknown database retrieval issue');
@@ -530,7 +532,7 @@ function initAuditLogsPage() {
       `;
       // Clear charts or show empty state
       updateCharts([]);
-      updateMetrics([]);
+      updateMetrics([], 0);
       prevBtn.disabled = true;
       nextBtn.disabled = true;
       pageInfo.innerText = `Page 1 of 1 (0 total)`;
@@ -581,7 +583,7 @@ function initAuditLogsPage() {
     }
 
     // 4. Calculate KPI metrics
-    updateMetrics(result);
+    updateMetrics(result, dbAuditLogCount);
 
     // 5. Update Chart.js datasets based on active matching set
     updateCharts(result);
@@ -762,7 +764,7 @@ function initAuditLogsPage() {
 }
 
 // Calculate and render KPI metrics in cards
-function updateMetrics(logs) {
+function updateMetrics(logs, totalCount) {
   const totalEventsEl = document.getElementById('metric-total-events');
   const avgLatencyEl = document.getElementById('metric-avg-latency');
   const latencyStatusEl = document.getElementById('metric-latency-status');
@@ -772,7 +774,14 @@ function updateMetrics(logs) {
 
   if (!totalEventsEl) return;
 
-  const total = logs.length;
+  const roleFilter = document.getElementById('audit-role-filter');
+  const latencyFilter = document.getElementById('audit-latency-filter');
+  const timeframeFilter = document.getElementById('audit-timeframe-filter');
+  const hasLocalFilters = (roleFilter && roleFilter.value) || 
+                          (latencyFilter && latencyFilter.value) || 
+                          (timeframeFilter && timeframeFilter.value);
+
+  const total = hasLocalFilters ? logs.length : (totalCount !== undefined ? totalCount : logs.length);
   totalEventsEl.innerText = total;
 
   // Calculate Average Latency, Unique IPs, errors
