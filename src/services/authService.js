@@ -311,27 +311,54 @@ export const listDoctors = async () => {
 
   const docMap = new Map((doctors || []).map(d => [d.id, d]));
 
-  // 1. Fetch patient counts per doctor
-  const { data: patients, error: patientError } = await client
-    .from('patients')
-    .select('id, doctor_id');
-  
-  if (patientError) throw patientError;
-  
+  // 1. Fetch patient counts per doctor (using range pagination to bypass PostgREST 1000 limit)
   const patientCountMap = new Map();
-  (patients || []).forEach(p => {
-    if (p.doctor_id) {
-      patientCountMap.set(p.doctor_id, (patientCountMap.get(p.doctor_id) || 0) + 1);
-    }
-  });
+  let patientsFrom = 0;
+  const limit = 1000;
+  let hasMorePatients = true;
 
-  // 2. Fetch precise file sizes per doctor
-  const { data: reports, error: reportsError } = await client
-    .from('patient_reports')
-    .select('patient_id, doctor_id, file_url');
-  
-  if (reportsError) throw reportsError;
-  
+  while (hasMorePatients) {
+    const { data: patients, error: patientError } = await client
+      .from('patients')
+      .select('id, doctor_id')
+      .range(patientsFrom, patientsFrom + limit - 1);
+    
+    if (patientError) throw patientError;
+    
+    (patients || []).forEach(p => {
+      if (p.doctor_id) {
+        patientCountMap.set(p.doctor_id, (patientCountMap.get(p.doctor_id) || 0) + 1);
+      }
+    });
+
+    if (!patients || patients.length < limit) {
+      hasMorePatients = false;
+    } else {
+      patientsFrom += limit;
+    }
+  }
+
+  // 2. Fetch precise file sizes per doctor (using range pagination to bypass PostgREST 1000 limit)
+  const reports = [];
+  let reportsFrom = 0;
+  let hasMoreReports = true;
+
+  while (hasMoreReports) {
+    const { data: reportsPage, error: reportsError } = await client
+      .from('patient_reports')
+      .select('patient_id, doctor_id, file_url')
+      .range(reportsFrom, reportsFrom + limit - 1);
+
+    if (reportsError) throw reportsError;
+    reports.push(...(reportsPage || []));
+
+    if (!reportsPage || reportsPage.length < limit) {
+      hasMoreReports = false;
+    } else {
+      reportsFrom += limit;
+    }
+  }
+
   const doctorSizeMap = new Map(); // doctor_id -> size in bytes
   
   if (reports && reports.length > 0) {
@@ -591,23 +618,49 @@ export const registerPatientByDoctor = async (email, password, profileData) => {
  */
 export const listPatients = async (doctorId) => {
   const client = supabaseAdmin || supabase;
+  const limit = 1000;
 
-  // 1. Fetch patient profile records
-  const { data: profiles, error: profilesError } = await client
-    .from('profiles')
-    .select('*')
-    .eq('role', 'patient')
-    .order('last_name', { ascending: true });
-
-  if (profilesError) throw profilesError;
-
-  // 2. Fetch patients details
-  let patientsQuery = client.from('patients').select('*');
-  if (doctorId) {
-    patientsQuery = patientsQuery.eq('doctor_id', doctorId);
+  // 1. Fetch patient profile records (using range pagination to bypass PostgREST limit)
+  const profiles = [];
+  let profilesFrom = 0;
+  let hasMoreProfiles = true;
+  while (hasMoreProfiles) {
+    const { data: profilesPage, error: profilesError } = await client
+      .from('profiles')
+      .select('*')
+      .eq('role', 'patient')
+      .order('last_name', { ascending: true })
+      .range(profilesFrom, profilesFrom + limit - 1);
+      
+    if (profilesError) throw profilesError;
+    profiles.push(...(profilesPage || []));
+    if (!profilesPage || profilesPage.length < limit) {
+      hasMoreProfiles = false;
+    } else {
+      profilesFrom += limit;
+    }
   }
-  const { data: patients, error: patientsError } = await patientsQuery;
-  if (patientsError) throw patientsError;
+
+  // 2. Fetch patients details (using range pagination)
+  const patients = [];
+  let patientsFrom = 0;
+  let hasMorePatients = true;
+  while (hasMorePatients) {
+    let patientsQuery = client.from('patients').select('*');
+    if (doctorId) {
+      patientsQuery = patientsQuery.eq('doctor_id', doctorId);
+    }
+    const { data: patientsPage, error: patientsError } = await patientsQuery
+      .range(patientsFrom, patientsFrom + limit - 1);
+      
+    if (patientsError) throw patientsError;
+    patients.push(...(patientsPage || []));
+    if (!patientsPage || patientsPage.length < limit) {
+      hasMorePatients = false;
+    } else {
+      patientsFrom += limit;
+    }
+  }
 
   const patientMap = new Map((patients || []).map(p => [p.id, p]));
 
@@ -620,21 +673,40 @@ export const listPatients = async (doctorId) => {
 
   const patientIds = filteredProfiles.map(p => p.id);
 
-  // 3. Fetch habits
-  const { data: habits, error: habitsError } = await client
-    .from('lifestyle_habits')
-    .select('*')
-    .in('patient_id', patientIds);
-  if (habitsError) throw habitsError;
+  // Helper to chunk patientIds to prevent query URL limits and PostgREST row caps
+  const chunkArray = (arr, size) => {
+    const chunks = [];
+    for (let i = 0; i < arr.length; i += size) {
+      chunks.push(arr.slice(i, i + size));
+    }
+    return chunks;
+  };
+
+  const patientIdChunks = chunkArray(patientIds, 500);
+
+  // 3. Fetch habits in chunks of 500
+  const habits = [];
+  for (const chunk of patientIdChunks) {
+    const { data: habitsPage, error: habitsError } = await client
+      .from('lifestyle_habits')
+      .select('*')
+      .in('patient_id', chunk);
+    if (habitsError) throw habitsError;
+    habits.push(...(habitsPage || []));
+  }
 
   const habitsMap = new Map((habits || []).map(h => [h.patient_id, h]));
 
-  // 4. Fetch medical records
-  const { data: records, error: recordsError } = await client
-    .from('medical_records')
-    .select('*')
-    .in('patient_id', patientIds);
-  if (recordsError) throw recordsError;
+  // 4. Fetch medical records in chunks of 500
+  const records = [];
+  for (const chunk of patientIdChunks) {
+    const { data: recordsPage, error: recordsError } = await client
+      .from('medical_records')
+      .select('*')
+      .in('patient_id', chunk);
+    if (recordsError) throw recordsError;
+    records.push(...(recordsPage || []));
+  }
 
   const recordsMap = new Map();
   (records || []).forEach(r => {
