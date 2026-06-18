@@ -14,3 +14,8 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+      - key: AUDIT_LOG_SUPABASE_URL
+        sync: false
+      - key: AUDIT_LOG_SUPABASE_ANON_KEY
+        sync: false
+
