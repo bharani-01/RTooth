@@ -52,8 +52,10 @@
       <!-- Quick Demo Accounts Autofill -->
       <div class="demo-card">
         <h2 class="demo-title">Quick Demo Login</h2>
-        <p class="demo-subtitle">Click a profile below to instantly autofill credentials & test the system.</p>
+        <p class="demo-subtitle">Click a profile below to instantly autofill credentials &amp; test the system.</p>
 
+        <!-- Section: System Roles -->
+        <div class="demo-section-label">System Roles</div>
         <div class="demo-list">
           <!-- Admin -->
           <div class="demo-item" data-email="admin@rtooth.in" data-password="AdminPassword123" id="demo-admin">
@@ -67,11 +69,15 @@
                 <span class="demo-name">IT Admin</span>
                 <span class="demo-badge badge-admin">IT-Admin</span>
               </div>
-              <p class="demo-desc">Can view/manage all doctors.</p>
+              <p class="demo-desc">Manage all doctors, view audit logs &amp; system health.</p>
               <div class="demo-credentials">admin@rtooth.in • AdminPassword123</div>
             </div>
           </div>
+        </div>
 
+        <!-- Section: Doctors -->
+        <div class="demo-section-label">Doctors</div>
+        <div class="demo-list">
           <!-- Dr. Emily -->
           <div class="demo-item" data-email="emily@rtooth.in" data-password="DoctorPassword123" id="demo-emily">
             <div class="demo-icon doctor-bg">
@@ -86,7 +92,7 @@
                 <span class="demo-name">Dr. Emily Smith</span>
                 <span class="demo-badge badge-doctor">Doctor</span>
               </div>
-              <p class="demo-desc">Can view patients: Rahul, Priya, and Sneha (Draft).</p>
+              <p class="demo-desc">Oral Oncology — views Rahul, Priya &amp; Sneha (Draft).</p>
               <div class="demo-credentials">emily@rtooth.in • DoctorPassword123</div>
             </div>
           </div>
@@ -105,11 +111,72 @@
                 <span class="demo-name">Dr. Amit Verma</span>
                 <span class="demo-badge badge-doctor">Doctor</span>
               </div>
-              <p class="demo-desc">Can view patients: Rajesh.</p>
+              <p class="demo-desc">Oral Pathology — views Rajesh.</p>
               <div class="demo-credentials">amit@rtooth.in • DoctorPassword123</div>
             </div>
           </div>
 
+          <!-- Seeded Doc 49 -->
+          <div class="demo-item" data-email="seeded_doc_49@rtooth.in" data-password="DoctorPassword123" id="demo-doc-49">
+            <div class="demo-icon doctor-bg">
+              <svg viewBox="0 0 24 24">
+                <path d="M4.5 16.5c-1.5 1.25-2.5 3.16-2.5 5.5h20c0-2.34-1-4.25-2.5-5.5"/>
+                <circle cx="12" cy="7" r="4"/>
+                <path d="M12 11v5m-2-2h4"/>
+              </svg>
+            </div>
+            <div class="demo-info">
+              <div class="demo-header">
+                <span class="demo-name">Dr. David Rao</span>
+                <span class="demo-badge badge-doctor">Doctor</span>
+              </div>
+              <p class="demo-desc">Seeded — large patient caseload for performance testing.</p>
+              <div class="demo-credentials">seeded_doc_49@rtooth.in • DoctorPassword123</div>
+            </div>
+          </div>
+
+          <!-- Seeded Doc 41 -->
+          <div class="demo-item" data-email="seeded_doc_41@rtooth.in" data-password="DoctorPassword123" id="demo-doc-41">
+            <div class="demo-icon doctor-bg">
+              <svg viewBox="0 0 24 24">
+                <path d="M4.5 16.5c-1.5 1.25-2.5 3.16-2.5 5.5h20c0-2.34-1-4.25-2.5-5.5"/>
+                <circle cx="12" cy="7" r="4"/>
+                <path d="M12 11v5m-2-2h4"/>
+              </svg>
+            </div>
+            <div class="demo-info">
+              <div class="demo-header">
+                <span class="demo-name">Dr. Vikram Hernandez</span>
+                <span class="demo-badge badge-doctor">Doctor</span>
+              </div>
+              <p class="demo-desc">Seeded — large patient caseload for performance testing.</p>
+              <div class="demo-credentials">seeded_doc_41@rtooth.in • DoctorPassword123</div>
+            </div>
+          </div>
+
+          <!-- Seeded Doc 48 -->
+          <div class="demo-item" data-email="seeded_doc_48@rtooth.in" data-password="DoctorPassword123" id="demo-doc-48">
+            <div class="demo-icon doctor-bg">
+              <svg viewBox="0 0 24 24">
+                <path d="M4.5 16.5c-1.5 1.25-2.5 3.16-2.5 5.5h20c0-2.34-1-4.25-2.5-5.5"/>
+                <circle cx="12" cy="7" r="4"/>
+                <path d="M12 11v5m-2-2h4"/>
+              </svg>
+            </div>
+            <div class="demo-info">
+              <div class="demo-header">
+                <span class="demo-name">Dr. Pooja Sen</span>
+                <span class="demo-badge badge-doctor">Doctor</span>
+              </div>
+              <p class="demo-desc">Seeded — large patient caseload for performance testing.</p>
+              <div class="demo-credentials">seeded_doc_48@rtooth.in • DoctorPassword123</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Patients -->
+        <div class="demo-section-label">Patients</div>
+        <div class="demo-list">
           <!-- Rahul -->
           <div class="demo-item" data-email="rahul@rtooth.in" data-password="PatientPassword123" id="demo-rahul">
             <div class="demo-icon patient-bg">
@@ -121,14 +188,68 @@
             <div class="demo-info">
               <div class="demo-header">
                 <span class="demo-name">Rahul Sharma</span>
-                <span class="demo-badge badge-patient-active">Patient (Active)</span>
+                <span class="demo-badge badge-patient-active">Active</span>
               </div>
-              <p class="demo-desc">Can log in to view his Stage II Lateral Tongue oncology profile.</p>
+              <p class="demo-desc">Stage II Lateral Tongue — full clinical profile with reports.</p>
               <div class="demo-credentials">rahul@rtooth.in • PatientPassword123</div>
             </div>
           </div>
 
-          <!-- Sneha -->
+          <!-- Priya -->
+          <div class="demo-item" data-email="priya@rtooth.in" data-password="PatientPassword123" id="demo-priya">
+            <div class="demo-icon patient-bg">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="demo-info">
+              <div class="demo-header">
+                <span class="demo-name">Priya Patel</span>
+                <span class="demo-badge badge-patient-active">Active</span>
+              </div>
+              <p class="demo-desc">Stage I Floor of Mouth — Biopsy report attached.</p>
+              <div class="demo-credentials">priya@rtooth.in • PatientPassword123</div>
+            </div>
+          </div>
+
+          <!-- Seeded Pat 9 -->
+          <div class="demo-item" data-email="seeded_pat_9@rtooth.in" data-password="PatientPassword123" id="demo-pat-9">
+            <div class="demo-icon patient-bg">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="demo-info">
+              <div class="demo-header">
+                <span class="demo-name">Vikram Martinez</span>
+                <span class="demo-badge badge-patient-active">Active</span>
+              </div>
+              <p class="demo-desc">Seeded — random staging &amp; ~50 checkup records.</p>
+              <div class="demo-credentials">seeded_pat_9@rtooth.in • PatientPassword123</div>
+            </div>
+          </div>
+
+          <!-- Seeded Pat 2 -->
+          <div class="demo-item" data-email="seeded_pat_2@rtooth.in" data-password="PatientPassword123" id="demo-pat-2">
+            <div class="demo-icon patient-bg">
+              <svg viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div class="demo-info">
+              <div class="demo-header">
+                <span class="demo-name">Seeded Patient #2</span>
+                <span class="demo-badge badge-patient-active">Active</span>
+              </div>
+              <p class="demo-desc">Seeded — random staging &amp; ~50 checkup records.</p>
+              <div class="demo-credentials">seeded_pat_2@rtooth.in • PatientPassword123</div>
+            </div>
+          </div>
+
+          <!-- Sneha Draft -->
           <div class="demo-item" data-email="sneha@rtooth.in" data-password="PatientPassword123" id="demo-sneha">
             <div class="demo-icon draft-bg">
               <svg viewBox="0 0 24 24">
@@ -140,9 +261,9 @@
             <div class="demo-info">
               <div class="demo-header">
                 <span class="demo-name">Sneha Gupta</span>
-                <span class="demo-badge badge-patient-draft">Patient (Draft)</span>
+                <span class="demo-badge badge-patient-draft">Draft</span>
               </div>
-              <p class="demo-desc">Blocked from login (shows pending draft registration alert).</p>
+              <p class="demo-desc">Blocked from login — shows pending draft alert.</p>
               <div class="demo-credentials">sneha@rtooth.in • PatientPassword123</div>
             </div>
           </div>
@@ -150,6 +271,7 @@
       </div>
     </div>
   </main>
+
 
   <!-- Footer -->
   <footer>

@@ -25,12 +25,31 @@
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 40px;
+  padding: 32px 40px;
   width: 100%;
   max-width: 480px;
+  max-height: 640px;
+  overflow-y: auto;
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+/* Scrollbar for the card itself */
+.demo-card::-webkit-scrollbar {
+  width: 5px;
+}
+.demo-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+.demo-card::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+.demo-card::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
 }
 
 .demo-title {
@@ -44,16 +63,32 @@
 .demo-subtitle {
   color: var(--text-muted);
   font-size: 13.5px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+}
+
+/* Section heading labels (System Roles / Doctors / Patients) */
+.demo-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-light);
+  margin-top: 16px;
+  margin-bottom: 10px;
+  padding-left: 2px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 6px;
+}
+
+.demo-section-label:first-of-type {
+  margin-top: 0;
 }
 
 .demo-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  overflow-y: auto;
-  max-height: 480px;
-  padding-right: 4px;
+  gap: 10px;
+  padding-right: 2px;
 }
 
 /* Custom Scrollbar for demo-list */
@@ -114,10 +149,15 @@
   background-color: #8b5cf6; /* purple for admin */
 }
 .demo-item[data-email*="emily"]:hover::before,
-.demo-item[data-email*="amit"]:hover::before {
+.demo-item[data-email*="amit"]:hover::before,
+.demo-item[data-email*="seeded_doc"]:hover::before {
   background-color: var(--accent-teal); /* teal for doctors */
 }
-.demo-item[data-email*="rahul"]:hover::before {
+.demo-item[data-email*="rahul"]:hover::before,
+.demo-item[data-email*="priya"]:hover::before,
+.demo-item[data-email*="rajesh"]:hover::before,
+.demo-item[data-email*="vikram"]:hover::before,
+.demo-item[data-email*="seeded_pat"]:hover::before {
   background-color: var(--success); /* green for active patients */
 }
 .demo-item[data-email*="sneha"]:hover::before {
@@ -254,9 +294,6 @@
   .demo-card {
     max-width: 520px;
     padding: 32px;
-  }
-  .demo-list {
-    max-height: 380px;
   }
 }
 

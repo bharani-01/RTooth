@@ -408,7 +408,8 @@ export const listDoctors = async () => {
  * Sign in user and retrieve their session + profile details.
  */
 export const signInUser = async (email, password) => {
-  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+  const client = supabaseAdmin || supabase;
+  const { data: authData, error: authError } = await client.auth.signInWithPassword({
     email,
     password,
   });
