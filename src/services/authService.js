@@ -292,7 +292,8 @@ export const registerDoctorByAdmin = async (email, password, doctorData) => {
  * List all registered doctors in the clinic database.
  */
 export const listDoctors = async () => {
-  const { data: profiles, error: profilesError } = await supabase
+  const client = supabaseAdmin || supabase;
+  const { data: profiles, error: profilesError } = await client
     .from('profiles')
     .select('*')
     .eq('role', 'doctor')
@@ -301,7 +302,7 @@ export const listDoctors = async () => {
   if (profilesError) throw profilesError;
 
   const docIds = profiles.map(p => p.id);
-  const { data: doctors, error: docError } = await supabase
+  const { data: doctors, error: docError } = await client
     .from('doctors')
     .select('*')
     .in('id', docIds);
@@ -311,7 +312,7 @@ export const listDoctors = async () => {
   const docMap = new Map((doctors || []).map(d => [d.id, d]));
 
   // 1. Fetch patient counts per doctor
-  const { data: patients, error: patientError } = await supabase
+  const { data: patients, error: patientError } = await client
     .from('patients')
     .select('id, doctor_id');
   
@@ -325,7 +326,7 @@ export const listDoctors = async () => {
   });
 
   // 2. Fetch precise file sizes per doctor
-  const { data: reports, error: reportsError } = await supabase
+  const { data: reports, error: reportsError } = await client
     .from('patient_reports')
     .select('patient_id, doctor_id, file_url');
   
@@ -582,8 +583,10 @@ export const registerPatientByDoctor = async (email, password, profileData) => {
  * Uses direct queries to prevent PostgREST relationship ambiguity bugs.
  */
 export const listPatients = async (doctorId) => {
+  const client = supabaseAdmin || supabase;
+
   // 1. Fetch patient profile records
-  const { data: profiles, error: profilesError } = await supabase
+  const { data: profiles, error: profilesError } = await client
     .from('profiles')
     .select('*')
     .eq('role', 'patient')
@@ -592,7 +595,7 @@ export const listPatients = async (doctorId) => {
   if (profilesError) throw profilesError;
 
   // 2. Fetch patients details
-  let patientsQuery = supabase.from('patients').select('*');
+  let patientsQuery = client.from('patients').select('*');
   if (doctorId) {
     patientsQuery = patientsQuery.eq('doctor_id', doctorId);
   }
@@ -611,7 +614,7 @@ export const listPatients = async (doctorId) => {
   const patientIds = filteredProfiles.map(p => p.id);
 
   // 3. Fetch habits
-  const { data: habits, error: habitsError } = await supabase
+  const { data: habits, error: habitsError } = await client
     .from('lifestyle_habits')
     .select('*')
     .in('patient_id', patientIds);
@@ -620,7 +623,7 @@ export const listPatients = async (doctorId) => {
   const habitsMap = new Map((habits || []).map(h => [h.patient_id, h]));
 
   // 4. Fetch medical records
-  const { data: records, error: recordsError } = await supabase
+  const { data: records, error: recordsError } = await client
     .from('medical_records')
     .select('*')
     .in('patient_id', patientIds);
@@ -677,8 +680,10 @@ export const listPatients = async (doctorId) => {
  * @param {string} doctorId - Doctor's UUID
  */
 export const getDoctorProfileWithStats = async (doctorId) => {
+  const client = supabaseAdmin || supabase;
+
   // 1. Fetch base profile fields
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile, error: profileError } = await client
     .from('profiles')
     .select('*')
     .eq('id', doctorId)
@@ -690,7 +695,7 @@ export const getDoctorProfileWithStats = async (doctorId) => {
   }
 
   // 2. Fetch doctor specific details
-  const { data: doctor, error: docError } = await supabase
+  const { data: doctor, error: docError } = await client
     .from('doctors')
     .select('*')
     .eq('id', doctorId)
@@ -699,7 +704,7 @@ export const getDoctorProfileWithStats = async (doctorId) => {
   if (docError) throw docError;
 
   // 3. Fetch patients assigned to this doctor
-  const { data: patients, error: patientError } = await supabase
+  const { data: patients, error: patientError } = await client
     .from('patients')
     .select('*')
     .eq('doctor_id', doctorId);
@@ -711,13 +716,13 @@ export const getDoctorProfileWithStats = async (doctorId) => {
   const recordsMap = new Map();
 
   if (patientIds.length > 0) {
-    const { data: profiles } = await supabase
+    const { data: profiles } = await client
       .from('profiles')
       .select('*')
       .in('id', patientIds);
     patientProfiles = profiles || [];
 
-    const { data: records } = await supabase
+    const { data: records } = await client
       .from('medical_records')
       .select('*')
       .in('patient_id', patientIds);
@@ -730,7 +735,7 @@ export const getDoctorProfileWithStats = async (doctorId) => {
   }
 
   // 4. Fetch count of checkups (visits) logged by this doctor
-  const { count: checkupCount, error: checkupError } = await supabase
+  const { count: checkupCount, error: checkupError } = await client
     .from('checkups')
     .select('*', { count: 'exact', head: true })
     .eq('doctor_id', doctorId);
@@ -738,7 +743,7 @@ export const getDoctorProfileWithStats = async (doctorId) => {
   if (checkupError) throw checkupError;
 
   // 5. Fetch uploaded reports and resolve sizes
-  const { data: reports, error: reportsError } = await supabase
+  const { data: reports, error: reportsError } = await client
     .from('patient_reports')
     .select('*')
     .eq('doctor_id', doctorId)
