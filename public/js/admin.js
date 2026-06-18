@@ -222,9 +222,10 @@ function setupDirectoryEventListeners() {
       if (query) {
         result = result.filter(doc => 
           `${doc.first_name} ${doc.last_name}`.toLowerCase().includes(query) ||
-          doc.specialization.toLowerCase().includes(query) ||
-          doc.license_number.toLowerCase().includes(query) ||
-          doc.email.toLowerCase().includes(query)
+          (doc.specialization && doc.specialization.toLowerCase().includes(query)) ||
+          (doc.license_number && doc.license_number.toLowerCase().includes(query)) ||
+          (doc.doctor_code && doc.doctor_code.toLowerCase().includes(query)) ||
+          (doc.email && doc.email.toLowerCase().includes(query))
         );
       }
     }
