@@ -1037,21 +1037,21 @@ footer {
 }
 
 /* ─────────────────────────────────────────
-   DOCTOR PORTAL MNC RED BRAND THEME
+   DOCTOR PORTAL LIGHTNING BLUE THEME
 ───────────────────────────────────────── */
 body.dashboard-body {
-  --primary: #9e1a22; /* Premium MNC Red */
-  --primary-hover: #80141a;
-  --primary-light: #fff5f5; /* Light rose background for hover / active elements */
-  --accent-teal: #be123c;
-  --accent-teal-light: #ffe4e6;
-  --border-focus: #be123c;
+  --primary: #0066ff; /* Lightning Blue */
+  --primary-hover: #0052cc;
+  --primary-light: #e6f0ff; /* Light blue background for hover / active elements */
+  --accent-teal: #00bfff; /* Deep sky blue/cyan */
+  --accent-teal-light: #e6f9ff;
+  --border-focus: #0066ff;
 }
 
 body.dashboard-body header {
   background-color: #ffffff;
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 20px rgba(158, 26, 34, 0.04);
+  box-shadow: 0 4px 20px rgba(0, 102, 255, 0.04);
   overflow: hidden;
 }
 
@@ -1062,7 +1062,7 @@ body.dashboard-body header.loading::after {
   left: -30%;
   height: 3px;
   width: 30%;
-  background: linear-gradient(to right, rgba(158, 26, 34, 0) 0%, #9e1a22 50%, rgba(158, 26, 34, 0) 100%);
+  background: linear-gradient(to right, rgba(0, 102, 255, 0) 0%, #0066ff 50%, rgba(0, 102, 255, 0) 100%);
   animation: header-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
@@ -1072,12 +1072,12 @@ body.dashboard-body header.loading::after {
 }
 
 body.dashboard-body .user-avatar {
-  background-color: #ffe4e6;
-  color: #9e1a22;
+  background-color: var(--primary-light);
+  color: var(--primary);
 }
 
 body.dashboard-body .logo-icon-container {
-  background-color: #ffe4e6;
-  color: #9e1a22;
-  box-shadow: 0 4px 10px rgba(158, 26, 34, 0.1);
+  background-color: var(--primary-light);
+  color: var(--primary);
+  box-shadow: 0 4px 10px rgba(0, 102, 255, 0.15);
 }

@@ -44,8 +44,8 @@
   width: 52px;
   height: 52px;
   border-radius: 12px;
-  background-color: #eff6ff;
-  color: #3b82f6;
+  background-color: var(--primary-light);
+  color: var(--primary);
   font-size: 18px;
   font-weight: 700;
   font-family: var(--font-heading);
@@ -144,13 +144,13 @@
 }
 .btn-xs:hover { background: #f8fafc; }
 .btn.btn-primary.btn-sm {
-  background: #1a1f2e;
+  background: var(--primary);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(26,31,46,0.12);
+  box-shadow: 0 2px 8px rgba(0,102,255,0.12);
 }
 .btn.btn-primary.btn-sm:hover {
-  background: #2d3748;
-  box-shadow: 0 4px 14px rgba(26,31,46,0.18);
+  background: var(--primary-hover);
+  box-shadow: 0 4px 14px rgba(0,102,255,0.18);
 }
 .btn.btn-primary.btn-sm.btn-teal {
   background: #0d9488;
@@ -279,7 +279,7 @@
 .profile-tab-btn:hover { color: #374151; background: rgba(0,0,0,0.02); }
 .profile-tab-btn.active {
   color: #1a1f2e;
-  border-bottom-color: #3b82f6;
+  border-bottom-color: var(--primary);
   background: #ffffff;
 }
 
@@ -353,20 +353,20 @@
   transition: border-color 0.18s, box-shadow 0.18s;
 }
 .checkup-node:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 2px 10px rgba(59,130,246,0.06);
+  border-color: var(--primary);
+  box-shadow: 0 2px 10px rgba(0,102,255,0.06);
 }
 .checkup-node::before {
   content: '';
   position: absolute;
   width: 8px;
   height: 8px;
-  background: #3b82f6;
+  background: var(--primary);
   border: 2px solid #ffffff;
   border-radius: 50%;
   left: -24px;
   top: 18px;
-  box-shadow: 0 0 0 2px #dbeafe;
+  box-shadow: 0 0 0 2px var(--primary-light);
 }
 
 .checkup-meta {
@@ -388,12 +388,12 @@
 .checkup-recs {
   display: inline-block;
   font-size: 12px;
-  background: #eff6ff;
-  color: #3b82f6;
+  background: var(--primary-light);
+  color: var(--primary);
   padding: 4px 10px;
   border-radius: 5px;
   font-weight: 500;
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--primary-light);
 }
 
 /* ── Skeleton entries for timeline ── */
@@ -506,7 +506,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #3b82f6;
+  color: var(--primary);
   border-bottom: 1px solid #f0f2f5;
   padding-bottom: 6px;
   margin-bottom: 14px;

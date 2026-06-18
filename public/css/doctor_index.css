@@ -86,7 +86,7 @@ body.dashboard-body {
   border-radius: 12px 12px 0 0;
 }
 
-.stat-card:nth-child(1)::before { background-color: #3b82f6; }
+.stat-card:nth-child(1)::before { background-color: var(--primary); }
 .stat-card:nth-child(2)::before { background-color: #f59e0b; }
 .stat-card:nth-child(3)::before { background-color: #ef4444; }
 
@@ -173,9 +173,9 @@ body.dashboard-body {
 }
 
 .badge-blue {
-  background-color: #eff6ff;
-  color: #3b82f6;
-  border: 1px solid #dbeafe;
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--primary-light);
 }
 
 .badge-red {
@@ -364,8 +364,8 @@ body.dashboard-body {
 }
 
 .compliance-tab-btn.active .compliance-badge {
-  background-color: #eff6ff;
-  color: #3b82f6;
+  background-color: var(--primary-light);
+  color: var(--primary);
 }
 
 .compliance-content {
@@ -392,7 +392,7 @@ body.dashboard-body {
 }
 
 .checkup-node:hover {
-  border-left-color: #3b82f6;
+  border-left-color: var(--primary);
 }
 
 /* ─────────────────────────────────────────
@@ -457,7 +457,7 @@ body.dashboard-body {
   width: 24px;
   height: 24px;
   border: 2px solid #e9ecf0;
-  border-top-color: #3b82f6;
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto;

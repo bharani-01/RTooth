@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Overview - RTooth Portal</title>
   <link rel="stylesheet" href="/css/admin_index.css">
+  <!-- Chart.js CDN for live traffic graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body data-auth-required="true" data-allowed-roles="admin" class="dashboard-body">
 
@@ -48,27 +50,149 @@
       <div class="dashboard-header">
         <div>
           <h2>Clinical Systems Administration</h2>
-          <p style="color: var(--text-muted); font-size: 14px;">Manage medical practitioners and system access policies.</p>
+          <p style="color: var(--text-muted); font-size: 14px;">Real-time IT infrastructure and clinical oncology registry monitor.</p>
         </div>
       </div>
 
-      <!-- Stats Grid -->
+      <!-- Upgraded Metrics Summary Grid -->
       <div class="stats-grid">
+        <!-- Metric 1: Live Active Users -->
         <div class="stat-card">
-          <div class="stat-label">Active Oncologists</div>
+          <div class="stat-header">
+            <span class="stat-label">Live Terminals</span>
+            <span class="live-badge">
+              <span class="pulse-dot"></span>
+              Live
+            </span>
+          </div>
+          <div class="stat-value" id="live-active-users">--</div>
+          <div class="stat-desc">Active WebSocket sessions</div>
+        </div>
+
+        <!-- Metric 2: Registered Doctors -->
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Oncologists</span>
+            <div class="stat-icon-wrapper blue">
+              <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            </div>
+          </div>
           <div class="stat-value" id="stat-doctors-count">0</div>
           <div class="stat-desc">Registered specialists</div>
         </div>
+
+        <!-- Metric 3: API Latency Index -->
         <div class="stat-card">
-          <div class="stat-label">System Security</div>
-          <div class="stat-value" style="font-size: 22px; margin-top: 6px; color: var(--success);">Supabase RLS Active</div>
-          <div class="stat-desc">All user keys verified</div>
+          <div class="stat-header">
+            <span class="stat-label">API Latency</span>
+            <div class="stat-icon-wrapper teal">
+              <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" style="color: var(--success);" id="stat-latency-value">Optimal</div>
+          <div class="stat-desc">Avg query speed: 45 ms</div>
         </div>
+
+        <!-- Metric 4: System Security Shield -->
         <div class="stat-card">
-          <div class="stat-label">Server Status</div>
-          <div class="stat-value" style="font-size: 22px; margin-top: 6px; color: var(--accent-teal);">Online</div>
-          <div class="stat-desc">Responding normally</div>
+          <div class="stat-header">
+            <span class="stat-label">Security State</span>
+            <div class="stat-icon-wrapper green">
+              <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" style="color: var(--primary);">RLS Secure</div>
+          <div class="stat-desc">All database keys verified</div>
         </div>
+      </div>
+
+      <!-- Real-time Dashboard Grid -->
+      <div class="dashboard-grid">
+        
+        <!-- Left Side: Traffic Chart & Security Console (Terminal) -->
+        <div style="display: flex; flex-direction: column;">
+          <!-- Live Requests Activity Line Chart -->
+          <div class="chart-card" style="height: 300px;">
+            <h3>
+              <svg style="width:16px; height:16px; color:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Live API Request Traffic (60s rolling)
+            </h3>
+            <div class="chart-container" style="height: 200px;">
+              <canvas id="live-traffic-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Live Event Feed Terminal -->
+          <div class="terminal-card">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+              </div>
+              <div class="terminal-title">IT-Admin Security Event Monitor</div>
+              <div style="width: 42px;"></div> <!-- Spacer -->
+            </div>
+            <div class="terminal-body" id="live-console-body">
+              <!-- Logs will scroll here in real-time -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Server Resources & MNC Office Breakdown -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          
+          <!-- Server Health Gauges Card -->
+          <div class="health-card">
+            <h3>
+              <svg style="width:16px; height:16px; color:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Server Resource Metrics
+            </h3>
+            <div class="health-grid">
+              
+              <!-- CPU Circle -->
+              <div class="gauge-item">
+                <div class="gauge-circle-wrapper">
+                  <svg class="gauge-svg" viewBox="0 0 72 72">
+                    <circle class="gauge-track" cx="36" cy="36" r="32" />
+                    <circle class="gauge-fill primary" id="gauge-cpu-fill" cx="36" cy="36" r="32" />
+                  </svg>
+                  <span class="gauge-value" id="gauge-cpu-val">0%</span>
+                </div>
+                <span class="gauge-label">CPU Load</span>
+              </div>
+
+              <!-- Memory Circle -->
+              <div class="gauge-item">
+                <div class="gauge-circle-wrapper">
+                  <svg class="gauge-svg" viewBox="0 0 72 72">
+                    <circle class="gauge-track" cx="36" cy="36" r="32" />
+                    <circle class="gauge-fill teal" id="gauge-ram-fill" cx="36" cy="36" r="32" />
+                  </svg>
+                  <span class="gauge-value" id="gauge-ram-val">0%</span>
+                </div>
+                <span class="gauge-label">RAM Util</span>
+              </div>
+
+              <!-- API Ping Circle -->
+              <div class="gauge-item">
+                <div class="gauge-circle-wrapper">
+                  <svg class="gauge-svg" viewBox="0 0 72 72">
+                    <circle class="gauge-track" cx="36" cy="36" r="32" />
+                    <circle class="gauge-fill success" id="gauge-ping-fill" cx="36" cy="36" r="32" />
+                  </svg>
+                  <span class="gauge-value" id="gauge-ping-val">0ms</span>
+                </div>
+                <span class="gauge-label">API Ping</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Resource Dials only -->
+
+        </div>
+
       </div>
 
     </section>

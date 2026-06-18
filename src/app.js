@@ -8,6 +8,7 @@ import patientRoutes from './routes/patientRoutes.js';
 import doctorRoutes from './routes/doctorRoutes.js';
 import { errorHandler } from './middlewares/errorMiddleware.js';
 import { NotFoundError } from './utils/errors.js';
+import { auditMiddleware } from './middlewares/auditMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +24,7 @@ app.use(cors({
 
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(auditMiddleware);
 
 // Redirect requests ending in .html to their clean URL path counterparts (permanent redirect)
 app.use((req, res, next) => {

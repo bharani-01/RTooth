@@ -1,6 +1,7 @@
 import * as authService from '../services/authService.js';
 import { sendResponse } from '../utils/response.js';
 import { BadRequestError } from '../utils/errors.js';
+import { fetchAuditLogs } from '../services/auditService.js';
 
 /**
  * Handle user registration (IT-Admin only)
@@ -210,6 +211,19 @@ export const getPatients = async (req, res, next) => {
     const isDoc = req.profile.role === 'doctor';
     const patients = await authService.listPatients(isDoc ? req.profile.id : null);
     return sendResponse(res, 200, 'Patients directory retrieved successfully.', { patients });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Retrieve system security audit logs (IT-Admin only)
+ */
+export const getAuditLogs = async (req, res, next) => {
+  try {
+    const { search, status, method, page, limit } = req.query;
+    const result = await fetchAuditLogs({ search, status, method, page, limit });
+    return sendResponse(res, 200, 'System audit logs retrieved successfully.', result);
   } catch (error) {
     next(error);
   }

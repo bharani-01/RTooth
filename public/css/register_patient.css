@@ -6,9 +6,9 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 body.dashboard-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f4f6f9;
-  color: #1e2535;
+  font-family: var(--font-body), sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-dark);
   margin: 0;
 }
 
@@ -74,10 +74,10 @@ body.dashboard-body {
 }
 .rp-tab:hover { color: #111827; border-color: #c8cdd6; }
 .rp-tab.active {
-  background: #111827;
+  background: var(--primary);
   color: #fff;
-  border-color: #111827;
-  box-shadow: 0 2px 8px rgba(17,24,39,.15);
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 102, 255, .15);
 }
 
 .drafts-pill {
@@ -239,8 +239,8 @@ body.dashboard-body {
   box-shadow: 0 1px 2px rgba(0,0,0,.04);
 }
 .rp-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
 }
 .rp-input::placeholder { color: #b8c0cc; }
 
@@ -315,13 +315,13 @@ body.dashboard-body {
 }
 
 .rp-btn-primary {
-  background: #111827;
+  background: var(--primary);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(17,24,39,.14);
+  box-shadow: 0 2px 8px rgba(0, 102, 255, .14);
 }
 .rp-btn-primary:hover {
-  background: #1f2937;
-  box-shadow: 0 4px 16px rgba(17,24,39,.2);
+  background: var(--primary-hover);
+  box-shadow: 0 4px 16px rgba(0, 102, 255, .2);
 }
 .rp-btn-primary:disabled {
   opacity: .6;
@@ -462,11 +462,11 @@ body.dashboard-body {
   white-space: nowrap;
 }
 .btn-action-sm.btn-primary {
-  background: #111827;
+  background: var(--primary);
   color: #fff;
-  box-shadow: 0 1px 4px rgba(17,24,39,.15);
+  box-shadow: 0 1px 4px rgba(0, 102, 255, .15);
 }
-.btn-action-sm.btn-primary:hover { background: #1f2937; }
+.btn-action-sm.btn-primary:hover { background: var(--primary-hover); }
 .btn-action-sm.btn-primary:disabled { opacity: .6; cursor: not-allowed; }
 
 .btn-action-sm.btn-secondary {
