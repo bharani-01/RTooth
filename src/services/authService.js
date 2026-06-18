@@ -9,8 +9,10 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
  * Queries each table directly to avoid PostgREST relationship join bugs.
  */
 async function getResolvedProfile(profileId) {
+  const client = supabaseAdmin || supabase;
+
   // 1. Fetch base profile fields
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile, error: profileError } = await client
     .from('profiles')
     .select('*')
     .eq('id', profileId)
@@ -23,7 +25,7 @@ async function getResolvedProfile(profileId) {
 
   // 2. Resolve Doctor specifics
   if (profile.role === 'doctor') {
-    const { data: doctor } = await supabase
+    const { data: doctor } = await client
       .from('doctors')
       .select('*')
       .eq('id', profileId)
@@ -45,19 +47,19 @@ async function getResolvedProfile(profileId) {
   
   // 3. Resolve Patient specifics
   else if (profile.role === 'patient') {
-    const { data: patient } = await supabase
+    const { data: patient } = await client
       .from('patients')
       .select('*')
       .eq('id', profileId)
       .maybeSingle();
 
-    const { data: habits } = await supabase
+    const { data: habits } = await client
       .from('lifestyle_habits')
       .select('*')
       .eq('patient_id', profileId)
       .maybeSingle();
 
-    const { data: records } = await supabase
+    const { data: records } = await client
       .from('medical_records')
       .select('*')
       .eq('patient_id', profileId)
@@ -70,14 +72,14 @@ async function getResolvedProfile(profileId) {
     // Resolve registering doctor details
     let doctor = null;
     if (patData.doctor_id) {
-      const { data: docProfile } = await supabase
+      const { data: docProfile } = await client
         .from('profiles')
         .select('*')
         .eq('id', patData.doctor_id)
         .maybeSingle();
 
       if (docProfile) {
-        const { data: docDetails } = await supabase
+        const { data: docDetails } = await client
           .from('doctors')
           .select('*')
           .eq('id', patData.doctor_id)
@@ -123,7 +125,7 @@ async function getResolvedProfile(profileId) {
   }
 
   // IT-Admin
-  const { data: admin } = await supabase
+  const { data: admin } = await client
     .from('admins')
     .select('*')
     .eq('id', profileId)
