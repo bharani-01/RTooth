@@ -264,6 +264,11 @@ export const forgotPassword = async (req, res, next) => {
     await authService.sendForgotPasswordEmail(email, redirectUrl);
     return sendResponse(res, 200, 'Password reset link sent successfully to your email.');
   } catch (error) {
+    console.error('[Forgot Password Controller Exception]', error);
+    const isTimeout = error.status === 500 || error.status === 504 || error.message?.includes('timeout') || error.message === '{}';
+    if (isTimeout) {
+      return next(new Error('The authentication service timed out sending the password recovery email. This is usually caused by SMTP server connection issues in the Supabase project configuration. Please check your Supabase Auth SMTP Settings.'));
+    }
     next(error);
   }
 };
@@ -296,6 +301,11 @@ export const sendOtp = async (req, res, next) => {
     await authService.sendOtpCode(email);
     return sendResponse(res, 200, 'One-time login code sent successfully to your email.');
   } catch (error) {
+    console.error('[Send OTP Exception]', error);
+    const isTimeout = error.status === 500 || error.status === 504 || error.message?.includes('timeout') || error.message === '{}';
+    if (isTimeout) {
+      return next(new Error('The authentication service timed out sending the one-time login code (OTP). This is usually caused by SMTP server connection issues in the Supabase project configuration. Please check your Supabase Auth SMTP Settings.'));
+    }
     next(error);
   }
 };
@@ -329,6 +339,11 @@ export const sendDoctorResetLink = async (req, res, next) => {
     await authService.sendAdminResetLink(id, redirectUrl);
     return sendResponse(res, 200, 'Recovery reset password link sent to practitioner successfully.');
   } catch (error) {
+    console.error('[Admin Reset Doctor Password Exception]', error);
+    const isTimeout = error.status === 500 || error.status === 504 || error.message?.includes('timeout') || error.message === '{}';
+    if (isTimeout) {
+      return next(new Error('The authentication service timed out sending the password recovery email to the doctor. This is usually caused by SMTP server connection issues in the Supabase project configuration. Please check your Supabase Auth SMTP Settings.'));
+    }
     next(error);
   }
 };
