@@ -23,9 +23,9 @@ services:
       - key: RESEND_FROM_EMAIL
         sync: false
       - key: ALLOWED_ORIGINS
-        value: https://rtooth-clinic.onrender.com
+        value: https://rtooth-wn3z.onrender.com
       - key: APP_URL
-        value: https://rtooth-clinic.onrender.com
+        value: https://rtooth-wn3z.onrender.com
       - key: BASE_URL
-        value: https://rtooth-clinic.onrender.com
+        value: https://rtooth-wn3z.onrender.com
 
