@@ -296,7 +296,7 @@ function initConsultationForm() {
       if (visitError) visitError.style.display = 'none';
       if (visitSuccess) visitSuccess.style.display = 'none';
 
-      const medRows = medsContainer.querySelectorAll('.dynamic-row');
+      const medRows = medsContainer.querySelectorAll('.dynamic-med-card, .dynamic-row');
       medRows.forEach(row => row.remove());
       if (noMedsText) noMedsText.style.display = 'block';
 
@@ -329,36 +329,109 @@ function initConsultationForm() {
     });
   }
 
-  // Add drug row
+  // Add drug card
   if (addMedBtn) {
     addMedBtn.addEventListener('click', () => {
       if (noMedsText) noMedsText.style.display = 'none';
 
-      const row = document.createElement('div');
-      row.className = 'dynamic-row';
-      row.style.gridTemplateColumns = '2fr 1fr 1.5fr 1.2fr 1.2fr auto';
+      const card = document.createElement('div');
+      card.className = 'dynamic-med-card';
 
       const todayStr = new Date().toISOString().split('T')[0];
 
-      row.innerHTML = `
-        <input type="text" class="form-input med-name" placeholder="Medication Name" required style="padding: 8px 10px;">
-        <input type="text" class="form-input med-dosage" placeholder="e.g. 500mg" required style="padding: 8px 10px;">
-        <input type="text" class="form-input med-freq" placeholder="e.g. Daily" required style="padding: 8px 10px;">
-        <input type="date" class="form-input med-start" required style="padding: 8px 10px;" value="${todayStr}">
-        <input type="date" class="form-input med-end" style="padding: 8px 10px;" placeholder="End Date">
-        <button type="button" class="btn-delete-row" title="Remove Prescription">
-          <svg viewBox="0 0 24 24" style="width:16px; height:16px; stroke:currentColor; stroke-width:2.5; fill:none;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-        </button>
+      card.innerHTML = `
+        <div class="dynamic-med-card-header">
+          <span class="dynamic-med-card-title">Medication details</span>
+          <button type="button" class="btn-delete-row" title="Remove Prescription">
+            <svg viewBox="0 0 24 24" style="width:14px; height:14px; stroke:currentColor; stroke-width:2.5; fill:none; margin-right:4px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            Remove
+          </button>
+        </div>
+        <div class="dynamic-med-grid">
+          <!-- Row 1: Name and Dosage Form -->
+          <div class="dynamic-med-grid-row">
+            <div class="dynamic-med-field">
+              <label>Medication Name <span class="req">*</span></label>
+              <input type="text" class="form-input med-name" placeholder="e.g. Amoxicillin, Curcumin Oral Gel" required style="padding: 8px 10px;">
+            </div>
+            <div class="dynamic-med-field">
+              <label>Dosage Form</label>
+              <select class="form-input med-dosage-form">
+                <option value="Tablet">Tablet</option>
+                <option value="Capsule">Capsule</option>
+                <option value="Gel">Gel / Ointment</option>
+                <option value="Syrup">Syrup</option>
+                <option value="Drops">Drops</option>
+                <option value="Mouthwash">Mouthwash</option>
+                <option value="N/A" selected>N/A</option>
+              </select>
+            </div>
+          </div>
+          <!-- Row 2: Dosage and Frequency -->
+          <div class="dynamic-med-grid-row-equal">
+            <div class="dynamic-med-field">
+              <label>Dosage <span class="req">*</span></label>
+              <input type="text" class="form-input med-dosage" placeholder="e.g. 500mg" required style="padding: 8px 10px;">
+            </div>
+            <div class="dynamic-med-field">
+              <label>Frequency <span class="req">*</span></label>
+              <input type="text" class="form-input med-freq" placeholder="e.g. Twice daily" required style="padding: 8px 10px;">
+            </div>
+          </div>
+          <!-- Row 3: Times a Day, Relation to Food, Route of Administration -->
+          <div class="dynamic-med-grid-row-3">
+            <div class="dynamic-med-field">
+              <label>Times a Day</label>
+              <input type="number" class="form-input med-times-a-day" placeholder="e.g. 2" min="1" style="padding: 8px 10px;">
+            </div>
+            <div class="dynamic-med-field">
+              <label>Relation to Food</label>
+              <select class="form-input med-relation-to-food">
+                <option value="Before Food">Before Food</option>
+                <option value="After Food">After Food</option>
+                <option value="With Food">With Food</option>
+                <option value="Empty Stomach">Empty Stomach</option>
+                <option value="N/A" selected>N/A</option>
+              </select>
+            </div>
+            <div class="dynamic-med-field">
+              <label>Route of Administration</label>
+              <select class="form-input med-route">
+                <option value="Oral">Oral</option>
+                <option value="Topical">Topical</option>
+                <option value="Mouthwash">Mouthwash</option>
+                <option value="Inhalation">Inhalation</option>
+                <option value="N/A" selected>N/A</option>
+              </select>
+            </div>
+          </div>
+          <!-- Row 4: Start Date and End Date -->
+          <div class="dynamic-med-grid-row-equal">
+            <div class="dynamic-med-field">
+              <label>Start Date <span class="req">*</span></label>
+              <input type="date" class="form-input med-start" required style="padding: 8px 10px;" value="${todayStr}">
+            </div>
+            <div class="dynamic-med-field">
+              <label>End Date</label>
+              <input type="date" class="form-input med-end" style="padding: 8px 10px;">
+            </div>
+          </div>
+          <!-- Row 5: Special Instructions -->
+          <div class="dynamic-med-field">
+            <label>Special Instructions</label>
+            <input type="text" class="form-input med-instructions" placeholder="e.g. Swallow whole with water, avoid dairy" style="padding: 8px 10px;">
+          </div>
+        </div>
       `;
 
-      row.querySelector('.btn-delete-row').addEventListener('click', () => {
-        row.remove();
-        if (medsContainer.querySelectorAll('.dynamic-row').length === 0) {
+      card.querySelector('.btn-delete-row').addEventListener('click', () => {
+        card.remove();
+        if (medsContainer.querySelectorAll('.dynamic-med-card').length === 0) {
           if (noMedsText) noMedsText.style.display = 'block';
         }
       });
 
-      medsContainer.appendChild(row);
+      medsContainer.appendChild(card);
     });
   }
 
@@ -429,14 +502,21 @@ function initConsultationForm() {
 
         // Prescriptions
         const prescriptionsList = [];
-        const medRows = medsContainer.querySelectorAll('.dynamic-row');
-        medRows.forEach(row => {
+        const medCards = medsContainer.querySelectorAll('.dynamic-med-card, .dynamic-row');
+        medCards.forEach(card => {
+          // Supports both old dynamic-row and new dynamic-med-card layouts
+          const timesVal = card.querySelector('.med-times-a-day')?.value;
           prescriptionsList.push({
-            medication_name: row.querySelector('.med-name').value.trim(),
-            dosage: row.querySelector('.med-dosage').value.trim(),
-            frequency: row.querySelector('.med-freq').value.trim(),
-            start_date: row.querySelector('.med-start').value,
-            end_date: row.querySelector('.med-end').value || null
+            medication_name: card.querySelector('.med-name').value.trim(),
+            dosage: card.querySelector('.med-dosage').value.trim(),
+            dosage_form: card.querySelector('.med-dosage-form')?.value || 'N/A',
+            frequency: card.querySelector('.med-freq').value.trim(),
+            times_a_day: timesVal ? parseInt(timesVal, 10) : null,
+            relation_to_food: card.querySelector('.med-relation-to-food')?.value || 'N/A',
+            route: card.querySelector('.med-route')?.value || 'N/A',
+            start_date: card.querySelector('.med-start').value,
+            end_date: card.querySelector('.med-end').value || null,
+            instructions: card.querySelector('.med-instructions')?.value.trim() || null
           });
         });
         formData.append('prescriptions', JSON.stringify(prescriptionsList));
@@ -662,13 +742,25 @@ async function renderHistory(patientId) {
         } else {
           medsBody.innerHTML = patient.medications.map(med => {
             const endDateFormatted = med.end_date ? formatDate(med.end_date) : 'Ongoing';
+            const detailsList = [];
+            if (med.dosage_form && med.dosage_form !== 'N/A') detailsList.push(escapeHtml(med.dosage_form));
+            if (med.route && med.route !== 'N/A') detailsList.push(`Route: ${escapeHtml(med.route)}`);
+            if (med.times_a_day) detailsList.push(`${med.times_a_day}x daily`);
+            if (med.relation_to_food && med.relation_to_food !== 'N/A') detailsList.push(`<span style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 5px; border-radius:4px; font-weight:600;">${escapeHtml(med.relation_to_food)}</span>`);
+            const detailsStr = detailsList.length > 0 ? `<div style="font-size:11.5px; color:#5a6478; margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">${detailsList.join(' · ')}</div>` : '';
+            const instructionsHtml = med.instructions ? `<div style="font-size:11.5px; color:#64748b; font-style:italic; margin-top:3px;">Note: ${escapeHtml(med.instructions)}</div>` : '';
+
             return `
               <tr>
-                <td style="padding: 8px 12px;"><strong>${escapeHtml(med.medication_name)}</strong></td>
-                <td style="padding: 8px 12px;">${escapeHtml(med.dosage)}</td>
-                <td style="padding: 8px 12px;">${escapeHtml(med.frequency)}</td>
-                <td style="padding: 8px 12px;">${formatDate(med.start_date)}</td>
-                <td style="padding: 8px 12px;">${endDateFormatted}</td>
+                <td style="padding: 8px 12px; vertical-align:top;">
+                  <strong>${escapeHtml(med.medication_name)}</strong>
+                  ${detailsStr}
+                  ${instructionsHtml}
+                </td>
+                <td style="padding: 8px 12px; vertical-align:middle;">${escapeHtml(med.dosage)}</td>
+                <td style="padding: 8px 12px; vertical-align:middle;">${escapeHtml(med.frequency)}</td>
+                <td style="padding: 8px 12px; vertical-align:middle;">${formatDate(med.start_date)}</td>
+                <td style="padding: 8px 12px; vertical-align:middle;">${endDateFormatted}</td>
               </tr>
             `;
           }).join('');
@@ -724,7 +816,14 @@ async function renderHistory(patientId) {
             if (c.prescriptions && c.prescriptions.length > 0) {
               const medsItems = c.prescriptions.map(m => {
                 const endStr = m.end_date ? ` until ${formatDate(m.end_date)}` : ' (Ongoing)';
-                return `<li><strong>${escapeHtml(m.medication_name)}</strong> - ${escapeHtml(m.dosage)} (${escapeHtml(m.frequency)})${endStr}</li>`;
+                const detailsList = [];
+                if (m.dosage_form && m.dosage_form !== 'N/A') detailsList.push(escapeHtml(m.dosage_form));
+                if (m.route && m.route !== 'N/A') detailsList.push(`Route: ${escapeHtml(m.route)}`);
+                if (m.times_a_day) detailsList.push(`${m.times_a_day}x/day`);
+                if (m.relation_to_food && m.relation_to_food !== 'N/A') detailsList.push(escapeHtml(m.relation_to_food));
+                const detailsStr = detailsList.length > 0 ? ` [${detailsList.join(', ')}]` : '';
+                const instructionsStr = m.instructions ? ` (Note: ${escapeHtml(m.instructions)})` : '';
+                return `<li><strong>${escapeHtml(m.medication_name)}</strong> - ${escapeHtml(m.dosage)} (${escapeHtml(m.frequency)})${detailsStr}${endStr}${instructionsStr}</li>`;
               }).join('');
               
               medsHtml = `
@@ -912,12 +1011,24 @@ async function fetchAndRenderVisitDetailsInline(patientId, visitId) {
         } else {
           medsBody.innerHTML = prescriptions.map(med => {
             const endStr = med.end_date ? formatDate(med.end_date) : 'Ongoing';
+            const detailsList = [];
+            if (med.dosage_form && med.dosage_form !== 'N/A') detailsList.push(escapeHtml(med.dosage_form));
+            if (med.route && med.route !== 'N/A') detailsList.push(`Route: ${escapeHtml(med.route)}`);
+            if (med.times_a_day) detailsList.push(`${med.times_a_day}x daily`);
+            if (med.relation_to_food && med.relation_to_food !== 'N/A') detailsList.push(`<span style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 5px; border-radius:4px; font-weight:600;">${escapeHtml(med.relation_to_food)}</span>`);
+            const detailsStr = detailsList.length > 0 ? `<div style="font-size:11.5px; color:#5a6478; margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">${detailsList.join(' · ')}</div>` : '';
+            const instructionsHtml = med.instructions ? `<div style="font-size:11.5px; color:#64748b; font-style:italic; margin-top:3px;">Note: ${escapeHtml(med.instructions)}</div>` : '';
+
             return `
               <tr>
-                <td style="padding: 8px 12px;"><strong>${escapeHtml(med.medication_name)}</strong></td>
-                <td style="padding: 8px 12px;">${escapeHtml(med.dosage)}</td>
-                <td style="padding: 8px 12px;">${escapeHtml(med.frequency)}</td>
-                <td style="padding: 8px 12px;">${formatDate(med.start_date)} to ${endStr}</td>
+                <td style="padding: 8px 12px; vertical-align:top;">
+                  <strong>${escapeHtml(med.medication_name)}</strong>
+                  ${detailsStr}
+                  ${instructionsHtml}
+                </td>
+                <td style="padding: 8px 12px; vertical-align:middle;">${escapeHtml(med.dosage)}</td>
+                <td style="padding: 8px 12px; vertical-align:middle;">${escapeHtml(med.frequency)}</td>
+                <td style="padding: 8px 12px; vertical-align:middle;">${formatDate(med.start_date)} to ${endStr}</td>
               </tr>
             `;
           }).join('');

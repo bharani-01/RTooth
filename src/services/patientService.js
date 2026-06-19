@@ -34,7 +34,7 @@ export const getPatientIdByIdOrCode = async (idOrCode, token) => {
 /**
  * Fetch patient profile details (demographics, habits, records, checkups, medications) by Patient ID or Patient Code.
  */
-export const getPatientProfileById = async (patientIdOrCode, token) => {
+export const getPatientProfileById = async (patientIdOrCode, token, requesterRole = 'doctor') => {
   const patientId = await getPatientIdByIdOrCode(patientIdOrCode, token);
   const client = getClient(token);
 
@@ -114,6 +114,12 @@ export const getPatientProfileById = async (patientIdOrCode, token) => {
 
   if (medicationsError) throw medicationsError;
 
+  let filteredMeds = medications || [];
+  if (requesterRole === 'patient') {
+    const todayStr = new Date().toISOString().split('T')[0];
+    filteredMeds = filteredMeds.filter(med => med.status !== 'discontinued' && (!med.end_date || med.end_date >= todayStr));
+  }
+
   // 7. Fetch patient reports
   const { data: reports, error: reportsError } = await client
     .from('patient_reports')
@@ -152,7 +158,10 @@ export const getPatientProfileById = async (patientIdOrCode, token) => {
     
     for (const c of checkups) {
       const doc = c.doctor_id ? docMap.get(c.doctor_id) : null;
-      const checkupMeds = medications ? medications.filter(m => m.checkup_id === c.id) : [];
+      let checkupMeds = medications ? medications.filter(m => m.checkup_id === c.id) : [];
+      if (requesterRole === 'patient') {
+        checkupMeds = checkupMeds.filter(m => m.status !== 'discontinued');
+      }
       const checkupReports = reports ? reports.filter(r => r.checkup_id === c.id) : [];
 
       resolvedCheckups.push({
@@ -193,7 +202,7 @@ export const getPatientProfileById = async (patientIdOrCode, token) => {
     lesion_location: latestRecord.lesion_location,
     risk_factors: latestRecord.risk_factors,
 
-    medications: medications || [],
+    medications: filteredMeds,
     checkups: resolvedCheckups,
     reports: reports || []
   };
@@ -213,7 +222,12 @@ export const createMedication = async (patientId, medData, token) => {
         dosage: medData.dosage,
         frequency: medData.frequency,
         start_date: medData.start_date,
-        end_date: medData.end_date || null
+        end_date: medData.end_date || null,
+        relation_to_food: medData.relation_to_food || null,
+        times_a_day: medData.times_a_day ? parseInt(medData.times_a_day, 10) : null,
+        route: medData.route || null,
+        dosage_form: medData.dosage_form || null,
+        instructions: medData.instructions || null
       }
     ])
     .select()
@@ -392,7 +406,12 @@ export const createVisit = async (patientId, doctorId, visitData, token) => {
             frequency: med.frequency,
             start_date: med.start_date || new Date().toISOString().split('T')[0],
             end_date: med.end_date || null,
-            checkup_id: checkupId
+            checkup_id: checkupId,
+            relation_to_food: med.relation_to_food || null,
+            times_a_day: med.times_a_day ? parseInt(med.times_a_day, 10) : null,
+            route: med.route || null,
+            dosage_form: med.dosage_form || null,
+            instructions: med.instructions || null
           }
         ])
         .select()
@@ -471,7 +490,7 @@ export const createVisit = async (patientId, doctorId, visitData, token) => {
 /**
  * Retrieve a specific visit details including nested prescriptions, reports, patient demographics and oncologist details
  */
-export const getVisitDetails = async (patientId, visitId, token) => {
+export const getVisitDetails = async (patientId, visitId, token, requesterRole = 'doctor') => {
   const client = getClient(token);
 
   // 1. Fetch the checkup record
@@ -557,6 +576,11 @@ export const getVisitDetails = async (patientId, visitId, token) => {
 
   if (reportsError) throw reportsError;
 
+  let filteredPrescriptions = prescriptions || [];
+  if (requesterRole === 'patient') {
+    filteredPrescriptions = filteredPrescriptions.filter(m => m.status !== 'discontinued');
+  }
+
   return {
     visit: {
       id: checkup.id,
@@ -579,7 +603,7 @@ export const getVisitDetails = async (patientId, visitId, token) => {
       cancer_stage: latestRecord.cancer_stage || 'Suspicious Lesion',
       lesion_location: latestRecord.lesion_location || 'Not Specified'
     },
-    prescriptions: prescriptions || [],
+    prescriptions: filteredPrescriptions,
     reports: reports || []
   };
 };
@@ -596,7 +620,12 @@ export const updateMedication = async (medicationId, medData, token) => {
       dosage: medData.dosage,
       frequency: medData.frequency,
       start_date: medData.start_date,
-      end_date: medData.end_date || null
+      end_date: medData.end_date || null,
+      relation_to_food: medData.relation_to_food || null,
+      times_a_day: medData.times_a_day ? parseInt(medData.times_a_day, 10) : null,
+      route: medData.route || null,
+      dosage_form: medData.dosage_form || null,
+      instructions: medData.instructions || null
     })
     .eq('id', medicationId)
     .select()
@@ -611,9 +640,13 @@ export const updateMedication = async (medicationId, medData, token) => {
  */
 export const deleteMedication = async (medicationId, token) => {
   const client = getClient(token);
+  const todayStr = new Date().toISOString().split('T')[0];
   const { error } = await client
     .from('medications')
-    .delete()
+    .update({
+      status: 'discontinued',
+      end_date: todayStr
+    })
     .eq('id', medicationId);
 
   if (error) throw error;

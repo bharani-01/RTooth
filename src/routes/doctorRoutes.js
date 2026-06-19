@@ -24,4 +24,15 @@ router.post('/', requireAuth, requireRole(['admin']), authController.registerDoc
 // Trigger reset link for doctor (IT-Admin only)
 router.post('/:id/send-reset-link', requireAuth, requireRole(['admin']), authController.sendDoctorResetLink);
 
+// Trigger daily notifications check (IT-Admin only)
+router.post('/notifications/trigger', requireAuth, requireRole(['admin']), async (req, res, next) => {
+  try {
+    const { runDailyNotificationsJob } = await import('../services/notificationService.js');
+    const summary = await runDailyNotificationsJob();
+    res.json({ success: true, summary });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

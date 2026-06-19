@@ -463,6 +463,78 @@ body.dashboard-body {
   animation: fadeUp .2s ease;
 }
 
+.dynamic-med-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  animation: fadeUp .2s ease;
+}
+.dynamic-med-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.dynamic-med-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.dynamic-med-card-header .btn-delete-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #fee2e2;
+  color: #dc2626;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.dynamic-med-card-header .btn-delete-row:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+.dynamic-med-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dynamic-med-grid-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 12px;
+}
+.dynamic-med-grid-row-equal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.dynamic-med-grid-row-3 {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr 1fr;
+  gap: 12px;
+}
+.dynamic-med-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dynamic-med-field label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+}
+
 .con-report-row {
   display: grid;
   grid-template-columns: 2fr 2fr auto;
@@ -820,6 +892,7 @@ body.dashboard-body {
   .con-field-row    { grid-template-columns: 1fr; }
   .con-meta-strip   { grid-template-columns: 1fr; }
   .dynamic-row      { grid-template-columns: 1fr; }
+  .dynamic-med-grid-row, .dynamic-med-grid-row-equal, .dynamic-med-grid-row-3 { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
   .con-patient-header { flex-direction: column; align-items: flex-start; }

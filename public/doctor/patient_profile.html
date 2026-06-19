@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Patient Profile — RTooth Doctor Portal</title>
   <meta name="description" content="RTooth clinical patient profile — view oncology history, consultations, medications and symptom logs.">
-  <link rel="stylesheet" href="/css/doctor_patient_profile.css">
-  <link rel="stylesheet" href="/css/gallery.css">
+  <link rel="stylesheet" href="/css/doctor_patient_profile.css?v=3">
+  <link rel="stylesheet" href="/css/gallery.css?v=3">
 </head>
 <body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
 
@@ -263,7 +263,7 @@
               Prescribe
             </button>
           </div>
-          <div class="table-wrap">
+          <div class="table-wrap" style="margin-bottom: 30px;">
             <table class="data-table" id="medications-table">
               <thead>
                 <tr>
@@ -278,6 +278,27 @@
               <tbody id="medications-table-body">
                 <tr class="skeleton-row"><td colspan="6"><div class="row-skeleton"></div></td></tr>
                 <tr class="skeleton-row"><td colspan="6"><div class="row-skeleton" style="width:70%"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tab-toolbar" style="margin-top: 20px; border-top: 1px solid #f0f2f5; padding-top: 20px; margin-bottom: 16px;">
+            <h2 class="tab-section-title">Medication History (Past Prescriptions)</h2>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table" id="medications-history-table">
+              <thead>
+                <tr>
+                  <th>Medication</th>
+                  <th>Dosage</th>
+                  <th>Frequency</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="medications-history-table-body">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 16px;">No past prescriptions found.</td></tr>
               </tbody>
             </table>
           </div>
@@ -345,8 +366,52 @@
             <input type="text" class="form-input" id="med_dosage" placeholder="e.g. 500mg" required>
           </div>
           <div class="form-group">
+            <label class="form-label" for="med_dosage_form">Dosage Form</label>
+            <select class="form-input" id="med_dosage_form">
+              <option value="Tablet">Tablet</option>
+              <option value="Capsule">Capsule</option>
+              <option value="Gel">Gel / Ointment</option>
+              <option value="Syrup">Syrup</option>
+              <option value="Drops">Drops</option>
+              <option value="Mouthwash">Mouthwash</option>
+              <option value="N/A" selected>N/A</option>
+            </select>
+            <span class="form-helper">Select the physical form (e.g. Tablet, Topical Gel).</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
             <label class="form-label" for="med_freq">Frequency *</label>
             <input type="text" class="form-input" id="med_freq" placeholder="e.g. Twice daily" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="med_times_a_day">Times a Day</label>
+            <input type="number" class="form-input" id="med_times_a_day" placeholder="e.g. 2" min="1">
+            <span class="form-helper">Numeric count per day, used for patient reminder scheduling.</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="med_relation_to_food">Relation to Food</label>
+            <select class="form-input" id="med_relation_to_food">
+              <option value="Before Food">Before Food</option>
+              <option value="After Food">After Food</option>
+              <option value="With Food">With Food</option>
+              <option value="Empty Stomach">Empty Stomach</option>
+              <option value="N/A" selected>N/A</option>
+            </select>
+            <span class="form-helper">Specifies administration timing relative to meals.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="med_route">Route of Administration</label>
+            <select class="form-input" id="med_route">
+              <option value="Oral">Oral</option>
+              <option value="Topical">Topical</option>
+              <option value="Mouthwash">Mouthwash</option>
+              <option value="Inhalation">Inhalation</option>
+              <option value="N/A" selected>N/A</option>
+            </select>
+            <span class="form-helper">The path by which the drug is taken (e.g. Oral vs Topical).</span>
           </div>
         </div>
         <div class="form-row">
@@ -359,7 +424,12 @@
             <input type="date" class="form-input" id="med_end">
           </div>
         </div>
-        <div class="alert alert-error" id="med-error-alert"></div>
+        <div class="form-group">
+          <label class="form-label" for="med_instructions">Special Instructions</label>
+          <input type="text" class="form-input" id="med_instructions" placeholder="e.g. Swallow whole with water, avoid dairy">
+          <span class="form-helper">Additional precautions or patient-facing usage guidelines.</span>
+        </div>
+        <div class="alert alert-error" id="med-error-alert" style="display:none; margin-bottom:16px;"></div>
         <div class="modal-footer-actions">
           <button type="button" class="btn btn-secondary" id="btn-cancel-med">Cancel</button>
           <button type="submit" class="btn btn-primary" id="btn-submit-med">Add Prescription</button>
@@ -387,8 +457,52 @@
             <input type="text" class="form-input" id="edit_med_dosage" required>
           </div>
           <div class="form-group">
+            <label class="form-label" for="edit_med_dosage_form">Dosage Form</label>
+            <select class="form-input" id="edit_med_dosage_form">
+              <option value="Tablet">Tablet</option>
+              <option value="Capsule">Capsule</option>
+              <option value="Gel">Gel / Ointment</option>
+              <option value="Syrup">Syrup</option>
+              <option value="Drops">Drops</option>
+              <option value="Mouthwash">Mouthwash</option>
+              <option value="N/A">N/A</option>
+            </select>
+            <span class="form-helper">Select the physical form (e.g. Tablet, Topical Gel).</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
             <label class="form-label" for="edit_med_freq">Frequency *</label>
             <input type="text" class="form-input" id="edit_med_freq" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_med_times_a_day">Times a Day</label>
+            <input type="number" class="form-input" id="edit_med_times_a_day" min="1">
+            <span class="form-helper">Numeric count per day, used for patient reminder scheduling.</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="edit_med_relation_to_food">Relation to Food</label>
+            <select class="form-input" id="edit_med_relation_to_food">
+              <option value="Before Food">Before Food</option>
+              <option value="After Food">After Food</option>
+              <option value="With Food">With Food</option>
+              <option value="Empty Stomach">Empty Stomach</option>
+              <option value="N/A">N/A</option>
+            </select>
+            <span class="form-helper">Specifies administration timing relative to meals.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_med_route">Route of Administration</label>
+            <select class="form-input" id="edit_med_route">
+              <option value="Oral">Oral</option>
+              <option value="Topical">Topical</option>
+              <option value="Mouthwash">Mouthwash</option>
+              <option value="Inhalation">Inhalation</option>
+              <option value="N/A">N/A</option>
+            </select>
+            <span class="form-helper">The path by which the drug is taken (e.g. Oral vs Topical).</span>
           </div>
         </div>
         <div class="form-row">
@@ -400,6 +514,11 @@
             <label class="form-label" for="edit_med_end">End Date</label>
             <input type="date" class="form-input" id="edit_med_end">
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_med_instructions">Special Instructions</label>
+          <input type="text" class="form-input" id="edit_med_instructions">
+          <span class="form-helper">Additional precautions or patient-facing usage guidelines.</span>
         </div>
         <div class="alert alert-error" id="edit-med-error-alert" style="display:none; margin-bottom:16px;"></div>
         <div class="modal-footer-actions split">

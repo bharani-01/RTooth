@@ -159,11 +159,20 @@ function renderMedicationsList(prescriptions) {
     const endStr = med.end_date ? formatDate(med.end_date) : 'Ongoing';
     return `
       <tr>
-        <td data-label="Medication Name"><strong>${escapeHtml(med.medication_name)}</strong></td>
-        <td data-label="Dosage">${escapeHtml(med.dosage)}</td>
-        <td data-label="Frequency">${escapeHtml(med.frequency)}</td>
-        <td data-label="Start Date">${formatDate(med.start_date)}</td>
-        <td data-label="End Date">${endStr}</td>
+        <td data-label="Medication Name">
+          <strong>${escapeHtml(med.medication_name)}</strong>
+          ${med.dosage_form && med.dosage_form !== 'N/A' ? ` <span style="font-size: 11.5px; color:#5a6478; font-weight:normal;">(${escapeHtml(med.dosage_form)})</span>` : ''}
+          ${med.route && med.route !== 'N/A' ? `<div style="font-size:11px; color:#5a6478; margin-top:2px;">Route: ${escapeHtml(med.route)}</div>` : ''}
+          ${med.instructions ? `<div style="font-size:11.5px; color:#64748b; font-style:italic; margin-top:3px;">Note: ${escapeHtml(med.instructions)}</div>` : ''}
+        </td>
+        <td data-label="Dosage" style="vertical-align:middle;">${escapeHtml(med.dosage)}</td>
+        <td data-label="Frequency" style="vertical-align:middle;">
+          ${escapeHtml(med.frequency)}
+          ${med.times_a_day ? `<div style="font-size:11px; color:#5a6478; margin-top:1px;">${med.times_a_day} times a day</div>` : ''}
+          ${med.relation_to_food && med.relation_to_food !== 'N/A' ? `<div style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px; font-weight:600;">${escapeHtml(med.relation_to_food)}</div>` : ''}
+        </td>
+        <td data-label="Start Date" style="vertical-align:middle;">${formatDate(med.start_date)}</td>
+        <td data-label="End Date" style="vertical-align:middle;">${endStr}</td>
       </tr>
     `;
   }).join('');

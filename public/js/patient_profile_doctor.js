@@ -358,7 +358,72 @@ function renderCheckups(checkups, patientId) {
  */
 function renderMedications(medications) {
   const tableBody = document.getElementById('medications-table-body');
-  if (medications.length === 0) {
+  const historyTableBody = document.getElementById('medications-history-table-body');
+  if (!tableBody) return;
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const activeMeds = medications.filter(med => med.status !== 'discontinued' && (!med.end_date || med.end_date >= todayStr));
+  const pastMeds = medications.filter(med => med.status === 'discontinued' || (med.end_date && med.end_date < todayStr));
+
+  const getRowHtml = (med, isActive) => {
+    const endDateFormatted = med.end_date ? formatDate(med.end_date) : 'Ongoing';
+    const rawStart = med.start_date ? med.start_date.split('T')[0] : '';
+    const rawEnd = med.end_date ? med.end_date.split('T')[0] : '';
+
+    let statusBadge = '';
+    if (med.status === 'discontinued') {
+      statusBadge = `<span class="status-badge" style="background:#fef2f2; color:#dc2626; border:1px solid #fecdd3; font-size:9.5px; padding:1px 6px; margin-left:6px; text-transform:none; letter-spacing:0; vertical-align:middle;">Discontinued</span>`;
+    } else if (isActive) {
+      statusBadge = `<span class="status-badge badge-active" style="font-size:9.5px; padding:1px 6px; margin-left:6px; text-transform:none; letter-spacing:0; vertical-align:middle;">Active</span>`;
+    } else {
+      statusBadge = `<span class="status-badge" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; font-size:9.5px; padding:1px 6px; margin-left:6px; text-transform:none; letter-spacing:0; vertical-align:middle;">Completed</span>`;
+    }
+
+    const actionButton = med.status === 'discontinued'
+      ? ''
+      : `<button class="btn btn-secondary btn-edit-med" style="padding: 4px 8px; font-size: 11.5px; height: auto;" 
+                  data-med-id="${med.id}"
+                  data-med-name="${escapeHtml(med.medication_name)}"
+                  data-med-dosage="${escapeHtml(med.dosage)}"
+                  data-med-freq="${escapeHtml(med.frequency)}"
+                  data-med-start="${rawStart}"
+                  data-med-end="${rawEnd}"
+                  data-med-dosage-form="${escapeHtml(med.dosage_form || 'N/A')}"
+                  data-med-times-a-day="${med.times_a_day || ''}"
+                  data-med-relation-to-food="${escapeHtml(med.relation_to_food || 'N/A')}"
+                  data-med-route="${escapeHtml(med.route || 'N/A')}"
+                  data-med-instructions="${escapeHtml(med.instructions || '')}">
+            Modify
+          </button>`;
+
+    return `
+      <tr>
+        <td data-label="Medication Name">
+          <div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap; margin-bottom:2px;">
+            <strong>${escapeHtml(med.medication_name)}</strong>
+            ${statusBadge}
+          </div>
+          ${med.dosage_form && med.dosage_form !== 'N/A' ? `<span style="font-size:11.5px; color:#5a6478; font-weight:500;">(${escapeHtml(med.dosage_form)})</span>` : ''}
+          ${med.route && med.route !== 'N/A' ? `<div style="font-size:11px; color:#5a6478; margin-top:2px;">Route: ${escapeHtml(med.route)}</div>` : ''}
+          ${med.instructions ? `<div style="font-size:11.5px; color:#64748b; font-style:italic; margin-top:3px;">Note: ${escapeHtml(med.instructions)}</div>` : ''}
+        </td>
+        <td data-label="Dosage" style="vertical-align:middle;">${escapeHtml(med.dosage)}</td>
+        <td data-label="Frequency" style="vertical-align:middle;">
+          ${escapeHtml(med.frequency)}
+          ${med.times_a_day ? `<div style="font-size:11px; color:#5a6478; margin-top:1px;">${med.times_a_day} times a day</div>` : ''}
+          ${med.relation_to_food && med.relation_to_food !== 'N/A' ? `<div style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; display:inline-block; margin-top:4px; font-weight:600;">${escapeHtml(med.relation_to_food)}</div>` : ''}
+        </td>
+        <td data-label="Start Date" style="vertical-align:middle;">${formatDate(med.start_date)}</td>
+        <td data-label="End Date" style="vertical-align:middle;">${endDateFormatted}</td>
+        <td data-label="Actions" style="vertical-align:middle;">
+          ${actionButton}
+        </td>
+      </tr>
+    `;
+  };
+
+  // Render Active Prescriptions
+  if (activeMeds.length === 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
@@ -366,39 +431,40 @@ function renderMedications(medications) {
         </td>
       </tr>
     `;
-    return;
+  } else {
+    tableBody.innerHTML = activeMeds.map(med => getRowHtml(med, true)).join('');
   }
 
-  tableBody.innerHTML = medications.map(med => {
-    const endDateFormatted = med.end_date ? formatDate(med.end_date) : 'Ongoing';
-    const rawStart = med.start_date ? med.start_date.split('T')[0] : '';
-    const rawEnd = med.end_date ? med.end_date.split('T')[0] : '';
-    return `
-      <tr>
-        <td data-label="Medication Name"><strong>${escapeHtml(med.medication_name)}</strong></td>
-        <td data-label="Dosage">${escapeHtml(med.dosage)}</td>
-        <td data-label="Frequency">${escapeHtml(med.frequency)}</td>
-        <td data-label="Start Date">${formatDate(med.start_date)}</td>
-        <td data-label="End Date">${endDateFormatted}</td>
-        <td data-label="Actions">
-          <button class="btn btn-secondary btn-edit-med" style="padding: 4px 8px; font-size: 11.5px; height: auto;" 
-                  data-med-id="${med.id}"
-                  data-med-name="${escapeHtml(med.medication_name)}"
-                  data-med-dosage="${escapeHtml(med.dosage)}"
-                  data-med-freq="${escapeHtml(med.frequency)}"
-                  data-med-start="${rawStart}"
-                  data-med-end="${rawEnd}">
-            Modify
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join('');
+  // Render Medication History (Past Prescriptions)
+  if (historyTableBody) {
+    if (pastMeds.length === 0) {
+      historyTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
+            No past prescriptions found.
+          </td>
+        </tr>
+      `;
+    } else {
+      historyTableBody.innerHTML = pastMeds.map(med => getRowHtml(med, false)).join('');
+    }
+  }
 
-  // Bind click delegation handler once on medications table body
+  // Bind click delegation handler once on active table body
   if (tableBody && !tableBody.dataset.listenerAttached) {
     tableBody.dataset.listenerAttached = 'true';
     tableBody.addEventListener('click', (e) => {
+      const editBtn = e.target.closest('.btn-edit-med');
+      if (editBtn) {
+        openEditMedicationModal(editBtn.dataset);
+      }
+    });
+  }
+
+  // Bind click delegation handler once on history table body
+  if (historyTableBody && !historyTableBody.dataset.listenerAttached) {
+    historyTableBody.dataset.listenerAttached = 'true';
+    historyTableBody.addEventListener('click', (e) => {
       const editBtn = e.target.closest('.btn-edit-med');
       if (editBtn) {
         openEditMedicationModal(editBtn.dataset);
@@ -421,6 +487,11 @@ function openEditMedicationModal(data) {
   document.getElementById('edit_med_freq').value = data.medFreq;
   document.getElementById('edit_med_start').value = data.medStart;
   document.getElementById('edit_med_end').value = data.medEnd || '';
+  document.getElementById('edit_med_dosage_form').value = data.medDosageForm || 'N/A';
+  document.getElementById('edit_med_times_a_day').value = data.medTimesADay || '';
+  document.getElementById('edit_med_relation_to_food').value = data.medRelationToFood || 'N/A';
+  document.getElementById('edit_med_route').value = data.medRoute || 'N/A';
+  document.getElementById('edit_med_instructions').value = data.medInstructions || '';
 
   if (modal) modal.classList.add('visible');
 }
@@ -592,6 +663,11 @@ function initModals(patientId) {
       const frequency = document.getElementById('med_freq').value.trim();
       const startDate = document.getElementById('med_start').value;
       const endDate = document.getElementById('med_end').value;
+      const dosageForm = document.getElementById('med_dosage_form').value;
+      const timesADay = document.getElementById('med_times_a_day').value;
+      const relationToFood = document.getElementById('med_relation_to_food').value;
+      const route = document.getElementById('med_route').value;
+      const instructions = document.getElementById('med_instructions').value.trim();
 
       const submitBtn = document.getElementById('btn-submit-med');
       if (submitBtn) {
@@ -607,7 +683,12 @@ function initModals(patientId) {
             dosage,
             frequency,
             start_date: startDate,
-            end_date: endDate || null
+            end_date: endDate || null,
+            dosage_form: dosageForm,
+            times_a_day: timesADay || null,
+            relation_to_food: relationToFood,
+            route,
+            instructions: instructions || null
           }
         });
 
@@ -654,6 +735,11 @@ function initModals(patientId) {
       const frequency = document.getElementById('edit_med_freq').value.trim();
       const startDate = document.getElementById('edit_med_start').value;
       const endDate = document.getElementById('edit_med_end').value;
+      const dosageForm = document.getElementById('edit_med_dosage_form').value;
+      const timesADay = document.getElementById('edit_med_times_a_day').value;
+      const relationToFood = document.getElementById('edit_med_relation_to_food').value;
+      const route = document.getElementById('edit_med_route').value;
+      const instructions = document.getElementById('edit_med_instructions').value.trim();
 
       const submitBtn = document.getElementById('btn-submit-edit-med');
       if (submitBtn) {
@@ -669,7 +755,12 @@ function initModals(patientId) {
             dosage,
             frequency,
             start_date: startDate,
-            end_date: endDate || null
+            end_date: endDate || null,
+            dosage_form: dosageForm,
+            times_a_day: timesADay || null,
+            relation_to_food: relationToFood,
+            route,
+            instructions: instructions || null
           }
         });
 
@@ -798,12 +889,37 @@ function initModals(patientId) {
       const todayStr = new Date().toISOString().split('T')[0];
 
       row.innerHTML = `
-        <input type="text" class="form-input med-name" placeholder="Medication Name" required style="padding: 8px 10px;">
-        <input type="text" class="form-input med-dosage" placeholder="e.g. 500mg" required style="padding: 8px 10px;">
-        <input type="text" class="form-input med-freq" placeholder="e.g. Daily" required style="padding: 8px 10px;">
-        <input type="date" class="form-input med-start" required style="padding: 8px 10px;" value="${todayStr}">
-        <input type="date" class="form-input med-end" style="padding: 8px 10px;" placeholder="End Date">
-        <button type="button" class="btn-delete-row" title="Remove Prescription">
+        <input type="text" class="form-input med-name" placeholder="Drug Name" required style="padding: 6px 8px; font-size: 12px;">
+        <input type="text" class="form-input med-dosage" placeholder="Dosage" required style="padding: 6px 8px; font-size: 12px;">
+        <select class="form-input med-dosage-form" style="padding: 6px 8px; font-size: 12px;">
+          <option value="Tablet">Tablet</option>
+          <option value="Capsule">Capsule</option>
+          <option value="Gel">Gel</option>
+          <option value="Syrup">Syrup</option>
+          <option value="Drops">Drops</option>
+          <option value="Mouthwash">Mouthwash</option>
+          <option value="N/A" selected>Form N/A</option>
+        </select>
+        <input type="text" class="form-input med-freq" placeholder="Freq" required style="padding: 6px 8px; font-size: 12px;">
+        <input type="number" class="form-input med-times-a-day" placeholder="Times" min="1" style="padding: 6px 8px; font-size: 12px;">
+        <select class="form-input med-relation-to-food" style="padding: 6px 8px; font-size: 12px;">
+          <option value="Before Food">Before</option>
+          <option value="After Food">After</option>
+          <option value="With Food">With</option>
+          <option value="Empty Stomach">Empty</option>
+          <option value="N/A" selected>Food N/A</option>
+        </select>
+        <select class="form-input med-route" style="padding: 6px 8px; font-size: 12px;">
+          <option value="Oral">Oral</option>
+          <option value="Topical">Topical</option>
+          <option value="Mouthwash">Mouthwash</option>
+          <option value="Inhalation">Inhalation</option>
+          <option value="N/A" selected>Route N/A</option>
+        </select>
+        <input type="date" class="form-input med-start" required style="padding: 6px 8px; font-size: 12px;" value="${todayStr}">
+        <input type="date" class="form-input med-end" style="padding: 6px 8px; font-size: 12px;" placeholder="End Date">
+        <input type="text" class="form-input med-instructions" placeholder="Instructions" style="padding: 6px 8px; font-size: 12px;">
+        <button type="button" class="btn-delete-row" title="Remove Prescription" style="padding: 4px;">
           <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
         </button>
       `;
@@ -891,7 +1007,12 @@ function initModals(patientId) {
             dosage: row.querySelector('.med-dosage').value.trim(),
             frequency: row.querySelector('.med-freq').value.trim(),
             start_date: row.querySelector('.med-start').value,
-            end_date: row.querySelector('.med-end').value || null
+            end_date: row.querySelector('.med-end').value || null,
+            dosage_form: row.querySelector('.med-dosage-form').value,
+            times_a_day: row.querySelector('.med-times-a-day').value || null,
+            relation_to_food: row.querySelector('.med-relation-to-food').value,
+            route: row.querySelector('.med-route').value,
+            instructions: row.querySelector('.med-instructions').value.trim() || null
           });
         });
         formData.append('prescriptions', JSON.stringify(prescriptionsList));

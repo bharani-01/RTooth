@@ -20,7 +20,7 @@ export const getPatientProfile = async (req, res, next) => {
       throw new ForbiddenError('Access denied: Patients can only retrieve their own clinical history.');
     }
 
-    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token, req.profile.role);
     
     // Check doctor ownership to prevent BOLA/IDOR
     if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
@@ -39,7 +39,7 @@ export const getPatientProfile = async (req, res, next) => {
 export const addMedication = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { medication_name, dosage, frequency, start_date, end_date } = req.body;
+    const { medication_name, dosage, frequency, start_date, end_date, relation_to_food, times_a_day, route, dosage_form, instructions } = req.body;
 
     if (!medication_name || !dosage || !frequency || !start_date) {
       throw new BadRequestError('Missing mandatory fields: medication_name, dosage, frequency, and start_date are required.');
@@ -49,12 +49,12 @@ export const addMedication = async (req, res, next) => {
     const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
 
     // Check doctor ownership to prevent BOLA/IDOR
-    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token, req.profile.role);
     if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
       throw new ForbiddenError('Access denied: You are not authorized to manage prescriptions for this patient.');
     }
 
-    const medData = { medication_name, dosage, frequency, start_date, end_date };
+    const medData = { medication_name, dosage, frequency, start_date, end_date, relation_to_food, times_a_day, route, dosage_form, instructions };
     const medication = await patientService.createMedication(patientId, medData, req.token);
 
     return sendResponse(res, 201, 'Medication prescription added successfully.', { medication });
@@ -440,7 +440,7 @@ export const getPatientVisitDetails = async (req, res, next) => {
       throw new ForbiddenError('Access denied: You are not authorized to view visit records for this patient.');
     }
 
-    const visitDetails = await patientService.getVisitDetails(patientId, visitId, req.token);
+    const visitDetails = await patientService.getVisitDetails(patientId, visitId, req.token, req.profile.role);
 
     return sendResponse(res, 200, 'Visit details retrieved successfully.', visitDetails);
   } catch (error) {
@@ -454,7 +454,7 @@ export const getPatientVisitDetails = async (req, res, next) => {
 export const updateMedication = async (req, res, next) => {
   try {
     const { id, medicationId } = req.params;
-    const { medication_name, dosage, frequency, start_date, end_date } = req.body;
+    const { medication_name, dosage, frequency, start_date, end_date, relation_to_food, times_a_day, route, dosage_form, instructions } = req.body;
 
     if (!medication_name || !dosage || !frequency || !start_date) {
       throw new BadRequestError('Missing mandatory fields for prescription update.');
@@ -462,12 +462,12 @@ export const updateMedication = async (req, res, next) => {
 
     // Resolve internal patient UUID to check doctor ownership to prevent BOLA/IDOR
     const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
-    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token, req.profile.role);
     if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
       throw new ForbiddenError('Access denied: You are not authorized to modify prescriptions for this patient.');
     }
 
-    const medData = { medication_name, dosage, frequency, start_date, end_date };
+    const medData = { medication_name, dosage, frequency, start_date, end_date, relation_to_food, times_a_day, route, dosage_form, instructions };
     const medication = await patientService.updateMedication(medicationId, medData, req.token);
 
     return sendResponse(res, 200, 'Medication prescription updated successfully.', { medication });
@@ -504,7 +504,7 @@ export const deleteMedication = async (req, res, next) => {
 export const getMyProfile = async (req, res, next) => {
   try {
     const patientId = req.profile.id;
-    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token, req.profile.role);
     return sendResponse(res, 200, 'Patient profile retrieved successfully.', { profile: patientProfile });
   } catch (error) {
     next(error);
@@ -518,7 +518,7 @@ export const getMyVisitDetails = async (req, res, next) => {
   try {
     const patientId = req.profile.id;
     const { visitId } = req.params;
-    const visitDetails = await patientService.getVisitDetails(patientId, visitId, req.token);
+    const visitDetails = await patientService.getVisitDetails(patientId, visitId, req.token, req.profile.role);
     return sendResponse(res, 200, 'Visit details retrieved successfully.', visitDetails);
   } catch (error) {
     next(error);

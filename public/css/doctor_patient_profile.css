@@ -1,4 +1,4 @@
-@import url("/css/doctor_index.css");
+@import url("/css/doctor_index.css?v=3");
 
 /* ─────────────────────────────────────────
    PATIENT PROFILE PAGE
@@ -582,8 +582,8 @@
 /* ── Dynamic form rows ── */
 .dynamic-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr 1.2fr 1.2fr auto;
-  gap: 10px;
+  grid-template-columns: 1.5fr 0.9fr 1.1fr 0.9fr 0.7fr 1.1fr 1.1fr 1.1fr 1.1fr 1.5fr auto;
+  gap: 8px;
   align-items: center;
   background: #f8fafc;
   padding: 10px 12px;
@@ -668,4 +668,15 @@
   .hero-actions { width: 100%; }
   .detail-meta-row { grid-template-columns: 1fr; }
   .dynamic-row { grid-template-columns: 1fr; }
+}
+
+/* ── Form Helper Text ── */
+.form-helper {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.4;
 }

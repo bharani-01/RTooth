@@ -1,6 +1,9 @@
 import { supabaseAdmin } from '../config/supabase.js';
 import * as emailService from './emailService.js';
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+
 /**
  * Execute the daily notifications and digests check
  */
@@ -81,6 +84,7 @@ export const runDailyNotificationsJob = async () => {
               notes: checkup.followup_notes
             });
             summary.remindersSent++;
+            await sleep(550);
           } catch (mailErr) {
             console.error(`[DAILY NOTIFICATIONS] Failed to send reminder email to ${patient.email}:`, mailErr.message);
             summary.errors.push(`Patient Reminder to ${patient.email}: ${mailErr.message}`);
@@ -183,6 +187,7 @@ export const runDailyNotificationsJob = async () => {
               severeLogs: docLogs
             });
             summary.digestsSent++;
+            await sleep(550);
           }
         } catch (docErr) {
           console.error(`[DAILY NOTIFICATIONS] Failed to send digest for Doctor ID ${doctorId}:`, docErr.message);
@@ -195,6 +200,169 @@ export const runDailyNotificationsJob = async () => {
   } catch (err) {
     console.error('[DAILY NOTIFICATIONS ERROR] Doctor digest pipeline failed:', err.message);
     summary.errors.push(`Doctor digests failure: ${err.message}`);
+  }
+
+  // COMMON RESOLUTION: Active Patients List
+  // ────────────────────────────────────────────────────────────────────────
+  let activePatients = [];
+  try {
+    const { data: patientList, error: patientListErr } = await supabaseAdmin
+      .from('patients')
+      .select('id')
+      .eq('status', 'active');
+
+    if (patientListErr) throw patientListErr;
+
+    const { data: profiles, error: profilesErr } = await supabaseAdmin
+      .from('profiles')
+      .select('id, first_name, last_name, email, status')
+      .eq('role', 'patient')
+      .eq('status', 'active');
+
+    if (profilesErr) throw profilesErr;
+
+    const patientIdSet = new Set((patientList || []).map(p => p.id));
+    const activeProfiles = (profiles || []).filter(p => patientIdSet.has(p.id) && p.email);
+
+    activePatients = activeProfiles.map(p => ({
+      id: p.id,
+      profiles: p
+    }));
+  } catch (err) {
+    console.error('[DAILY NOTIFICATIONS ERROR] Failed to fetch active patients for reminders:', err.message);
+    summary.errors.push(`Fetch active patients failure: ${err.message}`);
+  }
+
+  if (activePatients.length > 0) {
+    // ────────────────────────────────────────────────────────────────────────
+    // PART 3: Patient Self-Examination Reminders (Weekly Check)
+    // ────────────────────────────────────────────────────────────────────────
+    try {
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      
+      // Fetch any logs submitted in the last 7 days
+      const { data: recentLogs, error: recentLogsErr } = await supabaseAdmin
+        .from('symptom_logs')
+        .select('patient_id')
+        .gte('logged_at', sevenDaysAgo);
+
+      if (recentLogsErr) throw recentLogsErr;
+
+      const loggedPatientIds = new Set((recentLogs || []).map(l => l.patient_id));
+      const patientsNeedingSelfExam = activePatients.filter(p => !loggedPatientIds.has(p.id));
+
+      console.log(`[DAILY NOTIFICATIONS] Found ${patientsNeedingSelfExam.length} patients who have not completed self-exams in the last 7 days.`);
+
+      for (const patient of patientsNeedingSelfExam) {
+        const patientName = `${patient.profiles.first_name} ${patient.profiles.last_name}`;
+        try {
+          await emailService.sendSelfExamReminderEmail({
+            patientEmail: patient.profiles.email,
+            patientName
+          });
+          summary.remindersSent++;
+          await sleep(550);
+        } catch (mailErr) {
+          console.error(`[DAILY NOTIFICATIONS] Failed to send self-exam reminder to ${patient.profiles.email}:`, mailErr.message);
+          summary.errors.push(`Self-exam reminder to ${patient.profiles.email}: ${mailErr.message}`);
+        }
+      }
+    } catch (err) {
+      console.error('[DAILY NOTIFICATIONS ERROR] Self-exam reminder pipeline failed:', err.message);
+      summary.errors.push(`Self-exam reminders failure: ${err.message}`);
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // PART 4: Patient Medication Compliance Reminders
+    // ────────────────────────────────────────────────────────────────────────
+    try {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const { data: activeMeds, error: activeMedsErr } = await supabaseAdmin
+        .from('medications')
+        .select('patient_id, medication_name, dosage, frequency, start_date, end_date')
+        .lte('start_date', todayStr)
+        .or(`end_date.gte.${todayStr},end_date.is.null`);
+
+      if (activeMedsErr) throw activeMedsErr;
+
+      const medsGroupedByPatient = new Map();
+      for (const med of (activeMeds || [])) {
+        if (!medsGroupedByPatient.has(med.patient_id)) {
+          medsGroupedByPatient.set(med.patient_id, []);
+        }
+        medsGroupedByPatient.get(med.patient_id).push(med);
+      }
+
+      console.log(`[DAILY NOTIFICATIONS] Processing medication compliance reminders for active patient list...`);
+
+      for (const patient of activePatients) {
+        const patientMeds = medsGroupedByPatient.get(patient.id);
+        if (patientMeds && patientMeds.length > 0) {
+          const patientName = `${patient.profiles.first_name} ${patient.profiles.last_name}`;
+          try {
+            await emailService.sendMedicationComplianceReminderEmail({
+              patientEmail: patient.profiles.email,
+              patientName,
+              medications: patientMeds
+            });
+            summary.remindersSent++;
+            await sleep(550);
+          } catch (mailErr) {
+            console.error(`[DAILY NOTIFICATIONS] Failed to send med compliance reminder to ${patient.profiles.email}:`, mailErr.message);
+            summary.errors.push(`Med compliance reminder to ${patient.profiles.email}: ${mailErr.message}`);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[DAILY NOTIFICATIONS ERROR] Medication compliance reminder pipeline failed:', err.message);
+      summary.errors.push(`Med compliance reminders failure: ${err.message}`);
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // PART 5: Patient OSMF Exercises Reminders
+    // ────────────────────────────────────────────────────────────────────────
+    try {
+      const { data: medicalRecords, error: mrErr } = await supabaseAdmin
+        .from('medical_records')
+        .select('patient_id, cancer_stage, created_at')
+        .order('created_at', { ascending: false });
+
+      if (mrErr) throw mrErr;
+
+      const latestRecordMap = new Map();
+      for (const rec of (medicalRecords || [])) {
+        if (!latestRecordMap.has(rec.patient_id)) {
+          latestRecordMap.set(rec.patient_id, rec);
+        }
+      }
+
+      const patientsForOsmf = activePatients.filter(patient => {
+        const latestRec = latestRecordMap.get(patient.id);
+        if (!latestRec) return false;
+        const stage = (latestRec.cancer_stage || '').toLowerCase();
+        return stage.includes('high-risk dysplasia') || stage.includes('suspicious lesion');
+      });
+
+      console.log(`[DAILY NOTIFICATIONS] Found ${patientsForOsmf.length} patients requiring daily OSMF exercises.`);
+
+      for (const patient of patientsForOsmf) {
+        const patientName = `${patient.profiles.first_name} ${patient.profiles.last_name}`;
+        try {
+          await emailService.sendOsmfExercisesReminderEmail({
+            patientEmail: patient.profiles.email,
+            patientName
+          });
+          summary.remindersSent++;
+          await sleep(550);
+        } catch (mailErr) {
+          console.error(`[DAILY NOTIFICATIONS] Failed to send OSMF exercises reminder to ${patient.profiles.email}:`, mailErr.message);
+          summary.errors.push(`OSMF exercises reminder to ${patient.profiles.email}: ${mailErr.message}`);
+        }
+      }
+    } catch (err) {
+      console.error('[DAILY NOTIFICATIONS ERROR] OSMF exercises reminder pipeline failed:', err.message);
+      summary.errors.push(`OSMF exercises reminders failure: ${err.message}`);
+    }
   }
 
   console.log(`[DAILY NOTIFICATIONS] Execution finished. Summary: Sent ${summary.remindersSent} patient reminders, ${summary.digestsSent} doctor digests.`);

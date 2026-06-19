@@ -181,9 +181,18 @@ export const sendVisitSummaryEmail = async ({ patientEmail, patientName, doctorN
         <tbody>
           ${prescriptions.map(med => `
             <tr>
-              <td style="font-size: 13.5px; border-bottom: 1px solid #e2e8f0; color: #1e293b; font-weight: 600;">${med.medication_name}</td>
-              <td style="font-size: 13.5px; border-bottom: 1px solid #e2e8f0; color: #475569;">${med.dosage}</td>
-              <td style="font-size: 13.5px; border-bottom: 1px solid #e2e8f0; color: #475569;">${med.frequency}</td>
+              <td style="font-size: 13.5px; border-bottom: 1px solid #e2e8f0; color: #1e293b; font-weight: 600; padding: 12px 8px;">
+                ${med.medication_name}
+                ${med.dosage_form && med.dosage_form !== 'N/A' ? `<span style="font-size: 11px; color: #64748b; font-weight: normal;">(${med.dosage_form})</span>` : ''}
+                ${med.route && med.route !== 'N/A' ? `<br><span style="font-size: 11px; color: #64748b; font-weight: normal;">Route: ${med.route}</span>` : ''}
+                ${med.instructions ? `<br><span style="font-size: 12px; color: #64748b; font-style: italic; font-weight: normal;">Note: ${med.instructions}</span>` : ''}
+              </td>
+              <td style="font-size: 13.5px; border-bottom: 1px solid #e2e8f0; color: #475569; padding: 12px 8px;">${med.dosage}</td>
+              <td style="font-size: 13.5px; border-bottom: 1px solid #e2e8f0; color: #475569; padding: 12px 8px;">
+                ${med.frequency}
+                ${med.times_a_day ? ` (${med.times_a_day}x/day)` : ''}
+                ${med.relation_to_food && med.relation_to_food !== 'N/A' ? `<br><span style="font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 2px 4px; border-radius: 4px; display: inline-block; margin-top: 4px;">${med.relation_to_food}</span>` : ''}
+              </td>
             </tr>
           `).join('')}
         </tbody>
@@ -347,6 +356,143 @@ export const sendSevereSymptomsDigestEmail = async ({ doctorEmail, doctorName, s
   return sendEmail({
     to: doctorEmail,
     subject: `[RTooth Summary] Daily Severe Symptom Digest: ${severeLogs.length} cases require attention`,
+    html
+  });
+};
+
+/**
+ * Sent to a patient when they haven't logged a symptom log or self-examination in 7+ days.
+ */
+export const sendSelfExamReminderEmail = async ({ patientEmail, patientName, daysSinceLastExam }) => {
+  const timeText = daysSinceLastExam ? `${daysSinceLastExam} days` : 'over a week';
+  const bodyContent = `
+    <h2 style="color: #0f172a; font-size: 18px; margin-top: 0; margin-bottom: 16px;">Time for your Oral Self-Examination</h2>
+    <p style="margin-bottom: 24px; font-size: 15px; color: #334155;">
+      Dear <strong>${patientName}</strong>,
+      <br><br>
+      It has been <strong>${timeText}</strong> since your last Guided Oral Self-Examination. Performing a regular mirror-assisted self-check is highly effective for monitoring your oral mucosal health and tracking regression/progression.
+    </p>
+
+    <div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+      <h3 style="margin-top: 0; margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #0369a1;">Self-Exam Quick Steps:</h3>
+      <ol style="margin: 0; padding-left: 20px; font-size: 14px; color: #0f172a; line-height: 1.8;">
+        <li><strong>Lips & Gums:</strong> Wash hands, pull back lips, and inspect tissues for any red/white velvety patches or unusual lumps.</li>
+        <li><strong>Tongue Borders:</strong> Stick out your tongue, grasp the tip gently, and check the lateral borders (high-risk zones).</li>
+        <li><strong>Cheeks & Palate:</strong> Use a clean spoon to retract cheeks and tilt your head back to review the roof of your mouth.</li>
+        <li><strong>Floor of Mouth:</strong> Raise the tongue to check the salivary gland area underneath for firm swelling.</li>
+      </ol>
+    </div>
+
+    <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">
+      If you detect any persistent sore/ulcer (lasting over 14 days) or bleeding, please log it immediately to notify your oncology team.
+    </p>
+
+    <div style="text-align: center;">
+      <a href="${process.env.APP_URL || 'http://localhost:5000'}/login" style="background-color: #0284c7; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-decoration: none; display: inline-block;">Start Guided Self-Examination</a>
+    </div>
+  `;
+
+  const html = buildEmailTemplate(`Guided Oral Self-Examination Reminder`, bodyContent);
+  return sendEmail({
+    to: patientEmail,
+    subject: `[RTooth Reminder] Time for your weekly Guided Oral Self-Examination`,
+    html
+  });
+};
+
+/**
+ * Sent as a compliance reminder list of active medications.
+ */
+export const sendMedicationComplianceReminderEmail = async ({ patientEmail, patientName, medications }) => {
+  const medsListHtml = medications.map(med => `
+    <tr style="border-bottom: 1px solid #e2e8f0;">
+      <td style="padding: 12px 8px; font-size: 13.5px; font-weight: 600; color: #1e293b;">
+        ${med.medication_name}
+        ${med.dosage_form && med.dosage_form !== 'N/A' ? `<span style="font-size: 11px; color: #64748b; font-weight: normal;">(${med.dosage_form})</span>` : ''}
+        ${med.route && med.route !== 'N/A' ? `<br><span style="font-size: 11px; color: #64748b; font-weight: normal;">Route: ${med.route}</span>` : ''}
+        ${med.instructions ? `<br><span style="font-size: 12px; color: #64748b; font-style: italic; font-weight: normal;">Note: ${med.instructions}</span>` : ''}
+      </td>
+      <td style="padding: 12px 8px; font-size: 13.5px; color: #475569; vertical-align: middle;">${med.dosage}</td>
+      <td style="padding: 12px 8px; font-size: 13.5px; color: #475569; vertical-align: middle;">
+        ${med.frequency}
+        ${med.times_a_day ? ` (${med.times_a_day}x/day)` : ''}
+        ${med.relation_to_food && med.relation_to_food !== 'N/A' ? `<br><span style="font-size: 11px; background: #e0f2fe; color: #0369a1; padding: 2px 4px; border-radius: 4px; display: inline-block; margin-top: 4px;">${med.relation_to_food}</span>` : ''}
+      </td>
+    </tr>
+  `).join('');
+
+  const bodyContent = `
+    <h2 style="color: #0f172a; font-size: 18px; margin-top: 0; margin-bottom: 16px;">Daily Prescription Compliance Reminder</h2>
+    <p style="margin-bottom: 24px; font-size: 15px; color: #334155;">
+      Dear <strong>${patientName}</strong>,
+      <br><br>
+      This is a friendly reminder to take your prescribed oral medications exactly as scheduled by your oncologist. Below are your active prescriptions:
+    </p>
+
+    <table border="0" cellpadding="8" cellspacing="0" width="100%" style="border-collapse: collapse; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; margin-bottom: 24px;">
+      <thead>
+        <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+          <th align="left" style="font-weight: 600; font-size: 12px; color: #475569; padding: 12px 8px;">Medication</th>
+          <th align="left" style="font-weight: 600; font-size: 12px; color: #475569; padding: 12px 8px;">Dosage</th>
+          <th align="left" style="font-weight: 600; font-size: 12px; color: #475569; padding: 12px 8px;">Frequency</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${medsListHtml}
+      </tbody>
+    </table>
+
+    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 13.5px; color: #166534;">
+      <strong>Why compliance matters:</strong> Adhering to your prescribed therapies maintains optimal drug levels in the mucosal tissues, helping control oral cancer symptoms and lesion progression.
+    </div>
+
+    <div style="text-align: center;">
+      <a href="${process.env.APP_URL || 'http://localhost:5000'}/login" style="background-color: #0284c7; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-decoration: none; display: inline-block;">Access Patient Portal</a>
+    </div>
+  `;
+
+  const html = buildEmailTemplate(`Prescription Compliance Reminder`, bodyContent);
+  return sendEmail({
+    to: patientEmail,
+    subject: `[RTooth Reminder] Your Medication Compliance Checklist`,
+    html
+  });
+};
+
+/**
+ * Sent to patients requiring OSMF physical exercises.
+ */
+export const sendOsmfExercisesReminderEmail = async ({ patientEmail, patientName }) => {
+  const bodyContent = `
+    <h2 style="color: #0f172a; font-size: 18px; margin-top: 0; margin-bottom: 16px;">Daily Oral Exercises (OSMF) Reminder</h2>
+    <p style="margin-bottom: 24px; font-size: 15px; color: #334155;">
+      Dear <strong>${patientName}</strong>,
+      <br><br>
+      This is your daily reminder to perform your prescribed Oral Submucous Fibrosis (OSMF) physical therapy stretches. These exercises prevent progressive jaw opening reduction (trismus) and maintain mucosal elasticity.
+    </p>
+
+    <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+      <h3 style="margin-top: 0; margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #b45309;">Your OSMF Stretch Routine:</h3>
+      <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #78350f; line-height: 1.8;">
+        <li><strong>Mouth Stretching:</strong> Open your mouth as wide as possible until you feel a firm stretch. Hold for 5-10 seconds. Repeat 10 times. (If using ice cream sticks, stack them to gradually expand range).</li>
+        <li><strong>Cheek Stretching:</strong> Blow air into your mouth, puffing out both cheeks. Hold for 10 seconds. Repeat 5 times.</li>
+        <li><strong>Tongue Movements:</strong> Protrude your tongue out straight and then stretch it as far as possible to the left and right corners.</li>
+      </ul>
+    </div>
+
+    <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">
+      Please record any pain or difficulty opening your mouth in your daily symptom tracker.
+    </p>
+
+    <div style="text-align: center;">
+      <a href="${process.env.APP_URL || 'http://localhost:5000'}/login" style="background-color: #0284c7; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-decoration: none; display: inline-block;">Log Daily Progress</a>
+    </div>
+  `;
+
+  const html = buildEmailTemplate(`Daily OSMF Exercises Reminder`, bodyContent);
+  return sendEmail({
+    to: patientEmail,
+    subject: `[RTooth Reminder] Daily Mouth-Opening & OSMF Exercises`,
     html
   });
 };

@@ -72,3 +72,12 @@ CREATE POLICY "Allow public SELECT on patient-images" ON storage.objects FOR SEL
 
 DROP POLICY IF EXISTS "Allow public SELECT on patient-reports" ON storage.objects;
 CREATE POLICY "Allow public SELECT on patient-reports" ON storage.objects FOR SELECT USING (bucket_id = 'patient-reports');
+
+-- 10. Add advanced medication details & customizations
+ALTER TABLE public.medications ADD COLUMN IF NOT EXISTS relation_to_food TEXT;
+ALTER TABLE public.medications ADD COLUMN IF NOT EXISTS times_a_day INTEGER;
+ALTER TABLE public.medications ADD COLUMN IF NOT EXISTS route TEXT;
+ALTER TABLE public.medications ADD COLUMN IF NOT EXISTS dosage_form TEXT;
+ALTER TABLE public.medications ADD COLUMN IF NOT EXISTS instructions TEXT;
+ALTER TABLE public.medications ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
+
