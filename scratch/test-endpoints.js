@@ -40,13 +40,13 @@ async function testEndpoints() {
     return;
   }
   
-  const rahul = patientsData.data.patients.find(p => p.first_name === 'Rahul' && p.last_name === 'Sharma');
+  const rahul = patientsData.data.patients.find(p => p.first_name === 'Priya' && p.last_name === 'Patel');
   if (!rahul) {
-    console.error("Rahul Sharma not found in the patients list.");
+    console.error("Priya Patel not found in the patients list.");
     return;
   }
   const rahulIdOrCode = rahul.patient_code;
-  console.log(`Found Rahul Sharma. Code: ${rahulIdOrCode} (UUID: ${rahul.id})`);
+  console.log(`Found Priya Patel. Code: ${rahulIdOrCode} (UUID: ${rahul.id})`);
 
   // 3. Fetch Patient Clinical Profile
   console.log(`\n3. Fetching Rahul's clinical profile via GET /patients/${rahulIdOrCode}...`);

@@ -23,6 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 3. Trigger page-specific logic
   const path = window.location.pathname;
   if (path.endsWith('/doctor') || path.endsWith('/doctor/') || path.endsWith('index.html')) {
+    const chip = document.getElementById('today-date');
+    if (chip) {
+      chip.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
     await loadDashboardData();
     initComplianceTabs();
   } else if (path.endsWith('/patients') || path.endsWith('patients.html')) {
@@ -334,12 +338,12 @@ async function loadDashboardData() {
           return `
             <tr>
               <td data-label="Patient">
-                <a href="/doctor/patient_profile?id=${pat.patient_code}" style="color:#1a1f2e; text-decoration:none; font-weight:600; font-size:13.5px;">${pat.first_name} ${pat.last_name}</a>
-                <div style="font-size:11px; color:#8a94a6; margin-top:2px;">${pat.patient_code}</div>
+                <a href="/doctor/patient_profile?id=${escapeHtml(pat.patient_code)}" style="color:#1a1f2e; text-decoration:none; font-weight:600; font-size:13.5px;">${escapeHtml(pat.first_name)} ${escapeHtml(pat.last_name)}</a>
+                <div style="font-size:11px; color:#8a94a6; margin-top:2px;">${escapeHtml(pat.patient_code)}</div>
               </td>
               <td data-label="Time" style="font-size:13px; color:#374151;">${slotTime}</td>
-              <td data-label="Lesion Site" style="font-size:13px; color:#374151;">${pat.lesion_location || '—'}</td>
-              <td data-label="Staging"><span style="font-size:12.5px; font-weight:600; color:${stageColor};">${pat.cancer_stage || 'Suspicious'}</span></td>
+              <td data-label="Lesion Site" style="font-size:13px; color:#374151;">${escapeHtml(pat.lesion_location || '—')}</td>
+              <td data-label="Staging"><span style="font-size:12.5px; font-weight:600; color:${stageColor};">${escapeHtml(pat.cancer_stage || 'Suspicious')}</span></td>
               <td data-label="Status"><span class="status-pill ${statusClass}">${statusText}</span></td>
             </tr>
           `;
@@ -393,7 +397,7 @@ async function loadPatientsDirectory() {
 
       tableBody.innerHTML = patients.map(pat => {
         const age = calculateAge(pat.date_of_birth);
-        const genderAge = `${pat.gender || '—'} ${age !== 'N/A' ? '/ ' + age + ' yrs' : ''}`;
+        const genderAge = `${escapeHtml(pat.gender || '—')} ${age !== 'N/A' ? '/ ' + age + ' yrs' : ''}`;
         const isActive = pat.status !== 'draft';
         let stageColor = '#8a94a6';
         const stage = (pat.cancer_stage || '').toLowerCase();
@@ -401,13 +405,13 @@ async function loadPatientsDirectory() {
         else if (stage.includes('stage i')) stageColor = '#0d9488';
         else if (stage.includes('dysplasia')) stageColor = '#d97706';
         return `
-          <tr style="cursor:pointer;" onclick="window.location.href='/doctor/patient_profile?id=${pat.patient_code}'">
-            <td><a href="/doctor/patient_profile?id=${pat.patient_code}" style="font-weight:600;color:#1a1f2e;text-decoration:none;">${pat.first_name} ${pat.last_name}</a><div style="font-size:11px;color:#8a94a6;">${pat.patient_code}</div></td>
+          <tr style="cursor:pointer;" onclick="window.location.href='/doctor/patient_profile?id=${escapeHtml(pat.patient_code)}'">
+            <td><a href="/doctor/patient_profile?id=${escapeHtml(pat.patient_code)}" style="font-weight:600;color:#1a1f2e;text-decoration:none;">${escapeHtml(pat.first_name)} ${escapeHtml(pat.last_name)}</a><div style="font-size:11px;color:#8a94a6;">${escapeHtml(pat.patient_code)}</div></td>
             <td style="color:#5a6478;font-size:13px;">${genderAge}</td>
-            <td><span style="font-size:12px;font-weight:650;color:${stageColor};">${pat.cancer_stage || 'Unknown'}</span></td>
-            <td style="color:#5a6478;font-size:13px;">${pat.lesion_location || '—'}</td>
-            <td style="font-size:12.5px;color:#5a6478;">${pat.risk_factors || '—'}</td>
-            <td style="color:#5a6478;font-size:13px;">${pat.phone || pat.email || '—'}</td>
+            <td><span style="font-size:12px;font-weight:650;color:${stageColor};">${escapeHtml(pat.cancer_stage || 'Unknown')}</span></td>
+            <td style="color:#5a6478;font-size:13px;">${escapeHtml(pat.lesion_location || '—')}</td>
+            <td style="font-size:12.5px;color:#5a6478;">${escapeHtml(pat.risk_factors || '—')}</td>
+            <td style="color:#5a6478;font-size:13px;">${escapeHtml(pat.phone || pat.email || '—')}</td>
             <td><span style="font-size:12px;font-weight:600;color:${isActive?'#16a34a':'#d97706'};">${isActive?'Active':'Draft'}</span></td>
           </tr>`;
       }).join('');
@@ -504,7 +508,7 @@ async function loadDraftsData() {
 
         draftsTableBody.innerHTML = drafts.map(pat => {
           const age = calculateAge(pat.date_of_birth);
-          const genderAge = `${pat.gender || 'Not Specified'} ${age !== 'N/A' ? '/ ' + age : ''}`;
+          const genderAge = `${escapeHtml(pat.gender || 'Not Specified')} ${age !== 'N/A' ? '/ ' + age : ''}`;
           
           let stageColor = 'var(--text-muted)';
           const stage = (pat.cancer_stage || '').toLowerCase();
@@ -517,23 +521,23 @@ async function loadDraftsData() {
           }
 
           return `
-            <tr id="draft-row-${pat.patient_code}">
+            <tr id="draft-row-${escapeHtml(pat.patient_code)}">
               <td data-label="Patient">
-                <strong>${pat.first_name} ${pat.last_name}</strong>
-                <div style="font-size: 11px; color: var(--text-light); margin-top: 2px;">Code: ${pat.patient_code}</div>
+                <strong>${escapeHtml(pat.first_name)} ${escapeHtml(pat.last_name)}</strong>
+                <div style="font-size: 11px; color: var(--text-light); margin-top: 2px;">Code: ${escapeHtml(pat.patient_code)}</div>
               </td>
               <td data-label="Age/Gender">${genderAge}</td>
-              <td data-label="Lesion Site">${pat.lesion_location || 'Not Specified'}</td>
-              <td data-label="Staging"><span style="font-weight: 600; color: ${stageColor};">${pat.cancer_stage || 'Suspicious Lesion'}</span></td>
-              <td data-label="Risk Factors" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${pat.risk_factors || 'None'}">
-                ${pat.risk_factors || 'None'}
+              <td data-label="Lesion Site">${escapeHtml(pat.lesion_location || 'Not Specified')}</td>
+              <td data-label="Staging"><span style="font-weight: 600; color: ${stageColor};">${escapeHtml(pat.cancer_stage || 'Suspicious Lesion')}</span></td>
+              <td data-label="Risk Factors" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(pat.risk_factors || 'None')}">
+                ${escapeHtml(pat.risk_factors || 'None')}
               </td>
               <td data-label="Actions">
                 <div style="display: flex; gap: 8px;">
-                  <button class="btn-action-sm btn-primary promote-btn" data-code="${pat.patient_code}" data-id="${pat.id}">
+                  <button class="btn-action-sm btn-primary promote-btn" data-code="${escapeHtml(pat.patient_code)}" data-id="${pat.id}">
                     Register Now
                   </button>
-                  <button class="btn-action-sm btn-secondary edit-btn" data-code="${pat.patient_code}" data-id="${pat.id}">
+                  <button class="btn-action-sm btn-secondary edit-btn" data-code="${escapeHtml(pat.patient_code)}" data-id="${pat.id}">
                     Edit Draft
                   </button>
                 </div>
@@ -752,17 +756,17 @@ function renderLiveSymptomFeed(logs) {
     return `
       <div class="checkup-node">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px; flex-wrap:wrap;">
-          <a href="/doctor/patient_profile?id=${l.patient_code}" style="font-size:13px; font-weight:700; color:#1a1f2e; text-decoration:none;">
+          <a href="/doctor/patient_profile?id=${escapeHtml(l.patient_code)}" style="font-size:13px; font-weight:700; color:#1a1f2e; text-decoration:none;">
             ${escapeHtml(l.patient_name)}
-            <span style="color:#8a94a6; font-weight:400; font-size:11.5px; margin-left:4px;">${l.patient_code}</span>
+            <span style="color:#8a94a6; font-weight:400; font-size:11.5px; margin-left:4px;">${escapeHtml(l.patient_code)}</span>
           </a>
           <span style="font-size:11px; color:#8a94a6;">${dateStr}</span>
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:6px;">
-          <span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:${painBg(l.pain_scale)}; color:${painTxt(l.pain_scale)}; border:1px solid ${painBg(l.pain_scale)};">Pain ${l.pain_scale}/10</span>
-          <span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:#f8fafc; color:${sevTxt(l.burning_sensation)}; border:1px solid #e9ecf0;">Burn: ${l.burning_sensation}</span>
-          <span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:#f8fafc; color:${sevTxt(l.difficulty_opening_mouth)}; border:1px solid #e9ecf0;">Mouth: ${l.difficulty_opening_mouth}</span>
-          <span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:#f8fafc; color:#374151; border:1px solid #e9ecf0;">Ulcer: ${l.ulcer_duration}d</span>
+          <span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:${painBg(l.pain_scale)}; color:${painTxt(l.pain_scale)}; border:1px solid ${painBg(l.pain_scale)};">Pain ${escapeHtml(l.pain_scale)}/10</span>
+          <span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:#f8fafc; color:${sevTxt(l.burning_sensation)}; border:1px solid #e9ecf0;">Burn: ${escapeHtml(l.burning_sensation)}</span>
+          <span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:#f8fafc; color:${sevTxt(l.difficulty_opening_mouth)}; border:1px solid #e9ecf0;">Mouth: ${escapeHtml(l.difficulty_opening_mouth)}</span>
+          <span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:#f8fafc; color:#374151; border:1px solid #e9ecf0;">Ulcer: ${escapeHtml(l.ulcer_duration)}d</span>
           ${l.bleeding ? `<span style="font-size:11px; padding:2px 8px; border-radius:5px; font-weight:600; background:#fef2f2; color:#dc2626; border:1px solid #fecaca;">Bleeding</span>` : ''}
         </div>
       </div>
@@ -774,8 +778,8 @@ function renderLiveSymptomFeed(logs) {
  * Helper: Escape HTML
  */
 function escapeHtml(unsafe) {
-  if (!unsafe) return '';
-  return unsafe
+  if (unsafe == null) return '';
+  return String(unsafe)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -860,11 +864,11 @@ function renderComplianceRows(items) {
     return `
       <tr>
         <td data-label="Patient">
-          <a href="/doctor/patient_profile?id=${item.patient_code}" style="font-weight:600; color:#1a1f2e; text-decoration:none; font-size:13px;">${escapeHtml(fullName)}</a>
-          <div style="font-size:11px; color:#8a94a6; margin-top:2px;">${item.patient_code}</div>
+          <a href="/doctor/patient_profile?id=${escapeHtml(item.patient_code)}" style="font-weight:600; color:#1a1f2e; text-decoration:none; font-size:13px;">${escapeHtml(fullName)}</a>
+          <div style="font-size:11px; color:#8a94a6; margin-top:2px;">${escapeHtml(item.patient_code)}</div>
         </td>
         <td data-label="Date" style="font-size:13px; color:#374151; font-weight:500;">${nextCheckup}</td>
-        <td data-label="Interval" style="font-size:12.5px; color:#8a94a6;">${interval}</td>
+        <td data-label="Interval" style="font-size:12.5px; color:#8a94a6;">${escapeHtml(interval)}</td>
       </tr>
     `;
   }).join('');

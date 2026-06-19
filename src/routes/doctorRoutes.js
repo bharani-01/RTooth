@@ -11,7 +11,9 @@ router.get('/audit-logs', requireAuth, requireRole(['admin']), authController.ge
 router.get('/', requireAuth, requireRole(['admin']), authController.getDoctors);
 
 // Debug storage client (IT-Admin only)
-router.get('/debug-storage', requireAuth, requireRole(['admin']), authController.debugStorage);
+if (process.env.NODE_ENV !== 'production') {
+  router.get('/debug-storage', requireAuth, requireRole(['admin']), authController.debugStorage);
+}
 
 // Retrieve a specific doctor's detailed profile and stats (IT-Admin only)
 router.get('/:id', requireAuth, requireRole(['admin']), authController.getDoctorProfile);

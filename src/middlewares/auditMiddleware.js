@@ -83,10 +83,14 @@ function getActionName(method, path) {
 function sanitizePayload(body) {
   if (!body) return null;
   const sanitized = { ...body };
-  const sensitiveKeys = ['password', 'confirmPassword', 'token', 'apiKey', 'secret', 'key'];
+  const sensitiveKeys = ['password', 'confirmPassword', 'token', 'apiKey', 'secret', 'key', 'access_token', 'refresh_token'];
   for (const k of sensitiveKeys) {
-    if (k in sanitized) {
-      sanitized[k] = '[REDACTED]';
+    if (k in sanitized) sanitized[k] = '[REDACTED]';
+  }
+  // Truncate large text fields to prevent audit log bloat
+  for (const k of Object.keys(sanitized)) {
+    if (typeof sanitized[k] === 'string' && sanitized[k].length > 500) {
+      sanitized[k] = sanitized[k].substring(0, 500) + '...[TRUNCATED]';
     }
   }
   return sanitized;

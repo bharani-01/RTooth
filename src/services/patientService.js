@@ -1,10 +1,13 @@
-import { supabase } from '../config/supabase.js';
+import { supabase as baseSupabase, supabaseAdmin, getSupabaseUserClient } from '../config/supabase.js';
 import { NotFoundError, BadRequestError } from '../utils/errors.js';
+import * as emailService from './emailService.js';
+
+const getClient = (token) => token ? getSupabaseUserClient(token) : (supabaseAdmin || baseSupabase);
 
 /**
  * Resolves a patient ID (internal UUID) from either a UUID or a patient code (e.g. PAT-10001).
  */
-export const getPatientIdByIdOrCode = async (idOrCode) => {
+export const getPatientIdByIdOrCode = async (idOrCode, token) => {
   if (!idOrCode) throw new BadRequestError('No patient identifier provided.');
   
   // Standard UUID format regex
@@ -14,7 +17,8 @@ export const getPatientIdByIdOrCode = async (idOrCode) => {
   }
 
   // Look up by custom patient_code
-  const { data, error } = await supabase
+  const client = getClient(token);
+  const { data, error } = await client
     .from('patients')
     .select('id')
     .eq('patient_code', idOrCode)
@@ -30,11 +34,12 @@ export const getPatientIdByIdOrCode = async (idOrCode) => {
 /**
  * Fetch patient profile details (demographics, habits, records, checkups, medications) by Patient ID or Patient Code.
  */
-export const getPatientProfileById = async (patientIdOrCode) => {
-  const patientId = await getPatientIdByIdOrCode(patientIdOrCode);
+export const getPatientProfileById = async (patientIdOrCode, token) => {
+  const patientId = await getPatientIdByIdOrCode(patientIdOrCode, token);
+  const client = getClient(token);
 
   // 1. Fetch base profile fields
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile, error: profileError } = await client
     .from('profiles')
     .select('*')
     .eq('id', patientId)
@@ -46,7 +51,7 @@ export const getPatientProfileById = async (patientIdOrCode) => {
   }
 
   // 2. Fetch patient demographic specifics
-  const { data: patient, error: patientError } = await supabase
+  const { data: patient, error: patientError } = await client
     .from('patients')
     .select('*')
     .eq('id', patientId)
@@ -56,7 +61,7 @@ export const getPatientProfileById = async (patientIdOrCode) => {
   const patData = patient || {};
 
   // 3. Fetch lifestyle habits
-  const { data: habits, error: habitsError } = await supabase
+  const { data: habits, error: habitsError } = await client
     .from('lifestyle_habits')
     .select('*')
     .eq('patient_id', patientId)
@@ -66,7 +71,7 @@ export const getPatientProfileById = async (patientIdOrCode) => {
   const habitsData = habits || {};
 
   // 4. Fetch medical records (clinical stage, lesion location, etc.)
-  const { data: records, error: recordsError } = await supabase
+  const { data: records, error: recordsError } = await client
     .from('medical_records')
     .select('*')
     .eq('patient_id', patientId)
@@ -78,14 +83,14 @@ export const getPatientProfileById = async (patientIdOrCode) => {
   // 5. Fetch attending doctor details
   let doctor = null;
   if (patData.doctor_id) {
-    const { data: docProfile } = await supabase
+    const { data: docProfile } = await client
       .from('profiles')
       .select('*')
       .eq('id', patData.doctor_id)
       .maybeSingle();
 
     if (docProfile) {
-      const { data: docDetails } = await supabase
+      const { data: docDetails } = await client
         .from('doctors')
         .select('*')
         .eq('id', patData.doctor_id)
@@ -101,7 +106,7 @@ export const getPatientProfileById = async (patientIdOrCode) => {
   }
 
   // 6. Fetch medications
-  const { data: medications, error: medicationsError } = await supabase
+  const { data: medications, error: medicationsError } = await client
     .from('medications')
     .select('*')
     .eq('patient_id', patientId)
@@ -110,7 +115,7 @@ export const getPatientProfileById = async (patientIdOrCode) => {
   if (medicationsError) throw medicationsError;
 
   // 7. Fetch patient reports
-  const { data: reports, error: reportsError } = await supabase
+  const { data: reports, error: reportsError } = await client
     .from('patient_reports')
     .select('*')
     .eq('patient_id', patientId)
@@ -119,7 +124,7 @@ export const getPatientProfileById = async (patientIdOrCode) => {
   if (reportsError) throw reportsError;
 
   // 8. Fetch checkups
-  const { data: checkups, error: checkupsError } = await supabase
+  const { data: checkups, error: checkupsError } = await client
     .from('checkups')
     .select('*')
     .eq('patient_id', patientId)
@@ -135,7 +140,7 @@ export const getPatientProfileById = async (patientIdOrCode) => {
     let docMap = new Map();
     
     if (docIds.length > 0) {
-      const { data: docProfiles } = await supabase
+      const { data: docProfiles } = await client
         .from('profiles')
         .select('id, first_name, last_name')
         .in('id', docIds);
@@ -197,8 +202,9 @@ export const getPatientProfileById = async (patientIdOrCode) => {
 /**
  * Add a medication record for a patient.
  */
-export const createMedication = async (patientId, medData) => {
-  const { data, error } = await supabase
+export const createMedication = async (patientId, medData, token) => {
+  const client = getClient(token);
+  const { data, error } = await client
     .from('medications')
     .insert([
       {
@@ -220,7 +226,7 @@ export const createMedication = async (patientId, medData) => {
 /**
  * Add a checkup record for a patient.
  */
-export const createCheckup = async (patientId, doctorId, checkupData) => {
+export const createCheckup = async (patientId, doctorId, checkupData, token) => {
   const insertPayload = {
     patient_id: patientId,
     doctor_id: doctorId,
@@ -237,7 +243,8 @@ export const createCheckup = async (patientId, doctorId, checkupData) => {
     insertPayload.id = checkupData.id;
   }
 
-  const { data, error } = await supabase
+  const client = getClient(token);
+  const { data, error } = await client
     .from('checkups')
     .insert([insertPayload])
     .select()
@@ -250,8 +257,9 @@ export const createCheckup = async (patientId, doctorId, checkupData) => {
 /**
  * Update patient status (e.g. draft -> active)
  */
-export const updatePatientStatus = async (patientId, status) => {
-  const { data, error } = await supabase
+export const updatePatientStatus = async (patientId, status, token) => {
+  const client = getClient(token);
+  const { data, error } = await client
     .from('patients')
     .update({ status })
     .eq('id', patientId)
@@ -265,9 +273,11 @@ export const updatePatientStatus = async (patientId, status) => {
 /**
  * Update patient profile details (demographics, habits, medical records)
  */
-export const updatePatientProfile = async (patientId, updateData) => {
+export const updatePatientProfile = async (patientId, updateData, token) => {
+  const client = getClient(token);
+
   // 1. Update profiles table
-  const { error: profileError } = await supabase
+  const { error: profileError } = await client
     .from('profiles')
     .update({
       first_name: updateData.firstName,
@@ -279,7 +289,7 @@ export const updatePatientProfile = async (patientId, updateData) => {
   if (profileError) throw profileError;
 
   // 2. Update patients table
-  const { error: patientError } = await supabase
+  const { error: patientError } = await client
     .from('patients')
     .update({
       date_of_birth: updateData.dateOfBirth || null,
@@ -292,7 +302,7 @@ export const updatePatientProfile = async (patientId, updateData) => {
   if (patientError) throw patientError;
 
   // 3. Update lifestyle_habits table
-  const { error: habitsError } = await supabase
+  const { error: habitsError } = await client
     .from('lifestyle_habits')
     .update({
       tobacco_habit: updateData.tobaccoHabit || 'none',
@@ -309,7 +319,7 @@ export const updatePatientProfile = async (patientId, updateData) => {
   if (habitsError) throw habitsError;
 
   // 4. Update or Insert medical records
-  const { data: records, error: getRecError } = await supabase
+  const { data: records, error: getRecError } = await client
     .from('medical_records')
     .select('id')
     .eq('patient_id', patientId)
@@ -319,7 +329,7 @@ export const updatePatientProfile = async (patientId, updateData) => {
 
   if (records && records.length > 0) {
     const latestRecordId = records[0].id;
-    const { error: recordUpdateError } = await supabase
+    const { error: recordUpdateError } = await client
       .from('medical_records')
       .update({
         cancer_stage: updateData.cancerStage || 'Suspicious Lesion',
@@ -330,7 +340,7 @@ export const updatePatientProfile = async (patientId, updateData) => {
 
     if (recordUpdateError) throw recordUpdateError;
   } else {
-    const { error: recordInsertError } = await supabase
+    const { error: recordInsertError } = await client
       .from('medical_records')
       .insert([
         {
@@ -345,13 +355,15 @@ export const updatePatientProfile = async (patientId, updateData) => {
   }
 
   // Get full updated profile
-  return getPatientProfileById(patientId);
+  return getPatientProfileById(patientId, token);
 };
 
 /**
  * Create a complete patient visit record (checkup + medications + uploaded reports)
  */
-export const createVisit = async (patientId, doctorId, visitData) => {
+export const createVisit = async (patientId, doctorId, visitData, token) => {
+  const client = getClient(token);
+
   // 1. Create the checkup (visit header)
   const checkup = await createCheckup(patientId, doctorId, {
     id: visitData.id || null,
@@ -362,7 +374,7 @@ export const createVisit = async (patientId, doctorId, visitData) => {
     next_checkup_date: visitData.next_checkup_date,
     followup_interval: visitData.followup_interval,
     followup_notes: visitData.followup_notes
-  });
+  }, token);
 
   const checkupId = checkup.id;
 
@@ -370,7 +382,7 @@ export const createVisit = async (patientId, doctorId, visitData) => {
   const prescriptions = [];
   if (visitData.prescriptions && visitData.prescriptions.length > 0) {
     for (const med of visitData.prescriptions) {
-      const { data: medData, error: medError } = await supabase
+      const { data: medData, error: medError } = await client
         .from('medications')
         .insert([
           {
@@ -395,7 +407,7 @@ export const createVisit = async (patientId, doctorId, visitData) => {
   const reports = [];
   if (visitData.reports && visitData.reports.length > 0) {
     for (const rep of visitData.reports) {
-      const { data: repData, error: repError } = await supabase
+      const { data: repData, error: repError } = await client
         .from('patient_reports')
         .insert([
           {
@@ -415,6 +427,40 @@ export const createVisit = async (patientId, doctorId, visitData) => {
     }
   }
 
+  // Asynchronously dispatch clinical visit email notification to the patient
+  (async () => {
+    try {
+      // 1. Fetch patient profile details (name and email)
+      const { data: patProfile } = await client
+        .from('profiles')
+        .select('first_name, last_name, email')
+        .eq('id', patientId)
+        .single();
+
+      // 2. Fetch doctor profile details (name)
+      const { data: docProfile } = await client
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', doctorId)
+        .single();
+
+      if (patProfile && patProfile.email) {
+        const patientName = `${patProfile.first_name} ${patProfile.last_name}`;
+        const doctorName = docProfile ? `${docProfile.first_name} ${docProfile.last_name}` : 'RTooth Specialist';
+
+        await emailService.sendVisitSummaryEmail({
+          patientEmail: patProfile.email,
+          patientName,
+          doctorName,
+          checkup,
+          prescriptions
+        });
+      }
+    } catch (emailErr) {
+      console.error('[VISIT EMAIL SUMMARY ERROR]', emailErr.message);
+    }
+  })();
+
   return {
     checkup,
     prescriptions,
@@ -425,9 +471,11 @@ export const createVisit = async (patientId, doctorId, visitData) => {
 /**
  * Retrieve a specific visit details including nested prescriptions, reports, patient demographics and oncologist details
  */
-export const getVisitDetails = async (patientId, visitId) => {
+export const getVisitDetails = async (patientId, visitId, token) => {
+  const client = getClient(token);
+
   // 1. Fetch the checkup record
-  const { data: checkup, error: checkupError } = await supabase
+  const { data: checkup, error: checkupError } = await client
     .from('checkups')
     .select('*')
     .eq('id', visitId)
@@ -443,7 +491,7 @@ export const getVisitDetails = async (patientId, visitId) => {
   let doctorName = 'Unknown Doctor';
   let doctorSpecialization = 'Oncologist';
   if (checkup.doctor_id) {
-    const { data: docProfile } = await supabase
+    const { data: docProfile } = await client
       .from('profiles')
       .select('first_name, last_name')
       .eq('id', checkup.doctor_id)
@@ -453,7 +501,7 @@ export const getVisitDetails = async (patientId, visitId) => {
       doctorName = `Dr. ${docProfile.first_name} ${docProfile.last_name}`;
     }
 
-    const { data: docDetails } = await supabase
+    const { data: docDetails } = await client
       .from('doctors')
       .select('specialization')
       .eq('id', checkup.doctor_id)
@@ -465,7 +513,7 @@ export const getVisitDetails = async (patientId, visitId) => {
   }
 
   // 3. Fetch patient demographics
-  const { data: patProfile, error: patProfileError } = await supabase
+  const { data: patProfile, error: patProfileError } = await client
     .from('profiles')
     .select('first_name, last_name')
     .eq('id', patientId)
@@ -473,7 +521,7 @@ export const getVisitDetails = async (patientId, visitId) => {
 
   if (patProfileError) throw patProfileError;
 
-  const { data: patDetails, error: patDetailsError } = await supabase
+  const { data: patDetails, error: patDetailsError } = await client
     .from('patients')
     .select('date_of_birth, gender')
     .eq('id', patientId)
@@ -482,7 +530,7 @@ export const getVisitDetails = async (patientId, visitId) => {
   if (patDetailsError) throw patDetailsError;
 
   // 4. Fetch patient medical record oncology parameters
-  const { data: records, error: recordsError } = await supabase
+  const { data: records, error: recordsError } = await client
     .from('medical_records')
     .select('cancer_stage, lesion_location')
     .eq('patient_id', patientId)
@@ -492,7 +540,7 @@ export const getVisitDetails = async (patientId, visitId) => {
   const latestRecord = records && records.length > 0 ? records[0] : {};
 
   // 5. Fetch prescriptions linked to this visit
-  const { data: prescriptions, error: prescriptionsError } = await supabase
+  const { data: prescriptions, error: prescriptionsError } = await client
     .from('medications')
     .select('*')
     .eq('checkup_id', visitId)
@@ -501,7 +549,7 @@ export const getVisitDetails = async (patientId, visitId) => {
   if (prescriptionsError) throw prescriptionsError;
 
   // 6. Fetch reports uploaded for this visit
-  const { data: reports, error: reportsError } = await supabase
+  const { data: reports, error: reportsError } = await client
     .from('patient_reports')
     .select('*')
     .eq('checkup_id', visitId)
@@ -539,8 +587,9 @@ export const getVisitDetails = async (patientId, visitId) => {
 /**
  * Update an existing medication record
  */
-export const updateMedication = async (medicationId, medData) => {
-  const { data, error } = await supabase
+export const updateMedication = async (medicationId, medData, token) => {
+  const client = getClient(token);
+  const { data, error } = await client
     .from('medications')
     .update({
       medication_name: medData.medication_name,
@@ -560,8 +609,9 @@ export const updateMedication = async (medicationId, medData) => {
 /**
  * Delete a medication record
  */
-export const deleteMedication = async (medicationId) => {
-  const { error } = await supabase
+export const deleteMedication = async (medicationId, token) => {
+  const client = getClient(token);
+  const { error } = await client
     .from('medications')
     .delete()
     .eq('id', medicationId);
@@ -573,9 +623,11 @@ export const deleteMedication = async (medicationId) => {
 /**
  * Retrieve patient follow-up compliance list for a doctor or admin.
  */
-export const getPatientsFollowupCompliance = async (doctorId) => {
+export const getPatientsFollowupCompliance = async (doctorId, token) => {
+  const client = getClient(token);
+
   // 1. Fetch active patients for the doctor (or all if doctorId is null for admin)
-  let patientsQuery = supabase.from('patients').select('id, patient_code, status');
+  let patientsQuery = client.from('patients').select('id, patient_code, status');
   if (doctorId) {
     patientsQuery = patientsQuery.eq('doctor_id', doctorId);
   }
@@ -589,7 +641,7 @@ export const getPatientsFollowupCompliance = async (doctorId) => {
   const patientIds = activePatients.map(p => p.id);
 
   // 2. Fetch profiles for these patients
-  const { data: profiles, error: profilesError } = await supabase
+  const { data: profiles, error: profilesError } = await client
     .from('profiles')
     .select('id, first_name, last_name, email, phone')
     .in('id', patientIds);
@@ -598,7 +650,7 @@ export const getPatientsFollowupCompliance = async (doctorId) => {
   const profileMap = new Map((profiles || []).map(p => [p.id, p]));
 
   // 3. Fetch all checkups for these patients ordered by checkup_date descending
-  const { data: checkups, error: checkupsError } = await supabase
+  const { data: checkups, error: checkupsError } = await client
     .from('checkups')
     .select('id, patient_id, checkup_date, next_checkup_date, followup_interval, followup_notes')
     .in('patient_id', patientIds)
@@ -662,6 +714,59 @@ export const getPatientsFollowupCompliance = async (doctorId) => {
   });
 };
 
+/**
+ * Save patient uploaded image metadata to database
+ */
+export const savePatientImageMetadata = async (patientId, imageData, token) => {
+  const client = getClient(token);
+  const { data, error } = await client
+    .from('patient_images')
+    .insert([
+      {
+        patient_id: patientId,
+        image_type: imageData.image_type,
+        file_name: imageData.file_name,
+        file_url: imageData.file_url,
+        description: imageData.description || null
+      }
+    ])
+    .select()
+    .single();
 
+  if (error) throw error;
+  return data;
+};
 
+/**
+ * Fetch patient uploaded images, sorted chronologically descending
+ */
+export const fetchPatientImages = async (patientId, token) => {
+  const client = getClient(token);
+  const { data, error } = await client
+    .from('patient_images')
+    .select('*')
+    .eq('patient_id', patientId)
+    .order('uploaded_at', { ascending: false });
 
+  if (error) throw error;
+  return data || [];
+};
+
+/**
+ * Update doctor notes and visibility for an image
+ */
+export const updateImageNotes = async (imageId, notesData, token) => {
+  const client = getClient(token);
+  const { data, error } = await client
+    .from('patient_images')
+    .update({
+      doctor_notes: notesData.doctor_notes,
+      doctor_notes_visibility: notesData.doctor_notes_visibility || 'public'
+    })
+    .eq('id', imageId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};

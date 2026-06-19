@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patient Profile — RTooth Portal</title>
+  <title>Patient Profile — RTooth Doctor Portal</title>
   <meta name="description" content="RTooth clinical patient profile — view oncology history, consultations, medications and symptom logs.">
   <link rel="stylesheet" href="/css/doctor_patient_profile.css">
+  <link rel="stylesheet" href="/css/gallery.css">
 </head>
 <body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
 
@@ -220,6 +221,14 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             Symptom Logs
           </button>
+          <button class="profile-tab-btn" data-tab="gallery">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Photo Gallery
+          </button>
         </div>
 
         <!-- Tab 1: Consultations -->
@@ -283,6 +292,24 @@
             <div class="skeleton-timeline-entry">
               <div class="skeleton-line short" style="margin-bottom:8px;"></div>
               <div class="skeleton-line medium"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Photo Gallery -->
+        <div class="profile-tab-content" id="tab-gallery">
+          <div class="tab-toolbar">
+            <h2 class="tab-section-title">Patient Uploaded Photographs</h2>
+          </div>
+          <div class="gallery-filters" style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; overflow-x: auto; width: 100%;">
+            <button class="filter-tab active" data-doc-filter="all" style="background: none; border: none; padding: 6px 12px; border-radius: 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: var(--transition-smooth);">All Photos</button>
+            <button class="filter-tab" data-doc-filter="Lesion Photograph" style="background: none; border: none; padding: 6px 12px; border-radius: 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: var(--transition-smooth);">Lesion Photos</button>
+            <button class="filter-tab" data-doc-filter="Mouth Opening Image" style="background: none; border: none; padding: 6px 12px; border-radius: 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: var(--transition-smooth);">Mouth Opening</button>
+            <button class="filter-tab" data-doc-filter="Progression Image" style="background: none; border: none; padding: 6px 12px; border-radius: 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: var(--transition-smooth);">Progression Logs</button>
+          </div>
+          <div class="gallery-grid" id="doctor-gallery-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+            <div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 24px; grid-column: 1 / -1;">
+              Loading patient photo gallery...
             </div>
           </div>
         </div>
@@ -538,8 +565,49 @@
     </div>
   </div>
 
+  <!-- Doctor Fullscreen Lightbox Modal -->
+  <div class="lightbox-modal" id="doc-lightbox-modal">
+    <button class="lightbox-close" id="btn-close-doc-lightbox">&times;</button>
+    <div class="lightbox-content">
+      <div class="lightbox-image-frame">
+        <img id="doc-lightbox-img" src="" alt="Fullscreen visualization">
+      </div>
+      <div class="lightbox-sidebar">
+        <div class="lightbox-meta">
+          <span class="lightbox-badge" id="doc-lightbox-badge">Category</span>
+          <span class="lightbox-date" id="doc-lightbox-date">Uploaded on...</span>
+        </div>
+        
+        <div class="lightbox-section">
+          <h4 class="lightbox-section-title">Patient Annotation</h4>
+          <p class="lightbox-text" id="doc-lightbox-patient-desc">—</p>
+        </div>
+
+        <div class="lightbox-section">
+          <h4 class="lightbox-section-title" style="color: var(--primary);">Clinical Feedback / Notes</h4>
+          <form id="doc-notes-form">
+            <input type="hidden" id="doc-lightbox-image-id">
+            <div class="form-group" style="margin-bottom: 12px; display: flex; flex-direction: column;">
+              <textarea class="form-input" id="doc-notes-textarea" rows="4" placeholder="Write clinical annotations, size checks, or recommendations..." style="font-size: 13px; line-height: 1.5; padding: 10px; resize: vertical; box-sizing: border-box;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px; display: flex; flex-direction: column; gap: 4px;">
+              <label class="form-label" for="doc-notes-visibility" style="font-size: 11px; font-weight: 700; text-transform: uppercase;">Notes Visibility</label>
+              <select class="form-input" id="doc-notes-visibility" style="font-size: 12.5px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: #ffffff;">
+                <option value="public">Shared with Patient (Public)</option>
+                <option value="private">Oncologist-Only (Private)</option>
+              </select>
+            </div>
+            <div class="alert alert-error" id="doc-notes-error" style="display: none; margin-bottom: 10px; font-size: 12px; padding: 8px;"></div>
+            <div class="alert alert-success" id="doc-notes-success" style="display: none; margin-bottom: 10px; font-size: 12px; padding: 8px;"></div>
+            <button type="submit" class="btn btn-primary btn-sm" id="btn-save-doc-notes" style="width: 100%;">Save Notes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/patient_profile_doctor.js"></script>
+  <script type="module" src="/js/patient_profile_doctor.js?v=1.0.1"></script>
 
 
 </body>

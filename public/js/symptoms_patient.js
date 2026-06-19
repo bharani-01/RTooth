@@ -1,4 +1,4 @@
-import { apiRequest, getUserProfile, logoutUser } from './api.js';
+import { apiRequest, getUserProfile, logoutUser, escapeHtml } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -110,24 +110,24 @@ function renderLogsTimeline(logs) {
           <div>
             <strong>Pain Level:</strong> 
             <span class="status-pill" style="background-color: ${painColor}22; color: ${painColor}; border: 1px solid ${painColor}44; font-weight: 700; font-size: 11px; padding: 2px 6px;">
-              ${l.pain_scale} / 10
+              ${escapeHtml(l.pain_scale)} / 10
             </span>
           </div>
           <div>
             <strong>Burning Sensation:</strong> 
             <span style="color: ${getSeverityColor(l.burning_sensation)}; font-weight: 600;">
-              ${l.burning_sensation}
+              ${escapeHtml(l.burning_sensation)}
             </span>
           </div>
           <div>
             <strong>Difficulty Opening Mouth:</strong> 
             <span style="color: ${getSeverityColor(l.difficulty_opening_mouth)}; font-weight: 600;">
-              ${l.difficulty_opening_mouth}
+              ${escapeHtml(l.difficulty_opening_mouth)}
             </span>
           </div>
           <div>
             <strong>Ulcer Duration:</strong> 
-            <span>${l.ulcer_duration} Days</span>
+            <span>${escapeHtml(l.ulcer_duration)} Days</span>
           </div>
           <div>
             <strong>Bleeding:</strong> 

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Practitioner's Guide to Patient Compliance — RTooth</title>
+  <meta name="description"
+    content="Guidelines for oncology specialists on structuring compliance loops, tracking check-ups, and responding to patient symptom logs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/blog.css">
+</head>
+
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="reading-progress"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header>
+    <div class="container nav-bar">
+      <a href="/" class="logo" id="header-logo">
+        <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+      </a>
+      <nav class="nav-links">
+        <a href="/#features" class="nav-link">Capabilities</a>
+        <a href="/#workflow" class="nav-link">Workflow</a>
+        <a href="/self-assessment" class="nav-link">Self Assessment</a>
+        <a href="/blog" class="nav-link active">Education</a>
+        <a href="/login.html" class="btn-brand-primary" id="nav-login-btn"
+          style="padding: 8px 16px; font-size: 13.5px;">Portal Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="container">
+    <div class="article-container">
+      
+      <!-- Article Content Column -->
+      <article class="article-main">
+        <div class="article-header">
+          <span class="article-category">Clinical Practice</span>
+          <h1 class="article-title">A Practitioner's Guide to Patient Compliance in Oral Oncology</h1>
+          <div class="article-meta">
+            <span>By Dr. Matthew Cole, DDS, MS</span>
+            <div class="article-meta-divider"></div>
+            <span>June 12, 2026</span>
+            <div class="article-meta-divider"></div>
+            <span>6 min read</span>
+          </div>
+        </div>
+
+        <div class="article-content">
+          <p>In oral oncology registries, patient retention and compliance are critical determinants of clinical outcomes. Because early epithelial dysplasia can progress quickly to invasive squamous cell carcinoma, keeping patients on their scheduled check-up regimens is of paramount importance. This guide outlines how practitioners can leverage modern software, structured alerts, and clear communication to close compliance loops.</p>
+
+          <h2>The Compliance Retention Framework</h2>
+          <p>Clinical studies indicate that patient compliance drops by up to **35%** when follow-up windows exceed three months. To mitigate this risk, RTooth categorizes patient follow-ups dynamically into three indicators:</p>
+          <ul>
+            <li><strong>Compliant (🟢):</strong> Patient has an upcoming check-up scheduled, or has completed their scheduled visit within the target timeline.</li>
+            <li><strong>Due Soon (🟡):</strong> The patient's next scheduled appointment falls within the next 7 days, signaling the clinical team to send automated confirmations.</li>
+            <li><strong>Missed (🔴):</strong> The patient has passed their target check-up date without logging a clinic visit, triggering immediate outreach tasks.</li>
+          </ul>
+
+          <h2>Responding to Patient-Reported Symptoms</h2>
+          <p>A key aspect of RTooth's oncology portal is patient self-reporting. Patients are requested to submit weekly logs detailing symptoms like pain levels, burning sensations, bleeding, difficulty opening their mouth, and ulcer durations. Clinicians must establish a workflow to manage these reports:</p>
+          
+          <ol>
+            <li><strong>Daily Log Audits:</strong> The clinic's lead nurse or coordinator reviews the symptom feed daily.</li>
+            <li><strong>High-Risk Alarms:</strong> Reports containing severe pain (scale $\ge$ 7) or tissue bleeding are highlighted automatically. The system immediately schedules an incisional biopsy or clinical review slot.</li>
+            <li><strong>Direct Integration:</strong> These logs are linked directly to the patient's record, allowing oncologist practitioners to view symptom trend lines during consultations.</li>
+          </ol>
+
+          <blockquote>
+            "Digital data loops do not replace clinical judgment; rather, they serve as a digital safety net, alerting practitioners to patient regressions that would otherwise go unnoticed between quarterly visits."
+          </blockquote>
+
+          <h2>Improving Communication</h2>
+          <p>To maximize retention, practitioners must educate patients on the purpose of self-reporting. Explaining that logging a pain scale or bleeding episode triggers immediate specialist review fosters trust. By empowering patients to play an active role in their diagnostic pathways, clinics can double their overall retention rates and dramatically improve early detection rates.</p>
+        </div>
+      </article>
+
+      <!-- Sidebar Column -->
+      <aside class="article-sidebar">
+        
+        <!-- Self Assessment CTA -->
+        <div class="sidebar-widget widget-cta-box">
+          <h3 class="widget-title">Check Your Risk</h3>
+          <p class="widget-cta-desc">Are you experiencing white patches, persistent mouth sores, or hoarseness? Take our secure interactive assessment tool.</p>
+          <a href="/self-assessment" class="btn-brand-primary" style="background-color: #ffffff; color: var(--primary-brand); box-shadow: none; font-size: 13px; padding: 10px 16px;">Start Assessment</a>
+        </div>
+
+        <!-- Recent Articles -->
+        <div class="sidebar-widget">
+          <h3 class="widget-title">Recent Articles</h3>
+          <div class="recent-articles-list">
+            <div class="recent-article-item">
+              <a href="/blog/understanding-leukoplakia" class="recent-article-link">Understanding Leukoplakia & Erythroplakia</a>
+              <span class="recent-article-date">June 15, 2026</span>
+            </div>
+            <div class="recent-article-item">
+              <a href="/blog/reversing-risks" class="recent-article-link">The Road to Recovery: Cessation Timeline</a>
+              <span class="recent-article-date">June 14, 2026</span>
+            </div>
+            <div class="recent-article-item">
+              <a href="/blog/oral-cancer-prevention" class="recent-article-link">Oral Cancer Prevention & Screening Protocol</a>
+              <span class="recent-article-date">June 10, 2026</span>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container"
+      style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; text-align: left;">
+      <div>
+        <a href="/" class="logo" style="margin-bottom: 12px; display: inline-flex;">
+          <img src="/images/rtooth_logo.png" alt="RTooth" style="height: 32px;">
+        </a>
+        <p style="font-size: 13px; max-width: 280px; color: var(--text-muted); line-height: 1.5;">Enterprise digital clinic solutions for oncology diagnostics and patient compliance tracking.</p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Product</h4>
+        <p style="margin-bottom: 6px;"><a href="/#features" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Capabilities</a></p>
+        <p style="margin-bottom: 6px;"><a href="/#workflow" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Workflow</a></p>
+        <p><a href="/login.html" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Portal Sign In</a></p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Interactive Tools</h4>
+        <p style="margin-bottom: 6px;"><a href="/self-assessment" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Self Assessment</a></p>
+        <p><a href="/blog" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Education Hub</a></p>
+      </div>
+    </div>
+    <div class="container" style="border-top: 1px solid var(--border-slate); margin-top: 36px; padding-top: 20px; text-align: center; font-size: 12.5px; color: var(--text-light);">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll progress logic
+    window.onscroll = function() {
+      var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      var scrolled = (winScroll / height) * 100;
+      document.getElementById("reading-progress").style.width = scrolled + "%";
+    };
+  </script>
+
+</body>
+</html>

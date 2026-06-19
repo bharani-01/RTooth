@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doctor Dashboard — RTooth Portal</title>
+  <title>Dashboard — RTooth Doctor Portal</title>
   <meta name="description" content="RTooth Doctor Dashboard — Manage your oral oncology patients, follow-ups, and symptom monitoring.">
   <link rel="stylesheet" href="/css/doctor_index.css">
 </head>
@@ -224,13 +224,6 @@
   </footer>
 
   <script type="module" src="/js/auth.js"></script>
-  <script type="module" src="/js/doctor.js"></script>
-  <script>
-    // Set today's date chip
-    const chip = document.getElementById('today-date');
-    if (chip) {
-      chip.textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    }
-  </script>
+  <script type="module" src="/js/doctor.js?v=1.0.1"></script>
 </body>
 </html>

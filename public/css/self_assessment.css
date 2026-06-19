@@ -1,0 +1,598 @@
+@import url("/css/style.css");
+
+/* ══════════════════════════════════════════
+   RTOOTH PATIENT SELF-ASSESSMENT WIZARD — self_assessment.css
+   Premium wizard, visual indicators, active card states,
+   and dynamic risk gauge panels.
+   ══════════════════════════════════════════ */
+
+.assessment-wrapper {
+  max-width: 760px;
+  margin: 40px auto 96px;
+  background: #ffffff;
+  border: 1px solid var(--border-slate);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Header & Progress Bar */
+.assessment-header {
+  padding: 40px 40px 24px;
+  border-bottom: 1px solid var(--border-slate);
+  background: linear-gradient(180deg, #ffffff 0%, var(--light-slate) 100%);
+  text-align: center;
+}
+
+.assessment-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--dark-slate);
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.assessment-desc {
+  font-size: 14.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 24px;
+}
+
+/* Step Indicators Styling */
+.wizard-steps-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 24px auto 32px;
+  max-width: 600px;
+  position: relative;
+  padding: 0 10px;
+}
+
+.step-indicator-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 5;
+  gap: 8px;
+  cursor: default;
+}
+
+.step-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 2px solid var(--border-slate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-sm);
+}
+
+.step-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  transition: var(--transition-smooth);
+}
+
+/* Step Line Connections */
+.step-indicator-line {
+  flex-grow: 1;
+  height: 2px;
+  background-color: var(--border-slate);
+  margin: 0;
+  transform: translateY(-22px);
+  z-index: 2;
+  transition: var(--transition-smooth);
+}
+
+/* Active Step State */
+.step-indicator-item.active .step-num {
+  border-color: var(--primary-brand);
+  background-color: var(--primary-brand-light);
+  color: var(--primary-brand);
+  box-shadow: 0 0 0 4px rgba(158, 26, 34, 0.15);
+  transform: scale(1.1);
+}
+
+.step-indicator-item.active .step-label {
+  color: var(--primary-brand);
+  font-weight: 700;
+}
+
+/* Completed Step State */
+.step-indicator-item.completed .step-num {
+  border-color: #10b981;
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.step-indicator-item.completed .step-label {
+  color: #15803d;
+}
+
+/* Progress Track Bar */
+.wizard-progress-track {
+  width: 100%;
+  height: 6px;
+  background-color: var(--border-slate);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 16px;
+}
+
+.wizard-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-brand) 0%, #be123c 100%);
+  width: 100%;
+  transform: scaleX(0.25);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Step Container & Navigation */
+.step-container {
+  padding: 40px 48px;
+}
+
+.wizard-step {
+  display: none;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wizard-step.active {
+  display: block;
+}
+
+.step-question {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark-slate);
+  margin-bottom: 28px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+/* Custom Styled Option Cards */
+.option-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.custom-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 24px;
+  background-color: #ffffff;
+  border: 1.5px solid var(--border-slate);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  user-select: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.custom-option:hover {
+  background-color: var(--light-slate);
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.custom-option:focus-within {
+  outline: 2px solid var(--primary-brand);
+  outline-offset: 2px;
+  border-color: var(--primary-brand);
+  box-shadow: 0 0 0 4px rgba(158, 26, 34, 0.15);
+}
+
+.custom-option input[type="radio"],
+.custom-option input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Simulated Checkbox/Radio Indicator */
+.option-indicator {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition-smooth);
+  background-color: #ffffff;
+}
+
+.custom-option input[type="checkbox"] ~ .option-indicator {
+  border-radius: 6px;
+}
+
+/* Checked States */
+.custom-option input:checked ~ .option-indicator {
+  border-color: var(--primary-brand);
+  background-color: var(--primary-brand);
+}
+
+.custom-option input:checked ~ .option-indicator::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: block;
+}
+
+.custom-option input[type="checkbox"]:checked ~ .option-indicator::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: solid #ffffff;
+  border-width: 0 2px.5 2px.5 0;
+  border-radius: 0;
+  transform: rotate(45deg) translate(-1px, -2px);
+}
+
+/* Active Highlight Styling */
+.custom-option.selected {
+  border-color: var(--primary-brand);
+  background-color: var(--primary-brand-light);
+  box-shadow: 0 0 0 2px var(--primary-brand), 0 4px 12px rgba(158, 26, 34, 0.06);
+  transform: scale(1.005);
+}
+
+.option-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.option-title {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--dark-slate);
+}
+
+.option-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Controls Header & Footer */
+.wizard-controls {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-slate);
+  padding: 24px 48px 40px;
+  background-color: var(--light-slate);
+}
+
+.btn-wizard-back {
+  background: #ffffff;
+  color: var(--text-muted);
+  border: 1px solid var(--border-slate);
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: var(--transition-smooth);
+}
+
+.btn-wizard-back:hover:not(:disabled) {
+  background-color: #f1f5f9;
+  color: var(--dark-slate);
+}
+
+.btn-wizard-back:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Results Display details */
+.results-panel {
+  display: none;
+  animation: fadeIn 0.6s ease-out both;
+}
+
+.results-panel.active {
+  display: block;
+}
+
+.risk-badge-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 40px;
+  border-radius: 16px;
+  margin-bottom: 40px;
+  background: linear-gradient(180deg, #ffffff 0%, var(--light-slate) 100%);
+  border: 1px solid var(--border-slate);
+  box-shadow: var(--shadow-sm);
+}
+
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 20px;
+  border-radius: 9999px;
+  font-size: 13.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.risk-badge.low {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.risk-badge.moderate {
+  background-color: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.risk-badge.high {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  animation: pulseRed 2s infinite;
+}
+
+/* Risk Gauge Meter */
+.risk-gauge-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 28px;
+}
+
+.risk-gauge-track {
+  width: 100%;
+  height: 12px;
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.risk-gauge-fill {
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  border-radius: 9999px;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.risk-gauge-fill.low {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.risk-gauge-fill.moderate {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+.risk-gauge-fill.high {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.risk-gauge-markers {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-light);
+  letter-spacing: 0.05em;
+  padding: 0 4px;
+}
+
+.marker-low { color: #16a34a; }
+.marker-mod { color: #ea580c; }
+.marker-high { color: #dc2626; }
+
+.risk-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--dark-slate);
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+
+.risk-summary-text {
+  font-size: 15px;
+  color: var(--text-muted);
+  max-width: 540px;
+  line-height: 1.6;
+}
+
+/* Recommendations Layout */
+.recommendations-box {
+  margin-bottom: 40px;
+}
+
+.recommendations-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dark-slate);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--primary-brand-light);
+  padding-bottom: 8px;
+}
+
+.rec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rec-card {
+  display: flex;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid var(--border-slate);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+}
+
+.rec-card:hover {
+  transform: translateX(4px);
+  border-color: #cbd5e1;
+}
+
+.rec-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: var(--primary-brand);
+  background-color: var(--primary-brand-light);
+}
+
+.rec-icon.info {
+  color: #0369a1;
+  background-color: #e0f2fe;
+}
+
+.rec-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rec-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--dark-slate);
+}
+
+.rec-card-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.clinical-warning-banner {
+  background-color: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-sm);
+}
+
+.warning-icon {
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.warning-body {
+  font-size: 13.5px;
+  color: #78350f;
+  line-height: 1.5;
+}
+
+.warning-body span {
+  font-weight: 700;
+  display: block;
+  font-size: 14.5px;
+  margin-bottom: 6px;
+}
+
+/* Animations */
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Print Overrides */
+@media print {
+  body {
+    background: #ffffff !important;
+    padding-top: 0 !important;
+  }
+  header, footer, .wizard-controls, .btn-brand-secondary, button {
+    display: none !important;
+  }
+  .assessment-wrapper {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+  }
+  .step-container {
+    padding: 0 !important;
+  }
+}
+
+/* Responsive Wizard adjustments */
+@media (max-width: 768px) {
+  .assessment-header {
+    padding: 28px 24px 16px;
+  }
+  .step-container {
+    padding: 24px 20px;
+  }
+  .wizard-controls {
+    padding: 20px 20px 32px;
+  }
+  .step-question {
+    font-size: 17px;
+    margin-bottom: 20px;
+  }
+  .wizard-steps-indicator {
+    max-width: 100%;
+  }
+  .step-label {
+    display: none;
+  }
+  .step-indicator-line {
+    transform: translateY(-18px);
+  }
+}

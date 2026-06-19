@@ -26,10 +26,14 @@
       <nav class="nav-links">
         <a href="#features" class="nav-link">Capabilities</a>
         <a href="#workflow" class="nav-link">Workflow</a>
-        <a href="#security" class="nav-link">Security</a>
-        <a href="#faq" class="nav-link">FAQ</a>
-        <a href="/login.html" class="btn-brand-primary" id="nav-login-btn" style="padding: 8px 16px; font-size: 13.5px;">Portal Sign In</a>
+        <a href="/self-assessment" class="nav-link">Self Assessment</a>
+        <a href="/blog" class="nav-link">Education</a>
+        <a href="/login.html" class="btn-brand-primary" id="nav-login-btn"
+          style="padding: 8px 16px; font-size: 13.5px;">Portal Sign In</a>
       </nav>
+      <button class="landing-menu-toggle" id="landing-menu-toggle" aria-label="Toggle navigation menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
     </div>
   </header>
 
@@ -56,6 +60,9 @@
           Explore Capabilities
         </a>
       </div>
+      <p style="font-size: 11px; color: var(--text-muted); margin-top: 24px;">
+        * Metrics based on pilot deployment data. Results may vary by clinical configuration.
+      </p>
     </section>
   </main>
 
@@ -63,17 +70,17 @@
   <section class="metrics-section">
     <div class="container metrics-grid">
       <div class="metric-card">
-        <div class="metric-number">98.7%</div>
+        <div class="metric-number">98.7%*</div>
         <div class="metric-label">Screening Accuracy</div>
         <div class="metric-desc">For active oral oncology cases</div>
       </div>
       <div class="metric-card">
-        <div class="metric-number">&lt; 24 hr</div>
+        <div class="metric-number">&lt; 24 hr*</div>
         <div class="metric-label">Biopsy Response</div>
         <div class="metric-desc">Pathology slot coordination time</div>
       </div>
       <div class="metric-card">
-        <div class="metric-number">12,400+</div>
+        <div class="metric-number">12,400+*</div>
         <div class="metric-label">Monitored Profiles</div>
         <div class="metric-desc">Across cooperating clinics</div>
       </div>
@@ -117,6 +124,130 @@
         </div>
         <h3 class="cap-title">Patient Self-Reporting</h3>
         <p class="cap-desc">Patients report symptom logs (pain severity scales, bleeding, burning, and ulcer details) directly via their portal. Clinicians receive automated high-risk alert feeds.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TOBACCO AWARENESS INTERACTIVE SECTION ── -->
+  <section class="container tobacco-section">
+    <div class="section-header">
+      <span class="section-tag">Education & Prevention</span>
+      <h2 class="section-title">Tobacco Awareness & Clinical Cessation</h2>
+      <p class="section-desc">Smoking and chewing tobacco are the leading risk factors for oral mucosal dysplasia. Explore the risks, recovery milestones, and relapse strategies.</p>
+    </div>
+
+    <div class="tobacco-container">
+      <div class="tobacco-tabs">
+        <button class="tobacco-tab-btn active" onclick="switchTobaccoTab('harm')">Harmful Effects</button>
+        <button class="tobacco-tab-btn" onclick="switchTobaccoTab('benefits')">Benefits of Quitting</button>
+        <button class="tobacco-tab-btn" onclick="switchTobaccoTab('prevention')">Relapse Prevention</button>
+      </div>
+
+      <!-- Tab 1: Harmful Effects -->
+      <div class="tobacco-content-panel active" id="tobacco-panel-harm">
+        <div class="tobacco-grid">
+          <div class="tobacco-text">
+            <h3>How Tobacco Damages Oral Mucosa</h3>
+            <p>Chronic tobacco use exposes oral epithelial tissues to radioactive toxins and chemical carcinogens. These compounds cause microscopic inflammation and initiate genetic cellular alterations.</p>
+            <div class="tobacco-bullets">
+              <div class="tobacco-bullet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div>Chemical Cytotoxicity: <span>Formaldehyde, Nitrosamines, and Benzene poison the basal cells of the oral cavity.</span></div>
+              </div>
+              <div class="tobacco-bullet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div>Epithelial Dysplasia: <span>Chronic irritation prompts cell thickening (keratosis), resulting in white (Leukoplakia) and red (Erythroplakia) lesions.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tobacco-visual">
+            <h4 style="font-size:15px; font-weight:700; margin-bottom:12px; color:var(--dark-slate);">Oral Cancer Progression Path</h4>
+            <div class="timeline-list">
+              <div class="timeline-item">
+                <div class="timeline-badge" style="min-width: 120px;">Healthy Mucosa</div>
+                <div class="timeline-desc">Normal pink cellular tissue lining the cheeks and tongue.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-badge" style="min-width: 120px; background-color:#ffedd5; color:#c2410c; border-color:#fed7aa;">Dysplasia Stage</div>
+                <div class="timeline-desc">Appearance of leukoplakia (white patches) or erythroplakia (velvety red patches).</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-badge" style="min-width: 120px; background-color:#fee2e2; color:#b91c1c; border-color:#fecaca;">Malignant Stage</div>
+                <div class="timeline-desc">Progression into squamous cell carcinoma, requiring biopsy and surgical oncological care.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Benefits of Quitting -->
+      <div class="tobacco-content-panel" id="tobacco-panel-benefits">
+        <div class="tobacco-grid">
+          <div class="tobacco-text">
+            <h3>Immediate & Long-Term Healing Milestones</h3>
+            <p>Quitting tobacco halts mucosal irritation immediately, initiating a rapid cellular restoration process. The cardiovascular and oral tissues begin repairing themselves almost instantly.</p>
+            <div class="tobacco-bullets">
+              <div class="tobacco-bullet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <div>Improved Local Circulation: <span>Within 24 hours, oxygen levels rise, allowing mucosal lining cells to heal minor ulcerations.</span></div>
+              </div>
+              <div class="tobacco-bullet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <div>Reduced Cancer Pathways: <span>At 5 years post-cessation, your risk of developing mouth and throat cancers is halved.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tobacco-visual">
+            <h4 style="font-size:15px; font-weight:700; margin-bottom:12px; color:var(--dark-slate);">Cessation Healing Timeline</h4>
+            <div class="timeline-list">
+              <div class="timeline-item">
+                <div class="timeline-badge">20 Mins</div>
+                <div class="timeline-desc">Heart rate and blood pressure stabilize. Local circulation recovers.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-badge">48 Hours</div>
+                <div class="timeline-desc">Taste and smell improve. Saliva production normalizes.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-badge">5 Years</div>
+                <div class="timeline-desc">Oral cancer and cardiovascular risks drop by exactly 50%.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Relapse Prevention -->
+      <div class="tobacco-content-panel" id="tobacco-panel-prevention">
+        <div class="tobacco-grid">
+          <div class="tobacco-text">
+            <h3>Clinical Relapse Coping Mechanisms</h3>
+            <p>Avoiding relapse requires managing psychological triggers and replacing physical habits with clinical coping behaviors.</p>
+            <div class="tobacco-bullets">
+              <div class="tobacco-bullet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <div>The 4 D's Coping Strategy: <span>Use Delay (10 min), Deep breathing, Drinking water, and Distraction to outlast sudden cravings.</span></div>
+              </div>
+              <div class="tobacco-bullet">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <div>Nicotine Replacement Therapy: <span>Combine transdermal patches (baseline) with nicotine gums or lozenges (cravings spike management).</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tobacco-visual">
+            <h4 style="font-size:15px; font-weight:700; margin-bottom:12px; color:var(--dark-slate);">Relapse Cessation Strategy</h4>
+            <div class="timeline-list">
+              <div class="timeline-item">
+                <div class="timeline-badge" style="min-width: 110px;">Trigger Mapping</div>
+                <div class="timeline-desc">Identify emotional and situational triggers (stress, driving, social habits) and write out action plans.</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-badge" style="min-width: 110px;">Clinician Sync</div>
+                <div class="timeline-desc">Leverage oncology follow-ups to discuss nicotine cravings and request clinical cessation plans.</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -203,37 +334,37 @@
 
     <div class="faq-accordion-container">
       <!-- Node 1 -->
-      <div class="faq-node">
-        <div class="faq-summary">
+      <details class="faq-node" name="faq-group">
+        <summary class="faq-summary">
           What roles and permission levels does RTooth support?
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
+        </summary>
         <div class="faq-details">
           RTooth supports three primary clinical roles. IT-Admins manage practitioner registrations and system logs; Doctors/Oncologists maintain registry details, log check-ups, and review symptoms; Patients report symptom updates and view visit timelines.
         </div>
-      </div>
+      </details>
 
       <!-- Node 2 -->
-      <div class="faq-node">
-        <div class="faq-summary">
+      <details class="faq-node" name="faq-group">
+        <summary class="faq-summary">
           How does the Follow-up Compliance system categorize patients?
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
+        </summary>
         <div class="faq-details">
           Patients are grouped automatically based on their next scheduled check-up date. Overdue appointments are flagged as Missed (🔴), appointments in the next 7 days are flagged as Due Soon (🟡), and all other patients are marked as Compliant (🟢).
         </div>
-      </div>
+      </details>
 
       <!-- Node 3 -->
-      <div class="faq-node">
-        <div class="faq-summary">
+      <details class="faq-node" name="faq-group">
+        <summary class="faq-summary">
           Can I attach multiple files and pathology documents to a consultation record?
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
+        </summary>
         <div class="faq-details">
           Yes. Doctors can attach biopsy reports, histopathology logs, imaging files (CT, MRI, X-Ray), or blood reports during the initial consultation log or append files to existing logs.
         </div>
-      </div>
+      </details>
     </div>
   </section>
 
@@ -266,8 +397,17 @@
       </div>
       <div>
         <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Security</h4>
-        <p style="margin-bottom: 6px;"><a href="#security" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">RLS Access</a></p>
-        <p><a href="#security" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">HIPAA Compliance</a></p>
+        <p style="margin-bottom: 6px;">
+          <a href="/privacy" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Privacy Policy</a>
+        </p>
+        <p>
+          <a href="/terms" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Terms of Service</a>
+        </p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Interactive Tools</h4>
+        <p style="margin-bottom: 6px;"><a href="/self-assessment" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Self Assessment</a></p>
+        <p><a href="/blog" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Education Hub</a></p>
       </div>
     </div>
     <div class="container" style="border-top: 1px solid var(--border-slate); margin-top: 36px; padding-top: 20px; text-align: center; font-size: 12.5px; color: var(--text-light);">
@@ -275,25 +415,88 @@
     </div>
   </footer>
 
-  <!-- FAQ Interactivity script -->
+  <!-- Cookie Consent Banner -->
+  <div class="cookie-banner" id="cookie-consent-banner">
+    <div class="cookie-content">
+      <svg class="cookie-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5z"/></svg>
+      <p>We use cookies and basic session trackers to ensure secure access and optimal HIPAA compliance auditing. By continuing, you agree to our <a href="/privacy">Privacy Policy</a>.</p>
+    </div>
+    <button class="btn-brand-primary" id="btn-accept-cookies" style="padding: 8px 16px; font-size: 12.5px;">Accept Cookies</button>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const faqNodes = document.querySelectorAll('.faq-node');
-      faqNodes.forEach(node => {
-        const summary = node.querySelector('.faq-summary');
-        if (summary) {
-          summary.addEventListener('click', () => {
-            const isOpen = node.classList.contains('open');
-            // Close all
-            faqNodes.forEach(n => n.classList.remove('open'));
-            // Toggle clicked
-            if (!isOpen) {
-              node.classList.add('open');
-            }
-          });
+      const banner = document.getElementById('cookie-consent-banner');
+      const acceptBtn = document.getElementById('btn-accept-cookies');
+
+      if (banner && acceptBtn) {
+        const cookiesAccepted = localStorage.getItem('rtooth_cookies_accepted');
+        if (!cookiesAccepted) {
+          setTimeout(() => {
+            banner.classList.add('visible');
+          }, 1500); // Slight delay for smoother presentation
         }
-      });
+
+        acceptBtn.addEventListener('click', () => {
+          localStorage.setItem('rtooth_cookies_accepted', 'true');
+          banner.classList.remove('visible');
+        });
+      }
+
+      // Mobile menu toggle logic
+      const toggleBtn = document.getElementById('landing-menu-toggle');
+      const navLinks = document.querySelector('.nav-links');
+      
+      // Create backdrop dynamically if needed
+      let backdrop = document.getElementById('landing-menu-backdrop');
+      if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'landing-menu-backdrop';
+        backdrop.className = 'landing-menu-backdrop';
+        document.body.appendChild(backdrop);
+      }
+
+      if (toggleBtn && navLinks) {
+        toggleBtn.addEventListener('click', () => {
+          navLinks.classList.toggle('open');
+          backdrop.classList.toggle('visible');
+        });
+
+        backdrop.addEventListener('click', () => {
+          navLinks.classList.remove('open');
+          backdrop.classList.remove('visible');
+        });
+
+        // Close menu when clicking a link
+        navLinks.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            navLinks.classList.remove('open');
+            backdrop.classList.remove('visible');
+          });
+        });
+      }
     });
+
+    function switchTobaccoTab(tabName) {
+      // Deactivate all buttons and panels
+      document.querySelectorAll('.tobacco-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tobacco-content-panel').forEach(panel => panel.classList.remove('active'));
+
+      // Find the clicked button and target panel
+      const buttons = document.querySelectorAll('.tobacco-tab-btn');
+      let targetBtn;
+      if (tabName === 'harm') {
+        targetBtn = buttons[0];
+      } else if (tabName === 'benefits') {
+        targetBtn = buttons[1];
+      } else if (tabName === 'prevention') {
+        targetBtn = buttons[2];
+      }
+
+      if (targetBtn) targetBtn.classList.add('active');
+      const panel = document.getElementById(`tobacco-panel-${tabName}`);
+      if (panel) panel.classList.add('active');
+    }
   </script>
 
 </body>

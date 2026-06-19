@@ -27,4 +27,6 @@ DROP POLICY IF EXISTS "Allow anonymous inserts" ON public.audit_logs;
 CREATE POLICY "Allow anonymous inserts" ON public.audit_logs FOR INSERT WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow anonymous select" ON public.audit_logs;
-CREATE POLICY "Allow anonymous select" ON public.audit_logs FOR SELECT USING (true);
+CREATE POLICY "Allow admin select" ON public.audit_logs FOR SELECT USING (
+  ((auth.jwt() -> 'user_metadata'::text) ->> 'role'::text) = 'admin'
+);

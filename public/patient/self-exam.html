@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guided Oral Self-Examination — RTooth</title>
+  <meta name="description" content="A monthly mirror-assisted self-examination tutorial helping patients screen for mucosal lesions, ulcers, and swelling.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/patient_index.css">
+  <link rel="stylesheet" href="/css/self_exam.css">
+</head>
+<body data-auth-required="true" data-allowed-roles="patient" class="dashboard-body">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/patient" class="logo" id="header-logo">
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/patient/profile" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="patient-avatar">PT</div>
+            <div class="user-info">
+              <div class="user-name" id="patient-name-badge">Patient Loading...</div>
+              <div class="user-role-label">Registered Patient</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <main class="dashboard-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-menu">
+        <a href="/patient" class="sidebar-item">
+          <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          Home Portal
+        </a>
+        <a href="/patient/symptoms" class="sidebar-item">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          Symptom Tracker
+        </a>
+        <a href="/patient/self-exam" class="sidebar-item active">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5-.8-.7-1.3-1.4-1.7-2.3a9.7 9.7 0 0 0-4.6 0c-.4.9-.9 1.6-1.7 2.3-2 1.6-3 3.5-3 5.5a7 7 0 0 0 7 7z"></path>
+            <path d="M12 18V12"></path>
+            <path d="M9 15h6"></path>
+          </svg>
+          Oral Self-Exam
+        </a>
+        <a href="/patient/gallery" class="sidebar-item">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Photo Gallery
+        </a>
+      </div>
+      
+      <button class="btn btn-danger-outline" style="width: 100%; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px;" id="patient-logout-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; flex-shrink: 0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        <span>Logout Session</span>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="dashboard-content">
+      
+      <div class="exam-wrapper">
+        
+        <!-- Wizard Title Area -->
+        <div class="exam-header">
+          <h2 class="exam-title">Guided Oral Self-Examination</h2>
+          <p class="exam-desc">Perform this mirror-assisted check once a month. Catching red/white mucosal patches, ulcers, or swelling early plays a major role in oral cancer prevention.</p>
+          
+          <!-- Step Timeline Tracks -->
+          <div class="wizard-steps-indicator" id="steps-indicator">
+            <div class="step-indicator-item active" data-step="1">
+              <span class="step-num">1</span>
+              <span class="step-label">Setup</span>
+            </div>
+            <div class="step-indicator-line" id="line-1"></div>
+            
+            <div class="step-indicator-item" data-step="2">
+              <span class="step-num">2</span>
+              <span class="step-label">Lips</span>
+            </div>
+            <div class="step-indicator-line" id="line-2"></div>
+            
+            <div class="step-indicator-item" data-step="3">
+              <span class="step-num">3</span>
+              <span class="step-label">Tongue</span>
+            </div>
+            <div class="step-indicator-line" id="line-3"></div>
+            
+            <div class="step-indicator-item" data-step="4">
+              <span class="step-num">4</span>
+              <span class="step-label">Cheeks</span>
+            </div>
+            <div class="step-indicator-line" id="line-4"></div>
+            
+            <div class="step-indicator-item" data-step="5">
+              <span class="step-num">5</span>
+              <span class="step-label">Floor</span>
+            </div>
+            <div class="step-indicator-line" id="line-5"></div>
+            
+            <div class="step-indicator-item" data-step="6">
+              <span class="step-num">6</span>
+              <span class="step-label">Log</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wizard Pages Container -->
+        <div class="step-container">
+          
+          <!-- STEP 1: PREPARATION -->
+          <div class="wizard-step active" id="step-panel-1">
+            <div class="step-grid-layout">
+              <div class="step-instruction-block">
+                <span class="step-badge">Step 1 of 5</span>
+                <h3 class="step-heading">Mirror-Assisted Setup & Prep</h3>
+                <p class="step-text">Prepare your examination area. Find a bright, clear mirror in a well-lit room. You can also use a smartphone flashlight to illuminate the inside of your mouth.</p>
+                <div class="step-clinical-goals">
+                  <h4 class="goals-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+                    Initial Checklist
+                  </h4>
+                  <ul class="goals-list">
+                    <li>Wash hands thoroughly with soap and warm water.</li>
+                    <li>Remove any dental plates, retainers, or dentures.</li>
+                    <li>Adjust your light source to shine directly into the mouth.</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="visual-guide-frame">
+                <div class="visual-graphic-container">
+                  <img src="/images/exam_prep_mirror.webp" alt="Mirror preparation guide" loading="lazy" width="480" height="320">
+                </div>
+                <span class="visual-caption">Position yourself in front of a well-lit mirror with hands washed and dentures removed.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: LIPS & GUMS -->
+          <div class="wizard-step" id="step-panel-2">
+            <div class="step-grid-layout">
+              <div class="step-instruction-block">
+                <span class="step-badge">Step 2 of 5</span>
+                <h3 class="step-heading">Retract Your Lips & Check Gums</h3>
+                <p class="step-text">Gently pull your upper lip upward and your lower lip downward. Visually inspect the inner lip lining and gums. Run your fingers over the tissue to feel for lumps or texture changes.</p>
+                <div class="step-clinical-goals">
+                  <h4 class="goals-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+                    What to look for
+                  </h4>
+                  <ul class="goals-list">
+                    <li>Velvety red spots or raw surface textures on gums.</li>
+                    <li>Thickened white plaques that don't wash off.</li>
+                    <li>Sores on the inner lip that fail to heal.</li>
+                  </ul>
+                </div>
+                <div class="step-check-question">
+                  <h4 class="question-title">Step 2 Checkup findings</h4>
+                  <div class="step-options-stack">
+                    <label class="step-option-pill" for="chk-step2-patches">
+                      <input type="checkbox" id="chk-step2-patches" value="patches">
+                      <div class="option-pill-box"></div>
+                      <span>White or red patches on lips or gums</span>
+                    </label>
+                    <label class="step-option-pill" for="chk-step2-swelling">
+                      <input type="checkbox" id="chk-step2-swelling" value="swelling">
+                      <div class="option-pill-box"></div>
+                      <span>Swelling, lumps or thicker areas on lips or gums</span>
+                    </label>
+                    <label class="step-option-pill" for="chk-step2-healthy">
+                      <input type="checkbox" id="chk-step2-healthy" value="healthy">
+                      <div class="option-pill-box"></div>
+                      <span class="healthy-text">No abnormal findings on lips or gums</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="visual-guide-frame">
+                <div class="visual-graphic-container">
+                  <img src="/images/exam_lips_gums.webp" alt="Lips and gums check guide" loading="lazy" width="480" height="320">
+                </div>
+                <span class="visual-caption">Gently retract upper and lower lips to visually check the gum lines and inner mucosa.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: TONGUE BORDERS -->
+          <div class="wizard-step" id="step-panel-3">
+            <div class="step-grid-layout">
+              <div class="step-instruction-block">
+                <span class="step-badge">Step 3 of 5</span>
+                <h3 class="step-heading">Examine Lateral Tongue Borders</h3>
+                <p class="step-text">Stick your tongue straight out. Wrap a clean tissue or gauze around the tip to hold it gently. Pull the tongue to the left and then to the right, looking closely at the lateral borders.</p>
+                <div class="step-clinical-goals">
+                  <h4 class="goals-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+                    High-Risk Zones
+                  </h4>
+                  <ul class="goals-list">
+                    <li>The sides of the tongue are the most common site for oral lesions.</li>
+                    <li>Look for red, velvety ulcers or firm nodules.</li>
+                    <li>Check if side borders feel hardened (indurated) to touch.</li>
+                  </ul>
+                </div>
+                <div class="step-check-question">
+                  <h4 class="question-title">Step 3 Checkup findings</h4>
+                  <div class="step-options-stack">
+                    <label class="step-option-pill" for="chk-step3-ulcers">
+                      <input type="checkbox" id="chk-step3-ulcers" value="ulcers">
+                      <div class="option-pill-box"></div>
+                      <span>Non-healing sores or ulcers on tongue border</span>
+                    </label>
+                    <label class="step-option-pill" for="chk-step3-patches">
+                      <input type="checkbox" id="chk-step3-patches" value="patches">
+                      <div class="option-pill-box"></div>
+                      <span>White or red patches on tongue border</span>
+                    </label>
+                    <label class="step-option-pill" for="chk-step3-healthy">
+                      <input type="checkbox" id="chk-step3-healthy" value="healthy">
+                      <div class="option-pill-box"></div>
+                      <span class="healthy-text">No abnormal findings on tongue borders</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="visual-guide-frame">
+                <div class="visual-graphic-container">
+                  <img src="/images/exam_tongue_border.webp" alt="Tongue lateral margin check guide" loading="lazy" width="480" height="320">
+                </div>
+                <span class="visual-caption">Inspect both lateral margins of the tongue, as the sides are high-risk zones.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: CHEEKS & PALATE -->
+          <div class="wizard-step" id="step-panel-4">
+            <div class="step-grid-layout">
+              <div class="step-instruction-block">
+                <span class="step-badge">Step 4 of 5</span>
+                <h3 class="step-heading">Inspect Buccal Mucosa & Palate</h3>
+                <p class="step-text">Use the handle of a clean spoon or your fingers to pull your cheeks outward. Inspect the inner cheek linings. Tilt your head back to inspect the hard and soft palate (roof of the mouth).</p>
+                <div class="step-clinical-goals">
+                  <h4 class="goals-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+                    Inspection Areas
+                  </h4>
+                  <ul class="goals-list">
+                    <li>Examine cheek linings on both sides for spots or bite lines.</li>
+                    <li>Inspect the palate for color changes, rough spots, or lumps.</li>
+                    <li>Feel the tissues to check for uniform texture.</li>
+                  </ul>
+                </div>
+                <div class="step-check-question">
+                  <h4 class="question-title">Step 4 Checkup findings</h4>
+                  <div class="step-options-stack">
+                    <label class="step-option-pill" for="chk-step4-ulcers">
+                      <input type="checkbox" id="chk-step4-ulcers" value="ulcers">
+                      <div class="option-pill-box"></div>
+                      <span>Non-healing sores or ulcers on inner cheeks or palate</span>
+                    </label>
+                    <label class="step-option-pill" for="chk-step4-swelling">
+                      <input type="checkbox" id="chk-step4-swelling" value="swelling">
+                      <div class="option-pill-box"></div>
+                      <span>Swelling, lumps or texture changes in cheeks or palate</span>
+                    </label>
+                    <label class="step-option-pill" for="chk-step4-healthy">
+                      <input type="checkbox" id="chk-step4-healthy" value="healthy">
+                      <div class="option-pill-box"></div>
+                      <span class="healthy-text">No abnormal findings on cheeks or palate</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="visual-guide-frame">
+                <div class="visual-graphic-container">
+                  <img src="/images/exam_cheek_palate.webp" alt="Buccal mucosa and palate guide" loading="lazy" width="480" height="320">
+                </div>
+                <span class="visual-caption">Tilt your head back to inspect the palate (roof) and pull the cheeks out to check inner linings.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 5: FLOOR OF MOUTH -->
+          <div class="wizard-step" id="step-panel-5">
+            <div class="step-grid-layout">
+              <div class="step-instruction-block">
+                <span class="step-badge">Step 5 of 5</span>
+                <h3 class="step-heading">Examine Floor of Mouth & Throat</h3>
+                <p class="step-text">Raise the tip of your tongue to the roof of your mouth. Inspect the floor of the mouth beneath the tongue. Swallow slowly to test for any soreness, throat pain, or difficulty opening your jaw.</p>
+                <div class="step-clinical-goals">
+                  <h4 class="goals-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+                    Screening parameters
+                  </h4>
+                  <ul class="goals-list">
+                    <li>Unexplained swelling or hard nodes underneath the tongue.</li>
+                    <li>Sores or ulcerations on the sublingual salivary areas.</li>
+                    <li>Noticeable pain or tightness when opening the jaw wide.</li>
+                  </ul>
+                </div>
+                <div class="step-check-question">
+                  <h4 class="question-title">Step 5 Checkup findings</h4>
+                  <div class="step-options-stack">
+                    <label class="step-option-pill" for="chk-step5-swelling">
+                      <input type="checkbox" id="chk-step5-swelling" value="swelling">
+                      <div class="option-pill-box"></div>
+                      <span>Swelling, lumps or hard nodes under tongue</span>
+                    </label>
+                    <label class="step-option-pill" for="chk-step5-opening">
+                      <input type="checkbox" id="chk-step5-opening" value="reduced_opening">
+                      <div class="option-pill-box"></div>
+                      <span>Difficulty opening mouth or pain during swallowing</span>
+                    </label>
+                    <label class="step-option-pill" for="chk-step5-healthy">
+                      <input type="checkbox" id="chk-step5-healthy" value="healthy">
+                      <div class="option-pill-box"></div>
+                      <span class="healthy-text">No abnormal findings on floor of mouth or throat</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="visual-guide-frame">
+                <div class="visual-graphic-container">
+                  <img src="/images/exam_floor_mouth.webp" alt="Floor of mouth check guide" loading="lazy" width="480" height="320">
+                </div>
+                <span class="visual-caption">Raise your tongue tip to check the sublingual floor area and glands beneath.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 6: SUBMIT REPORT & SUMMARY -->
+          <div class="wizard-step" id="step-panel-6">
+            <h3 class="step-heading" style="text-align: center; margin-bottom: 8px;">Record Self-Exam Findings</h3>
+            <p class="step-text" style="text-align: center; max-width: 600px; margin: 0 auto 32px;">Please review the summary of findings compiled from your step-by-step examination before submitting to your clinical record.</p>
+            
+            <form id="self-exam-log-form">
+              <!-- Summary Report Card -->
+              <div class="summary-report-card">
+                <div class="summary-report-title">Self-Examination Summary</div>
+                <div class="summary-list-stack" id="summary-findings-list">
+                  <!-- Dynamic summary items inserted by JS -->
+                </div>
+              </div>
+
+              <!-- Alerts Panel -->
+              <!-- Warning alert (if visual findings checked) -->
+              <div class="warning-alert-panel" id="warning-panel">
+                <svg class="warning-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div class="warning-content">
+                  <span>Warning Sign Detected!</span>
+                  You have checked one or more abnormal visual symptoms. While this is not a diagnosis, you must report these symptoms to your doctor. Click below to auto-log these symptoms and consult your oncologist immediately.
+                </div>
+              </div>
+
+              <!-- Success alert (if healthy checked) -->
+              <div class="healthy-success-panel" id="healthy-panel">
+                <svg class="healthy-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"></path>
+                </svg>
+                <div class="healthy-content">
+                  <span>No Warning Signs Found</span>
+                  Your oral self-examination looks healthy. Monthly screening is highly effective to monitor your health. Log this healthy check to keep your oncology team updated on your progress.
+                </div>
+              </div>
+              
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Common Error Panel -->
+        <div class="alert alert-error" id="exam-error" style="display: none; margin: 0 48px 20px;"></div>
+
+        <!-- Wizard Navigation Controls -->
+        <div class="wizard-controls" id="wizard-controls">
+          <button class="btn-wizard-back" id="back-btn" disabled>Back Step</button>
+          <button class="btn-brand-primary" id="next-btn" style="font-size: 13.5px; padding: 10px 20px;">Next Step</button>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/self_exam.js"></script>
+</body>
+</html>

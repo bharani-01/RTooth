@@ -1,7 +1,7 @@
 import * as patientService from '../services/patientService.js';
 import { sendResponse } from '../utils/response.js';
 import { BadRequestError, ForbiddenError } from '../utils/errors.js';
-import { supabase, supabaseAdmin } from '../config/supabase.js';
+import { supabase, supabaseAdmin, getSupabaseUserClient } from '../config/supabase.js';
 import crypto from 'crypto';
 
 
@@ -13,18 +13,18 @@ export const getPatientProfile = async (req, res, next) => {
     const { id } = req.params;
     
     // Resolve internal UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
 
     // Safety check: Patient role can only request their own record
     if (req.profile.role === 'patient' && req.profile.id !== patientId) {
       throw new ForbiddenError('Access denied: Patients can only retrieve their own clinical history.');
     }
 
-    const patientProfile = await patientService.getPatientProfileById(patientId);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
     
-    // Attending doctor log warning
+    // Check doctor ownership to prevent BOLA/IDOR
     if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
-      console.warn(`[Warning] Attending doctor discrepancy. Doctor: ${req.profile.id}, Patient Attending Doctor: ${patientProfile.doctor_id}`);
+      throw new ForbiddenError('Access denied: You are not authorized to retrieve this patient\'s clinical history.');
     }
 
     return sendResponse(res, 200, 'Patient profile retrieved successfully.', { profile: patientProfile });
@@ -46,10 +46,16 @@ export const addMedication = async (req, res, next) => {
     }
 
     // Resolve internal UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
+
+    // Check doctor ownership to prevent BOLA/IDOR
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to manage prescriptions for this patient.');
+    }
 
     const medData = { medication_name, dosage, frequency, start_date, end_date };
-    const medication = await patientService.createMedication(patientId, medData);
+    const medication = await patientService.createMedication(patientId, medData, req.token);
 
     return sendResponse(res, 201, 'Medication prescription added successfully.', { medication });
   } catch (error) {
@@ -70,11 +76,17 @@ export const addCheckup = async (req, res, next) => {
     }
 
     // Resolve internal UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
+
+    // Check doctor ownership to prevent BOLA/IDOR
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to log check-ups for this patient.');
+    }
 
     const checkupData = { findings, notes, recommendations, checkup_date, next_checkup_date, followup_interval, followup_notes };
     const doctorId = req.profile.id; // Logged-in doctor ID
-    const checkup = await patientService.createCheckup(patientId, doctorId, checkupData);
+    const checkup = await patientService.createCheckup(patientId, doctorId, checkupData, req.token);
 
     return sendResponse(res, 201, 'Check-up record logged successfully.', { checkup });
   } catch (error) {
@@ -95,9 +107,15 @@ export const updatePatientStatus = async (req, res, next) => {
     }
 
     // Resolve internal UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
 
-    const patient = await patientService.updatePatientStatus(patientId, status);
+    // Check doctor ownership to prevent BOLA/IDOR
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to update this patient\'s status.');
+    }
+
+    const patient = await patientService.updatePatientStatus(patientId, status, req.token);
 
     return sendResponse(res, 200, `Patient status updated to '${status}' successfully.`, { patient });
   } catch (error) {
@@ -137,7 +155,13 @@ export const updatePatientProfile = async (req, res, next) => {
     }
 
     // Resolve internal UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
+
+    // Check doctor ownership to prevent BOLA/IDOR
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to update this patient\'s profile.');
+    }
 
     const updateData = {
       firstName,
@@ -160,7 +184,7 @@ export const updatePatientProfile = async (req, res, next) => {
       status: status || 'draft'
     };
 
-    const updatedProfile = await patientService.updatePatientProfile(patientId, updateData);
+    const updatedProfile = await patientService.updatePatientProfile(patientId, updateData, req.token);
 
     return sendResponse(res, 200, 'Patient profile updated successfully.', { profile: updatedProfile });
   } catch (error) {
@@ -181,9 +205,15 @@ export const createPatientVisit = async (req, res, next) => {
     }
 
     // Resolve internal UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
     const doctorId = req.profile.id;
-    const patientProfile = await patientService.getPatientProfileById(patientId);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+
+    // Check doctor ownership to prevent BOLA/IDOR
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to create visit records for this patient.');
+    }
+
     const cleanPatientName = `${patientProfile.first_name}_${patientProfile.last_name}`.replace(/[^a-zA-Z0-9_]/g, '');
     const checkupId = crypto.randomUUID();
 
@@ -274,7 +304,7 @@ export const createPatientVisit = async (req, res, next) => {
       followup_notes: followup_notes || null
     };
 
-    const visitResult = await patientService.createVisit(patientId, doctorId, visitData);
+    const visitResult = await patientService.createVisit(patientId, doctorId, visitData, req.token);
 
     return sendResponse(res, 201, 'Consultation visit logged successfully.', visitResult);
   } catch (error) {
@@ -295,9 +325,15 @@ export const addVisitReports = async (req, res, next) => {
     }
 
     // Resolve internal UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
     const doctorId = req.profile.id;
-    const patientProfile = await patientService.getPatientProfileById(patientId);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+
+    // Check doctor ownership to prevent BOLA/IDOR
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to add reports for this patient.');
+    }
+
     const cleanPatientName = `${patientProfile.first_name}_${patientProfile.last_name}`.replace(/[^a-zA-Z0-9_]/g, '');
 
     // Parse report types JSON if sent
@@ -357,7 +393,8 @@ export const addVisitReports = async (req, res, next) => {
         .getPublicUrl(uniqueFileName);
 
       // Insert metadata into patient_reports
-      const { data: repData, error: repError } = await supabase
+      const dbClient = getSupabaseUserClient(req.token);
+      const { data: repData, error: repError } = await dbClient
         .from('patient_reports')
         .insert([
           {
@@ -390,14 +427,20 @@ export const getPatientVisitDetails = async (req, res, next) => {
     const { id, visitId } = req.params;
 
     // Resolve internal patient UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
 
     // Safety check: Patient role can only request their own record
     if (req.profile.role === 'patient' && req.profile.id !== patientId) {
       throw new ForbiddenError('Access denied: Patients can only retrieve their own clinical history.');
     }
 
-    const visitDetails = await patientService.getVisitDetails(patientId, visitId);
+    // Check doctor ownership to prevent BOLA/IDOR
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to view visit records for this patient.');
+    }
+
+    const visitDetails = await patientService.getVisitDetails(patientId, visitId, req.token);
 
     return sendResponse(res, 200, 'Visit details retrieved successfully.', visitDetails);
   } catch (error) {
@@ -417,8 +460,15 @@ export const updateMedication = async (req, res, next) => {
       throw new BadRequestError('Missing mandatory fields for prescription update.');
     }
 
+    // Resolve internal patient UUID to check doctor ownership to prevent BOLA/IDOR
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to modify prescriptions for this patient.');
+    }
+
     const medData = { medication_name, dosage, frequency, start_date, end_date };
-    const medication = await patientService.updateMedication(medicationId, medData);
+    const medication = await patientService.updateMedication(medicationId, medData, req.token);
 
     return sendResponse(res, 200, 'Medication prescription updated successfully.', { medication });
   } catch (error) {
@@ -433,7 +483,14 @@ export const deleteMedication = async (req, res, next) => {
   try {
     const { id, medicationId } = req.params;
 
-    await patientService.deleteMedication(medicationId);
+    // Resolve internal patient UUID to check doctor ownership to prevent BOLA/IDOR
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to delete prescriptions for this patient.');
+    }
+
+    await patientService.deleteMedication(medicationId, req.token);
 
     return sendResponse(res, 200, 'Medication prescription deleted successfully.');
   } catch (error) {
@@ -447,7 +504,7 @@ export const deleteMedication = async (req, res, next) => {
 export const getMyProfile = async (req, res, next) => {
   try {
     const patientId = req.profile.id;
-    const patientProfile = await patientService.getPatientProfileById(patientId);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
     return sendResponse(res, 200, 'Patient profile retrieved successfully.', { profile: patientProfile });
   } catch (error) {
     next(error);
@@ -461,7 +518,7 @@ export const getMyVisitDetails = async (req, res, next) => {
   try {
     const patientId = req.profile.id;
     const { visitId } = req.params;
-    const visitDetails = await patientService.getVisitDetails(patientId, visitId);
+    const visitDetails = await patientService.getVisitDetails(patientId, visitId, req.token);
     return sendResponse(res, 200, 'Visit details retrieved successfully.', visitDetails);
   } catch (error) {
     next(error);
@@ -475,13 +532,169 @@ export const getFollowupCompliance = async (req, res, next) => {
   try {
     const isDoc = req.profile.role === 'doctor';
     const doctorId = isDoc ? req.profile.id : null;
-    const compliance = await patientService.getPatientsFollowupCompliance(doctorId);
+    const compliance = await patientService.getPatientsFollowupCompliance(doctorId, req.token);
     return sendResponse(res, 200, 'Patient follow-up compliance retrieved successfully.', { compliance });
   } catch (error) {
     next(error);
   }
 };
 
+/**
+ * Upload diagnostic photograph for the patient
+ */
+export const uploadPatientImage = async (req, res, next) => {
+  try {
+    const patientId = req.profile.id;
+    const { image_type, description } = req.body;
 
+    if (!req.file) {
+      throw new BadRequestError('No file provided for upload.');
+    }
 
+    if (!image_type || !['Lesion Photograph', 'Mouth Opening Image', 'Progression Image'].includes(image_type)) {
+      throw new BadRequestError('Invalid or missing image_type. Must be one of: Lesion Photograph, Mouth Opening Image, Progression Image.');
+    }
 
+    // Resolve patient details for clean file name
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    const cleanPatientName = `${patientProfile.first_name}_${patientProfile.last_name}`.replace(/[^a-zA-Z0-9_]/g, '');
+
+    // Ensure bucket exists
+    try {
+      if (supabaseAdmin) {
+        await supabaseAdmin.storage.createBucket('patient-images', {
+          public: true,
+          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/webp'],
+          fileSizeLimit: 10485760 // 10MB
+        });
+      }
+    } catch (bucketErr) {
+      // Ignored if exists
+    }
+
+    // Generate unique name
+    const fileExt = req.file.originalname.split('.').pop();
+    const cleanImageType = image_type.replace(/[^a-zA-Z0-9_]/g, '_');
+    const formattedDate = new Date().toISOString().slice(0, 19).replace(/T/, '_').replace(/:/g, '-');
+    const uniqueFileName = `${patientId}/${cleanPatientName}-${cleanImageType}-${formattedDate}.${fileExt}`;
+
+    const storageClient = supabaseAdmin || supabase;
+    const { data, error: uploadErr } = await storageClient.storage
+      .from('patient-images')
+      .upload(uniqueFileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: true
+      });
+
+    if (uploadErr) {
+      console.error('Supabase upload error:', uploadErr);
+      throw new Error(`Failed to upload file: ${uploadErr.message}`);
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('patient-images')
+      .getPublicUrl(uniqueFileName);
+
+    const imageRecord = await patientService.savePatientImageMetadata(patientId, {
+      image_type,
+      file_name: `${cleanPatientName}-${cleanImageType}-${formattedDate}.${fileExt}`,
+      file_url: publicUrl,
+      description
+    }, req.token);
+
+    return sendResponse(res, 201, 'Photograph uploaded successfully.', { image: imageRecord });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get currently logged-in patient's own gallery images
+ */
+export const getMyImages = async (req, res, next) => {
+  try {
+    const patientId = req.profile.id;
+    const images = await patientService.fetchPatientImages(patientId, req.token);
+
+    // Sanitize private doctor notes
+    const sanitizedImages = images.map(img => {
+      if (img.doctor_notes_visibility === 'private') {
+        const { doctor_notes, ...rest } = img;
+        return { ...rest, doctor_notes: null };
+      }
+      return img;
+    });
+
+    return sendResponse(res, 200, 'Patient gallery images retrieved successfully.', { images: sanitizedImages });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get images for a specific patient (doctor/admin sees all; self patient gets sanitized notes)
+ */
+export const getPatientImages = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
+
+    // Safety check: Patients can only retrieve their own gallery
+    if (req.profile.role === 'patient' && req.profile.id !== patientId) {
+      throw new ForbiddenError('Access denied: Patients can only retrieve their own gallery.');
+    }
+
+    // Check doctor ownership to prevent BOLA/IDOR
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to view gallery images for this patient.');
+    }
+
+    const images = await patientService.fetchPatientImages(patientId, req.token);
+
+    let sanitizedImages = images;
+    if (req.profile.role === 'patient') {
+      sanitizedImages = images.map(img => {
+        if (img.doctor_notes_visibility === 'private') {
+          const { doctor_notes, ...rest } = img;
+          return { ...rest, doctor_notes: null };
+        }
+        return img;
+      });
+    }
+
+    return sendResponse(res, 200, 'Patient gallery images retrieved successfully.', { images: sanitizedImages });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Add or update doctor notes for a patient image (doctors/admins only)
+ */
+export const updateImageDoctorNotes = async (req, res, next) => {
+  try {
+    const { id, imageId } = req.params;
+    const { doctor_notes, doctor_notes_visibility } = req.body;
+
+    if (doctor_notes_visibility && !['public', 'private'].includes(doctor_notes_visibility)) {
+      throw new BadRequestError("Invalid visibility. Visibility must be 'public' or 'private'.");
+    }
+
+    // Resolve internal patient UUID to check doctor ownership to prevent BOLA/IDOR
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
+    const patientProfile = await patientService.getPatientProfileById(patientId, req.token);
+    if (req.profile.role === 'doctor' && patientProfile.doctor_id && patientProfile.doctor_id !== req.profile.id) {
+      throw new ForbiddenError('Access denied: You are not authorized to manage notes for this patient\'s gallery.');
+    }
+
+    const updatedImage = await patientService.updateImageNotes(imageId, {
+      doctor_notes,
+      doctor_notes_visibility
+    }, req.token);
+
+    return sendResponse(res, 200, 'Doctor notes updated successfully.', { image: updatedImage });
+  } catch (error) {
+    next(error);
+  }
+};

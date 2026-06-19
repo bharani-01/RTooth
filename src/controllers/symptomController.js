@@ -16,7 +16,7 @@ export const logSymptoms = async (req, res, next) => {
     }
 
     const logData = { burning_sensation, pain_scale, difficulty_opening_mouth, ulcer_duration, bleeding };
-    const log = await symptomService.createSymptomLog(patientId, logData);
+    const log = await symptomService.createSymptomLog(patientId, logData, req.token);
 
     return sendResponse(res, 201, 'Symptoms logged successfully.', { log });
   } catch (error) {
@@ -30,7 +30,7 @@ export const logSymptoms = async (req, res, next) => {
 export const getMySymptoms = async (req, res, next) => {
   try {
     const patientId = req.profile.id;
-    const logs = await symptomService.getSymptomLogsByPatientId(patientId);
+    const logs = await symptomService.getSymptomLogsByPatientId(patientId, req.token);
 
     return sendResponse(res, 200, 'Symptom history retrieved successfully.', { logs });
   } catch (error) {
@@ -46,7 +46,7 @@ export const getPatientSymptoms = async (req, res, next) => {
     const { id } = req.params;
     
     // Resolve internal patient UUID
-    const patientId = await patientService.getPatientIdByIdOrCode(id);
+    const patientId = await patientService.getPatientIdByIdOrCode(id, req.token);
 
     // Safety check: Patient role can only request their own records
     if (req.profile.role === 'patient' && req.profile.id !== patientId) {
@@ -58,7 +58,7 @@ export const getPatientSymptoms = async (req, res, next) => {
       throw new ForbiddenError('Access denied: Unauthorized role.');
     }
 
-    const logs = await symptomService.getSymptomLogsByPatientId(patientId);
+    const logs = await symptomService.getSymptomLogsByPatientId(patientId, req.token);
 
     return sendResponse(res, 200, 'Symptom logs retrieved successfully.', { logs });
   } catch (error) {
@@ -79,7 +79,7 @@ export const getRecentSymptomLogs = async (req, res, next) => {
       throw new ForbiddenError('Access denied: Unauthorized role.');
     }
 
-    const logs = await symptomService.getRecentSymptomLogs(doctorId);
+    const logs = await symptomService.getRecentSymptomLogs(doctorId, req.token);
 
     return sendResponse(res, 200, 'Recent symptom logs retrieved successfully.', { logs });
   } catch (error) {

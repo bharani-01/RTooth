@@ -434,6 +434,11 @@ body {
   justify-content: space-between;
   align-items: center;
   user-select: none;
+  list-style: none;
+}
+
+.faq-summary::-webkit-details-marker {
+  display: none;
 }
 
 .faq-summary svg {
@@ -451,14 +456,14 @@ body {
   line-height: 1.6;
 }
 
-.faq-node.open .faq-details {
+.faq-node[open] .faq-details {
   max-height: 200px;
   padding-bottom: 20px;
   border-top: 1px solid #f1f5f9;
   padding-top: 14px;
 }
 
-.faq-node.open .faq-summary svg {
+.faq-node[open] .faq-summary svg {
   transform: rotate(180deg);
   color: var(--primary-brand);
 }
@@ -514,6 +519,10 @@ body {
 }
 
 /* ── Responsive adjustments ── */
+.landing-menu-toggle {
+  display: none;
+}
+
 @media (max-width: 992px) {
   .hero-headline { font-size: 44px; }
   .capabilities-grid { grid-template-columns: repeat(2, 1fr); }
@@ -529,4 +538,286 @@ body {
   .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .capabilities-grid { grid-template-columns: 1fr; }
   .workflow-row { grid-template-columns: 1fr; }
+  
+  .landing-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: var(--dark-slate);
+  }
+  .landing-menu-toggle svg {
+    width: 24px;
+    height: 24px;
+  }
+  .nav-bar {
+    position: relative;
+  }
+  .nav-links {
+    position: fixed;
+    top: 72px;
+    right: -280px;
+    width: 280px;
+    height: calc(100vh - 72px);
+    background: #ffffff;
+    border-left: 1px solid var(--border-slate);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 32px 24px;
+    gap: 20px;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.05);
+    transition: var(--transition-smooth);
+    z-index: 1000;
+  }
+  .nav-links.open {
+    right: 0;
+  }
+  .landing-menu-backdrop {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 999;
+  }
+  .landing-menu-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* ── Tobacco Awareness Section ── */
+.tobacco-section {
+  margin-bottom: 96px;
+}
+
+.tobacco-container {
+  background: #ffffff;
+  border: 1px solid var(--border-slate);
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.tobacco-tabs {
+  display: flex;
+  background-color: var(--light-slate);
+  border-bottom: 1px solid var(--border-slate);
+}
+
+.tobacco-tab-btn {
+  flex: 1;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.tobacco-tab-btn:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  color: var(--dark-slate);
+}
+
+.tobacco-tab-btn.active {
+  background-color: #ffffff;
+  color: var(--primary-brand);
+  border-bottom: 3px solid var(--primary-brand);
+}
+
+.tobacco-content-panel {
+  padding: 48px;
+  display: none;
+  animation: fadeUp 0.4s ease-out both;
+}
+
+.tobacco-content-panel.active {
+  display: block;
+}
+
+.tobacco-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.tobacco-text h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dark-slate);
+  margin-bottom: 16px;
+}
+
+.tobacco-text p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.tobacco-bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tobacco-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dark-slate);
+}
+
+.tobacco-bullet span {
+  font-weight: 400;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 2px;
+}
+
+.tobacco-bullet svg {
+  color: var(--primary-brand);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tobacco-visual {
+  background-color: var(--light-slate);
+  border-radius: 14px;
+  padding: 32px;
+  border: 1px dashed var(--border-slate);
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+
+.timeline-badge {
+  background-color: var(--primary-brand-light);
+  color: var(--primary-brand);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 11px;
+  min-width: 85px;
+  text-align: center;
+  flex-shrink: 0;
+  height: 24px;
+  border: 1px solid #ffe4e6;
+}
+
+.timeline-desc {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--dark-slate);
+}
+
+.timeline-desc strong {
+  display: block;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .tobacco-grid {
+    grid-template-columns: 1fr;
+  }
+  .tobacco-content-panel {
+    padding: 24px;
+  }
+  .tobacco-tab-btn {
+    padding: 14px 10px;
+    font-size: 11px;
+  }
+}
+
+/* Cookie Consent Banner */
+.cookie-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  max-width: 600px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-slate);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  z-index: 10000;
+  transform: translateY(120%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cookie-banner.visible {
+  transform: translateY(0);
+}
+
+.cookie-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cookie-icon {
+  color: var(--primary-brand);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cookie-content p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.cookie-content a {
+  color: var(--primary-brand);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .cookie-banner {
+    flex-direction: column;
+    align-items: stretch;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    gap: 12px;
+  }
 }

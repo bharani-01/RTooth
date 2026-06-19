@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical Education & Awareness Hub — RTooth</title>
+  <meta name="description"
+    content="Access clinical articles, tobacco cessation resources, oral health recovery guides, and practitioner compliance guidelines from the RTooth clinical team.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/blog.css">
+</head>
+
+<body>
+
+  <!-- Header / Navigation -->
+  <header>
+    <div class="container nav-bar">
+      <a href="/" class="logo" id="header-logo">
+        <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+      </a>
+      <nav class="nav-links">
+        <a href="/#features" class="nav-link">Capabilities</a>
+        <a href="/#workflow" class="nav-link">Workflow</a>
+        <a href="/self-assessment" class="nav-link">Self Assessment</a>
+        <a href="/blog" class="nav-link active">Education</a>
+        <a href="/login.html" class="btn-brand-primary" id="nav-login-btn"
+          style="padding: 8px 16px; font-size: 13.5px;">Portal Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="container" style="padding-top: 40px;">
+    <!-- Blog Hub Header -->
+    <section class="blog-hub-header">
+      <span class="section-tag">Resources & Guidelines</span>
+      <h1>Clinical Education Hub</h1>
+      <p>Scientific resources for oral oncology practitioners, tobacco cessation timelines, and guidance on pre-cancerous lesion tracking.</p>
+    </section>
+
+    <!-- Search & Filters Container -->
+    <section class="filter-search-container">
+      <div class="search-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" id="search-box" placeholder="Search articles by title or keyword...">
+      </div>
+
+      <div class="filter-pills">
+        <button class="filter-btn active" data-category="all">All Articles</button>
+        <button class="filter-btn" data-category="prevention">Prevention & Screening</button>
+        <button class="filter-btn" data-category="cessation">Tobacco Cessation</button>
+        <button class="filter-btn" data-category="clinical">Clinical Practice</button>
+      </div>
+    </section>
+
+    <!-- Articles Grid -->
+    <section class="blog-grid" id="blog-grid">
+      
+      <!-- Article 1 -->
+      <article class="blog-card" data-category="clinical" data-keywords="leukoplakia erythroplakia lesion mouth dysplasia signs">
+        <div class="blog-card-content">
+          <div class="blog-card-meta">
+            <span class="blog-card-tag">Clinical Practice</span>
+            <span>5 min read</span>
+          </div>
+          <a href="/blog/understanding-leukoplakia" class="blog-card-title">Understanding Leukoplakia & Erythroplakia</a>
+          <p class="blog-card-desc">A diagnostic overview of identifying pre-cancerous white and red patches in the oral cavity, including staging and biopsy criteria.</p>
+          <a href="/blog/understanding-leukoplakia" class="blog-card-link">
+            Read Clinical Guide
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 5"></polyline></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Article 2 -->
+      <article class="blog-card" data-category="cessation" data-keywords="quitting tobacco recovery mouth heart timeline healing cessation">
+        <div class="blog-card-content">
+          <div class="blog-card-meta">
+            <span class="blog-card-tag">Tobacco Cessation</span>
+            <span>4 min read</span>
+          </div>
+          <a href="/blog/reversing-risks" class="blog-card-title">The Road to Recovery: Cessation Timeline</a>
+          <p class="blog-card-desc">An in-depth timeline analysis showing how fast the cardiovascular and oral mucosal systems repair themselves after quitting tobacco.</p>
+          <a href="/blog/reversing-risks" class="blog-card-link">
+            View Healing Timeline
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 5"></polyline></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Article 3 -->
+      <article class="blog-card" data-category="clinical" data-keywords="practitioner doctor clinic compliance guidelines tracking dashboard">
+        <div class="blog-card-content">
+          <div class="blog-card-meta">
+            <span class="blog-card-tag">Clinical Practice</span>
+            <span>6 min read</span>
+          </div>
+          <a href="/blog/practitioner-compliance-guide" class="blog-card-title">A Practitioner's Guide to Patient Compliance</a>
+          <p class="blog-card-desc">How oncology specialists can improve follow-up retention, handle severe symptom alarms, and leverage data loops for tracking dysplasia.</p>
+          <a href="/blog/practitioner-compliance-guide" class="blog-card-link">
+            Read Practitioner Guidelines
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 5"></polyline></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Article 4 -->
+      <article class="blog-card" data-category="prevention" data-keywords="oral cancer screening early prevention dentist screening biopsy">
+        <div class="blog-card-content">
+          <div class="blog-card-meta">
+            <span class="blog-card-tag">Prevention & Screening</span>
+            <span>5 min read</span>
+          </div>
+          <a href="/blog/oral-cancer-prevention" class="blog-card-title">Oral Cancer Prevention & Screening Protocol</a>
+          <p class="blog-card-desc">Key guidelines for early-stage mucosal screenings, highlighting regular dental checkpoints and high-risk demographic targeting.</p>
+          <a href="/blog/oral-cancer-prevention" class="blog-card-link">
+            Read Screening Protocol
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 5"></polyline></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Article 5 -->
+      <article class="blog-card" data-category="prevention" data-keywords="nutrition diet vitamins mucosa cells dysplasia healing antioxidants">
+        <div class="blog-card-content">
+          <div class="blog-card-meta">
+            <span class="blog-card-tag">Prevention & Screening</span>
+            <span>4 min read</span>
+          </div>
+          <a href="/blog/nutrition-and-oral-health" class="blog-card-title">Nutrition & Mucosal Tissue Healing</a>
+          <p class="blog-card-desc">Exploring how antioxidant-rich diets, Vitamin A, C, and E intake assist in cell repair and help prevent oral epithelial dysplasia.</p>
+          <a href="/blog/nutrition-and-oral-health" class="blog-card-link">
+            Read Nutritional Guide
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 5"></polyline></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Article 6 -->
+      <article class="blog-card" data-category="cessation" data-keywords="nicotine replacement patches gum behavior therapy support relapse prevention">
+        <div class="blog-card-content">
+          <div class="blog-card-meta">
+            <span class="blog-card-tag">Tobacco Cessation</span>
+            <span>5 min read</span>
+          </div>
+          <a href="/blog/nicotine-replacement-therapies" class="blog-card-title">Nicotine Replacement Therapies & Support</a>
+          <p class="blog-card-desc">An evidence-based comparison of patches, gums, counseling, and stress-reduction strategies to manage triggers and avoid relapse.</p>
+          <a href="/blog/nicotine-replacement-therapies" class="blog-card-link">
+            Read Cessation Guide
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 5"></polyline></svg>
+          </a>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container"
+      style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; text-align: left;">
+      <div>
+        <a href="/" class="logo" style="margin-bottom: 12px; display: inline-flex;">
+          <img src="/images/rtooth_logo.png" alt="RTooth" style="height: 32px;">
+        </a>
+        <p style="font-size: 13px; max-width: 280px; color: var(--text-muted); line-height: 1.5;">Enterprise digital clinic solutions for oncology diagnostics and patient compliance tracking.</p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Product</h4>
+        <p style="margin-bottom: 6px;"><a href="/#features" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Capabilities</a></p>
+        <p style="margin-bottom: 6px;"><a href="/#workflow" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Workflow</a></p>
+        <p><a href="/login.html" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Portal Sign In</a></p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Interactive Tools</h4>
+        <p style="margin-bottom: 6px;"><a href="/self-assessment" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Self Assessment</a></p>
+        <p><a href="/blog" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Education Hub</a></p>
+      </div>
+    </div>
+    <div class="container" style="border-top: 1px solid var(--border-slate); margin-top: 36px; padding-top: 20px; text-align: center; font-size: 12.5px; color: var(--text-light);">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Blog Interaction and Filter Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchBox = document.getElementById('search-box');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const cards = document.querySelectorAll('.blog-card');
+
+      let currentCategory = 'all';
+      let searchQuery = '';
+
+      function filterArticles() {
+        cards.forEach(card => {
+          const cat = card.getAttribute('data-category');
+          const keywords = card.getAttribute('data-keywords').toLowerCase();
+          const title = card.querySelector('.blog-card-title').innerText.toLowerCase();
+          const desc = card.querySelector('.blog-card-desc').innerText.toLowerCase();
+
+          const matchesCategory = (currentCategory === 'all' || cat === currentCategory);
+          const matchesSearch = (!searchQuery || title.includes(searchQuery) || desc.includes(searchQuery) || keywords.includes(searchQuery));
+
+          if (matchesCategory && matchesSearch) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      // Search event
+      searchBox.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        filterArticles();
+      });
+
+      // Category filter buttons
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.getAttribute('data-category');
+          filterArticles();
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

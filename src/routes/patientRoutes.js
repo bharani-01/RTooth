@@ -65,4 +65,14 @@ router.post('/:id/visits/:visitId/reports', requireAuth, requireRole(['doctor'])
 // Retrieve a specific consultation visit details (doctors, admins, and patients)
 router.get('/:id/visits/:visitId', requireAuth, requireRole(['doctor', 'admin', 'patient']), patientController.getPatientVisitDetails);
 
+// Patient image gallery uploads (patients only)
+router.post('/me/images', requireAuth, requireRole(['patient']), upload.single('image_file'), patientController.uploadPatientImage);
+router.get('/me/images', requireAuth, requireRole(['patient']), patientController.getMyImages);
+
+// Retrieve patient images (doctors, admins, or patient self)
+router.get('/:id/images', requireAuth, requireRole(['doctor', 'admin', 'patient']), patientController.getPatientImages);
+
+// Update doctor notes for a patient image (doctors and admins only)
+router.patch('/:id/images/:imageId/notes', requireAuth, requireRole(['doctor', 'admin']), patientController.updateImageDoctorNotes);
+
 export default router;

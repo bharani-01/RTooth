@@ -1,5 +1,19 @@
 import { apiRequest, getUserProfile, logoutUser, getSessionToken } from './api.js';
 
+function escapeHtml(unsafe) {
+  if (unsafe == null) return '';
+  return String(unsafe)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+let patientImages = [];
+let activeDocFilter = 'all';
+let activeElementBeforeModal = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. Dynamically Load Sidebar
   await loadDoctorSidebar();
@@ -37,6 +51,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 5. Modal Controls
   initModals(patientId);
+
+  // 6. Photo Gallery controls
+  initDocGalleryEvents(patientId);
 });
 
 /**
@@ -423,6 +440,14 @@ function initTabs() {
       btn.classList.add('active');
       const tabName = btn.dataset.tab;
       document.getElementById(`tab-${tabName}`).classList.add('active');
+
+      if (tabName === 'gallery') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const patientId = urlParams.get('id');
+        if (patientId) {
+          fetchAndRenderPatientGallery(patientId);
+        }
+      }
     });
   });
 }
@@ -1227,19 +1252,6 @@ function formatDate(dateStr) {
 }
 
 /**
- * Utility: Escape HTML strings to prevent XSS injection
- */
-function escapeHtml(unsafe) {
-  if (!unsafe) return '';
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-/**
  * Fetch and Render past symptom logs for the patient
  */
 async function fetchAndRenderSymptomLogs(patientId) {
@@ -1308,24 +1320,24 @@ function renderSymptomLogs(logs) {
           <div>
             <strong>Pain Level:</strong> 
             <span class="status-pill" style="background-color: ${painColor}22; color: ${painColor}; border: 1px solid ${painColor}44; font-weight: 700; font-size: 11px; padding: 2px 6px; display: inline-block;">
-              ${l.pain_scale} / 10
+              ${escapeHtml(l.pain_scale)} / 10
             </span>
           </div>
           <div>
             <strong>Burning Sensation:</strong> 
             <span style="color: ${getSeverityColor(l.burning_sensation)}; font-weight: 600;">
-              ${l.burning_sensation}
+              ${escapeHtml(l.burning_sensation)}
             </span>
           </div>
           <div>
             <strong>Difficulty Opening Mouth:</strong> 
             <span style="color: ${getSeverityColor(l.difficulty_opening_mouth)}; font-weight: 600;">
-              ${l.difficulty_opening_mouth}
+              ${escapeHtml(l.difficulty_opening_mouth)}
             </span>
           </div>
           <div>
             <strong>Ulcer Duration:</strong> 
-            <span>${l.ulcer_duration} Days</span>
+            <span>${escapeHtml(l.ulcer_duration)} Days</span>
           </div>
           <div>
             <strong>Bleeding:</strong> 
@@ -1338,4 +1350,255 @@ function renderSymptomLogs(logs) {
       </div>
     `;
   }).join('');
+}
+
+/**
+ * Initialize Photo Gallery controls for the doctor
+ */
+function initDocGalleryEvents(patientId) {
+  const filterTabs = document.querySelectorAll('[data-doc-filter]');
+  filterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      filterTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeDocFilter = tab.getAttribute('data-doc-filter');
+      renderDoctorGallery();
+    });
+  });
+
+  const lightboxModal = document.getElementById('doc-lightbox-modal');
+  const btnCloseLightbox = document.getElementById('btn-close-doc-lightbox');
+  
+  if (btnCloseLightbox && lightboxModal) {
+    const closeLightbox = () => {
+      lightboxModal.classList.remove('active');
+      if (activeElementBeforeModal) {
+        activeElementBeforeModal.focus();
+      }
+    };
+
+    btnCloseLightbox.addEventListener('click', closeLightbox);
+
+    lightboxModal.addEventListener('click', (e) => {
+      if (e.target === lightboxModal) {
+        closeLightbox();
+      }
+    });
+
+    // Keyboard handlers
+    document.addEventListener('keydown', (e) => {
+      if (lightboxModal.classList.contains('active')) {
+        if (e.key === 'Escape') {
+          closeLightbox();
+          e.preventDefault();
+        } else if (e.key === 'Tab') {
+          const focusableElements = lightboxModal.querySelectorAll('input, select, textarea, button, [tabindex="0"]');
+          if (focusableElements.length > 0) {
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+
+            if (e.shiftKey) { // Shift + Tab
+              if (document.activeElement === firstElement) {
+                lastElement.focus();
+                e.preventDefault();
+              }
+            } else { // Tab
+              if (document.activeElement === lastElement) {
+                firstElement.focus();
+                e.preventDefault();
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  const notesForm = document.getElementById('doc-notes-form');
+  if (notesForm) {
+    notesForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const imageId = document.getElementById('doc-lightbox-image-id').value;
+      const doctorNotes = document.getElementById('doc-notes-textarea').value.trim();
+      const visibility = document.getElementById('doc-notes-visibility').value;
+
+      const errorAlert = document.getElementById('doc-notes-error');
+      const successAlert = document.getElementById('doc-notes-success');
+      const submitBtn = document.getElementById('btn-save-doc-notes');
+
+      if (errorAlert) errorAlert.style.display = 'none';
+      if (successAlert) successAlert.style.display = 'none';
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Saving...';
+
+      try {
+        const response = await apiRequest(`/patients/${patientId}/images/${imageId}/notes`, {
+          method: 'PATCH',
+          body: {
+            doctor_notes: doctorNotes,
+            doctor_notes_visibility: visibility
+          }
+        });
+
+        if (response.success) {
+          if (successAlert) {
+            successAlert.innerText = 'Notes updated successfully!';
+            successAlert.style.display = 'block';
+          }
+          const img = patientImages.find(i => i.id === imageId);
+          if (img) {
+            img.doctor_notes = doctorNotes;
+            img.doctor_notes_visibility = visibility;
+          }
+          renderDoctorGallery();
+          
+          setTimeout(() => {
+            if (successAlert) successAlert.style.display = 'none';
+            if (lightboxModal) lightboxModal.classList.remove('active');
+          }, 1000);
+        }
+      } catch (err) {
+        console.error('Error saving doctor notes:', err);
+        if (errorAlert) {
+          errorAlert.innerText = err.message || 'Failed to save notes.';
+          errorAlert.style.display = 'block';
+        }
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Save Notes';
+      }
+    });
+  }
+}
+
+/**
+ * Fetch and render patient images for doctor dashboard gallery
+ */
+async function fetchAndRenderPatientGallery(patientId) {
+  const container = document.getElementById('doctor-gallery-container');
+  if (!container) return;
+
+  try {
+    const response = await apiRequest(`/patients/${patientId}/images`);
+    patientImages = response.data?.images || [];
+    renderDoctorGallery();
+  } catch (err) {
+    console.error('Error loading patient gallery:', err);
+    container.innerHTML = `
+      <div style="color: var(--danger); font-size: 14px; text-align: center; padding: 24px; grid-column: 1 / -1;">
+        Failed to load patient photographs.
+      </div>
+    `;
+  }
+}
+
+/**
+ * Render doctor gallery list
+ */
+function renderDoctorGallery() {
+  const container = document.getElementById('doctor-gallery-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const filtered = patientImages.filter(img => {
+    if (activeDocFilter === 'all') return true;
+    return img.image_type === activeDocFilter;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 32px; grid-column: 1 / -1; border: 1px dashed var(--border-color); border-radius: 8px;">
+        No photographs found matching the filter.
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach(img => {
+    const card = document.createElement('div');
+    card.className = 'gallery-card';
+    card.style.cursor = 'pointer';
+    card.style.border = '1px solid var(--border-color)';
+    card.style.borderRadius = '8px';
+    card.style.overflow = 'hidden';
+    card.style.backgroundColor = '#ffffff';
+
+    let badgeClass = 'lesion';
+    if (img.image_type === 'Mouth Opening Image') badgeClass = 'opening';
+    else if (img.image_type === 'Progression Image') badgeClass = 'progression';
+
+    const uploadDateStr = new Date(img.uploaded_at).toLocaleDateString(undefined, {
+      year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    const hasNotes = img.doctor_notes && img.doctor_notes.trim().length > 0;
+    const isPrivate = img.doctor_notes_visibility === 'private';
+
+    card.innerHTML = `
+      <div class="gallery-card-media" style="position: relative; height: 160px; background-color: #f1f4f8;">
+        <img src="${img.file_url}" alt="${img.image_type}" style="width: 100%; height: 100%; object-fit: cover;">
+        <span class="gallery-card-badge ${badgeClass}" style="position: absolute; top: 10px; left: 10px;">${img.image_type}</span>
+      </div>
+      <div class="gallery-card-details" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <span class="gallery-card-date" style="font-size: 11px; color: var(--text-muted);">${uploadDateStr}</span>
+        <p class="gallery-card-notes" style="font-size: 12.5px; color: var(--text-dark); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; line-height: 1.4;">
+          ${escapeHtml(img.description) || 'No patient annotations provided.'}
+        </p>
+        <div style="border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px; display: flex; align-items: center; justify-content: space-between; font-size: 11.5px;">
+          ${hasNotes 
+            ? `<span style="color: ${isPrivate ? '#e11d48' : 'var(--primary)'}; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+                Feedback (${isPrivate ? 'Private' : 'Public'})
+               </span>`
+            : `<span style="color: var(--text-muted); font-style: italic;">No feedback yet</span>`
+          }
+        </div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      openDoctorLightbox(img);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+/**
+ * Open the doctor gallery lightbox modal
+ */
+function openDoctorLightbox(img) {
+  const lightboxModal = document.getElementById('doc-lightbox-modal');
+  if (!lightboxModal) return;
+
+  activeElementBeforeModal = document.activeElement;
+
+  document.getElementById('doc-lightbox-img').src = img.file_url;
+  document.getElementById('doc-lightbox-badge').innerText = img.image_type;
+
+  const badge = document.getElementById('doc-lightbox-badge');
+  badge.className = 'lightbox-badge';
+  if (img.image_type === 'Mouth Opening Image') badge.classList.add('opening');
+  else if (img.image_type === 'Progression Image') badge.classList.add('progression');
+
+  const dateStr = new Date(img.uploaded_at).toLocaleDateString(undefined, {
+    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+  document.getElementById('doc-lightbox-date').innerText = `Uploaded on ${dateStr}`;
+  document.getElementById('doc-lightbox-patient-desc').innerText = img.description || 'No patient annotations provided.';
+
+  document.getElementById('doc-lightbox-image-id').value = img.id;
+  document.getElementById('doc-notes-textarea').value = img.doctor_notes || '';
+  document.getElementById('doc-notes-visibility').value = img.doctor_notes_visibility || 'public';
+
+  const errorAlert = document.getElementById('doc-notes-error');
+  const successAlert = document.getElementById('doc-notes-success');
+  if (errorAlert) errorAlert.style.display = 'none';
+  if (successAlert) successAlert.style.display = 'none';
+
+  lightboxModal.classList.add('active');
+  const btnClose = document.getElementById('btn-close-doc-lightbox');
+  if (btnClose) btnClose.focus();
 }

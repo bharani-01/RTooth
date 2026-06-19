@@ -42,6 +42,14 @@
   --radius-md: 12px;
   --radius-lg: 20px;
   --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Brand Theme Variables (copied from landing.css for global availability) */
+  --primary-brand: #9e1a22; /* Premium MNC Red */
+  --primary-brand-hover: #80141a;
+  --primary-brand-light: #fff5f5;
+  --dark-slate: #0f172a;
+  --light-slate: #f8fafc;
+  --border-slate: #e2e8f0;
 }
 
 /* Reset */
@@ -174,6 +182,12 @@ header {
   right: -2px;
   box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 6px var(--success);
   animation: beacon-logo 2s infinite;
+}
+
+.logo-icon-container.beacon-offline::after {
+  background-color: var(--danger);
+  box-shadow: 0 0 0 2px var(--bg-secondary), 0 0 6px var(--danger);
+  animation: none;
 }
 
 .logo:hover .logo-icon-container {
@@ -1341,3 +1355,55 @@ footer {
   border-radius: var(--radius-sm);
 }
 
+
+
+/* Brand Theme Buttons */
+.btn-brand-primary {
+  background-color: var(--primary-brand);
+  color: white;
+  padding: 12px 28px;
+  border-radius: 9px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14.5px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(158, 26, 34, 0.15);
+  transition: var(--transition-smooth);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-brand-primary:hover {
+  background-color: var(--primary-brand-hover);
+  box-shadow: 0 6px 22px rgba(158, 26, 34, 0.25);
+  transform: translateY(-1px);
+  color: white; /* Ensure text remains white on hover */
+}
+
+.btn-brand-secondary {
+  background-color: #ffffff;
+  color: var(--dark-slate);
+  padding: 12px 28px;
+  border-radius: 9px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14.5px;
+  border: 1px solid var(--border-slate);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-brand-secondary:hover {
+  background-color: var(--light-slate);
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}

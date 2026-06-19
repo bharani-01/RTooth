@@ -28,3 +28,21 @@ export const supabaseAdmin = supabaseServiceKey
       }
     })
   : null;
+
+/**
+ * Returns a Supabase client scoped to the authenticated user's token, forcing RLS.
+ */
+export const getSupabaseUserClient = (token) => {
+  if (!token) return supabase;
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    },
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  });
+};

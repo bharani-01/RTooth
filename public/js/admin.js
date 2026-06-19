@@ -1,4 +1,4 @@
-import { apiRequest, getUserProfile, logoutUser } from './api.js';
+import { apiRequest, getUserProfile, logoutUser, escapeHtml } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. Dynamically Load Sidebar
@@ -197,19 +197,26 @@ function renderDoctorDirectoryTable(doctorsList) {
     const patientCount = doc.patient_count || 0;
     const storageText = formatBytes(doc.total_file_size_bytes || 0);
 
+    const fName = escapeHtml(doc.first_name);
+    const lName = escapeHtml(doc.last_name);
+    const spec = escapeHtml(doc.specialization);
+    const lic = escapeHtml(doc.license_number);
+    const email = escapeHtml(doc.email);
+    const phone = doc.phone ? escapeHtml(doc.phone) : 'N/A';
+
     return `
       <tr>
-        <td data-label="Doctor"><strong>Dr. ${doc.first_name} ${doc.last_name}</strong></td>
-        <td data-label="Specialization"><span style="font-weight: 500; color: var(--primary);">${doc.specialization}</span></td>
-        <td data-label="License Number"><code>${doc.license_number}</code></td>
-        <td data-label="Email">${doc.email}</td>
-        <td data-label="Phone">${doc.phone || 'N/A'}</td>
+        <td data-label="Doctor"><strong>Dr. ${fName} ${lName}</strong></td>
+        <td data-label="Specialization"><span style="font-weight: 500; color: var(--primary);">${spec}</span></td>
+        <td data-label="License Number"><code>${lic}</code></td>
+        <td data-label="Email">${email}</td>
+        <td data-label="Phone">${phone}</td>
         <td data-label="Patients Assigned" style="font-weight: 600; text-align: center;">${patientCount}</td>
         <td data-label="Storage Occupied" style="font-family: monospace;">${storageText}</td>
         <td data-label="Actions" style="text-align: center;">
           <div style="display: inline-flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap;">
             <a href="/admin/doctor_profile?id=${doc.id}" class="btn-info-action" style="padding: 6px 12px; font-size: 13px; font-weight: 600;">View Profile</a>
-            <button type="button" class="btn-reset-action send-reset-link-btn" data-id="${doc.id}" data-name="Dr. ${doc.first_name} ${doc.last_name}" style="background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger); border-radius: 4px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: var(--font-heading);">Reset Pass</button>
+            <button type="button" class="btn-reset-action send-reset-link-btn" data-id="${doc.id}" data-name="Dr. ${fName} ${lName}" style="background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger); border-radius: 4px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: var(--font-heading);">Reset Pass</button>
           </div>
         </td>
       </tr>
@@ -425,6 +432,7 @@ function initAuditLogsPage() {
   const modal = document.getElementById('audit-details-modal');
   const closeModalBtn = document.getElementById('close-modal-btn');
   const closeModalFooterBtn = document.getElementById('close-modal-footer-btn');
+  let lastFocusEl = null;
 
   if (!tableBody) return;
 
@@ -488,12 +496,36 @@ function initAuditLogsPage() {
   // Modal close handlers
   const closeModal = () => {
     modal.classList.remove('show');
+    lastFocusEl?.focus();
   };
   
   closeModalBtn.addEventListener('click', closeModal);
   closeModalFooterBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
+  });
+
+  // Modal keydown for Escape and Tab focus trap
+  modal.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      e.preventDefault();
+      return;
+    }
+    if (e.key === 'Tab') {
+      const focusEls = [closeModalBtn, closeModalFooterBtn];
+      if (e.shiftKey) { /* Shift + Tab */
+        if (document.activeElement === focusEls[0] || !focusEls.includes(document.activeElement)) {
+          focusEls[focusEls.length - 1].focus();
+          e.preventDefault();
+        }
+      } else { /* Tab */
+        if (document.activeElement === focusEls[focusEls.length - 1] || !focusEls.includes(document.activeElement)) {
+          focusEls[0].focus();
+          e.preventDefault();
+        }
+      }
+    }
   });
 
   // Initial Fetch
@@ -535,7 +567,7 @@ function initAuditLogsPage() {
         <tr>
           <td colspan="6" style="text-align: center; color: var(--danger); padding: 32px;">
             <div style="font-weight: 600;">Failed to retrieve audit log cache</div>
-            <div style="font-size: 12px; margin-top: 4px;">${err.message || 'Ensure db_audit_logs.sql schema is run.'}</div>
+            <div style="font-size: 12px; margin-top: 4px;">${escapeHtml(err.message || 'Ensure db_audit_logs.sql schema is run.')}</div>
           </td>
         </tr>
       `;
@@ -686,8 +718,8 @@ function initAuditLogsPage() {
       const dateStr = formatAuditTimestamp(log.created_at);
       const methodClass = getMethodBadgeClass(log.method);
       const statusClass = getStatusCodeClass(log.status_code);
-      const emailText = log.user_email || '<span style="color:var(--text-light);font-style:italic;">anonymous</span>';
-      const roleText = log.user_role ? `<span class="status-pill status-pending" style="padding: 2px 6px; font-size: 10px; margin-left: 4px;">${log.user_role}</span>` : '';
+      const emailText = log.user_email ? escapeHtml(log.user_email) : '<span style="color:var(--text-light);font-style:italic;">anonymous</span>';
+      const roleText = log.user_role ? `<span class="status-pill status-pending" style="padding: 2px 6px; font-size: 10px; margin-left: 4px;">${escapeHtml(log.user_role)}</span>` : '';
 
       return `
         <tr>
@@ -696,29 +728,29 @@ function initAuditLogsPage() {
             <div style="display:flex; flex-direction:column;">
               <span style="font-weight:500;">${emailText}</span>
               <span style="font-size:11px; color:var(--text-muted); font-family:monospace; margin-top:2px;">
-                ${log.user_id ? log.user_id.substring(0, 8) + '...' : 'no-session'} ${roleText}
+                ${log.user_id ? escapeHtml(log.user_id.substring(0, 8)) + '...' : 'no-session'} ${roleText}
               </span>
             </div>
           </td>
           <td data-label="Action">
             <div style="display:flex; flex-direction:column; gap:4px;">
-              <span style="font-weight:600; color:var(--text-dark);">${log.action}</span>
+              <span style="font-weight:600; color:var(--text-dark);">${escapeHtml(log.action)}</span>
               <span style="font-size:12px; color:var(--text-muted); font-family:monospace;">
-                <span class="method-badge ${methodClass}">${log.method}</span> 
-                ${log.accessed_route.split('?')[0]}
+                <span class="method-badge ${methodClass}">${escapeHtml(log.method)}</span> 
+                ${escapeHtml(log.accessed_route.split('?')[0])}
               </span>
             </div>
           </td>
           <td data-label="Status" style="text-align: center;">
             <div style="display:flex; flex-direction:column; align-items:center;">
-              <span class="status-code ${statusClass}">${log.status_code}</span>
+              <span class="status-code ${statusClass}">${escapeHtml(log.status_code)}</span>
               <span style="font-size:11px; color:var(--text-light); margin-top:2px;">${log.response_time_ms ? log.response_time_ms + 'ms' : '-'}</span>
             </div>
           </td>
           <td data-label="Location">
             <div style="display:flex; flex-direction:column;">
-              <span style="font-weight:500;">${log.geo_location}</span>
-              <span style="font-size:11px; color:var(--text-muted); font-family:monospace; margin-top:2px;">${log.ip_address}</span>
+              <span style="font-weight:500;">${escapeHtml(log.geo_location)}</span>
+              <span style="font-size:11px; color:var(--text-muted); font-family:monospace; margin-top:2px;">${escapeHtml(log.ip_address)}</span>
             </div>
           </td>
           <td data-label="Details" style="text-align: center;">
@@ -746,18 +778,19 @@ function initAuditLogsPage() {
   }
 
   function showAuditModal(log) {
+    lastFocusEl = document.activeElement;
     document.getElementById('modal-action-title').innerText = log.action;
-    document.getElementById('modal-log-id').innerHTML = `<code>${log.id}</code>`;
+    document.getElementById('modal-log-id').innerHTML = `<code>${escapeHtml(log.id)}</code>`;
     document.getElementById('modal-timestamp').innerText = new Date(log.created_at).toLocaleString();
     document.getElementById('modal-email').innerText = log.user_email || 'anonymous';
-    document.getElementById('modal-role').innerHTML = log.user_role ? `<span class="status-pill status-pending">${log.user_role}</span>` : 'none';
-    document.getElementById('modal-route').innerHTML = `<code>${log.method} ${log.accessed_route}</code>`;
+    document.getElementById('modal-role').innerHTML = log.user_role ? `<span class="status-pill status-pending">${escapeHtml(log.user_role)}</span>` : 'none';
+    document.getElementById('modal-route').innerHTML = `<code>${escapeHtml(log.method)} ${escapeHtml(log.accessed_route)}</code>`;
     
     const statusClass = getStatusCodeClass(log.status_code);
     const timeText = log.response_time_ms ? ` (Duration: ${log.response_time_ms}ms)` : '';
-    document.getElementById('modal-status-dur').innerHTML = `<span class="status-code ${statusClass}">${log.status_code}</span>${timeText}`;
+    document.getElementById('modal-status-dur').innerHTML = `<span class="status-code ${statusClass}">${escapeHtml(log.status_code)}</span>${escapeHtml(timeText)}`;
     
-    document.getElementById('modal-ip').innerHTML = `<code>${log.ip_address}</code>`;
+    document.getElementById('modal-ip').innerHTML = `<code>${escapeHtml(log.ip_address)}</code>`;
     document.getElementById('modal-location').innerText = log.geo_location;
     document.getElementById('modal-user-agent').innerText = log.user_agent;
 
@@ -769,6 +802,7 @@ function initAuditLogsPage() {
     }
 
     modal.classList.add('show');
+    closeModalBtn.focus();
   }
 }
 
@@ -1100,12 +1134,12 @@ function initOverviewLiveWidgets() {
     const timestamp = new Date(log.created_at || Date.now()).toLocaleTimeString([], { hour12: false });
     const lineEl = document.createElement('div');
     lineEl.className = 'terminal-line';
-    const role = log.user_role || 'anonymous';
-    const email = log.user_email || 'anonymous';
-    const method = log.method || 'GET';
-    const route = log.accessed_route ? log.accessed_route.split('?')[0] : '';
-    const action = log.action || 'Unknown Event';
-    const office = log.geo_location || 'Unknown Location';
+    const role = escapeHtml(log.user_role || 'anonymous');
+    const email = escapeHtml(log.user_email || 'anonymous');
+    const method = escapeHtml(log.method || 'GET');
+    const route = escapeHtml(log.accessed_route ? log.accessed_route.split('?')[0] : '');
+    const action = escapeHtml(log.action || 'Unknown Event');
+    const office = escapeHtml(log.geo_location || 'Unknown Location');
 
     lineEl.innerHTML = `
       <span class="timestamp">[${timestamp}]</span> 
@@ -1135,6 +1169,7 @@ function initOverviewLiveWidgets() {
   let accumulatedRequests = 0;
 
   ws.onopen = () => {
+    document.querySelector('.logo-icon-container')?.classList.remove('beacon-offline');
     addConsoleLine({
       created_at: new Date().toISOString(),
       user_role: 'system',
@@ -1164,6 +1199,7 @@ function initOverviewLiveWidgets() {
   };
 
   ws.onclose = () => {
+    document.querySelector('.logo-icon-container')?.classList.add('beacon-offline');
     addConsoleLine({
       created_at: new Date().toISOString(),
       user_role: 'system',
@@ -1319,11 +1355,11 @@ async function initDoctorProfilePage() {
 
         patientsTableBody.innerHTML = filtered.map(pat => `
           <tr>
-            <td data-label="Patient Code"><strong>${pat.patient_code}</strong></td>
-            <td data-label="Full Name"><strong>${pat.first_name} ${pat.last_name}</strong></td>
-            <td data-label="Gender & Age">${pat.gender} (DOB: ${pat.date_of_birth || 'N/A'})</td>
+            <td data-label="Patient Code"><strong>${escapeHtml(pat.patient_code)}</strong></td>
+            <td data-label="Full Name"><strong>${escapeHtml(pat.first_name)} ${escapeHtml(pat.last_name)}</strong></td>
+            <td data-label="Gender & Age">${escapeHtml(pat.gender)} (DOB: ${escapeHtml(pat.date_of_birth || 'N/A')})</td>
             <td data-label="Cancer Stage">
-              <span class="doctor-code-badge" style="background:#fff7ed;color:#ea580c;border:1px solid #ffedd5;">${pat.cancer_stage}</span>
+              <span class="doctor-code-badge" style="background:#fff7ed;color:#ea580c;border:1px solid #ffedd5;">${escapeHtml(pat.cancer_stage)}</span>
             </td>
             <td data-label="Clinical Status">
               <span class="status-pill ${pat.status === 'active' ? 'status-active' : 'status-pending'}">
@@ -1361,16 +1397,16 @@ async function initDoctorProfilePage() {
               <td data-label="Uploaded Date">${uploadDateStr}</td>
               <td data-label="File Name">
                 <div style="display:flex; flex-direction:column;">
-                  <strong>${file.file_name}</strong>
-                  <span style="font-size:11px; color:var(--text-muted); margin-top:2px;">Patient: ${file.patient_name} (${file.patient_id.substring(0,8)}...)</span>
+                  <strong>${escapeHtml(file.file_name)}</strong>
+                  <span style="font-size:11px; color:var(--text-muted); margin-top:2px;">Patient: ${escapeHtml(file.patient_name)} (${escapeHtml(file.patient_id.substring(0,8))}...)</span>
                 </div>
               </td>
               <td data-label="Report Type">
-                <span class="status-pill status-pending" style="padding:2px 8px; font-size:11px;">${file.report_type}</span>
+                <span class="status-pill status-pending" style="padding:2px 8px; font-size:11px;">${escapeHtml(file.report_type)}</span>
               </td>
               <td data-label="File Size" style="font-family: monospace;">${sizeText}</td>
               <td data-label="Actions" style="text-align: center;">
-                <a href="${file.file_url}" target="_blank" class="btn-download-file">
+                <a href="${escapeHtml(file.file_url)}" target="_blank" class="btn-download-file">
                   <svg style="width:12px; height:12px; margin-right:4px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                   Download
                 </a>
@@ -1703,8 +1739,8 @@ function renderUsersTable(usersList) {
   }
 
   tableBody.innerHTML = usersList.map(u => {
-    const initials = `${(u.first_name || 'U')[0].toUpperCase()}${(u.last_name || 'U')[0].toUpperCase()}`;
-    const name = `${u.first_name} ${u.last_name}`;
+    const initials = `${(escapeHtml(u.first_name) || 'U')[0].toUpperCase()}${(escapeHtml(u.last_name) || 'U')[0].toUpperCase()}`;
+    const name = `${escapeHtml(u.first_name)} ${escapeHtml(u.last_name)}`;
     const statusText = u.status === 'banned' ? 'Suspended' : 'Active';
     const statusClass = u.status === 'banned' ? 'banned' : 'active';
     const createdDate = new Date(u.created_at).toLocaleDateString([], { dateStyle: 'medium' });
@@ -1738,8 +1774,8 @@ function renderUsersTable(usersList) {
         </td>
         <td data-label="Contact Info">
           <div style="font-size:13px; line-height: 1.4;">
-            <strong>Email:</strong> ${u.email}<br>
-            <strong>Phone:</strong> ${u.phone || 'N/A'}
+            <strong>Email:</strong> ${escapeHtml(u.email)}<br>
+            <strong>Phone:</strong> ${escapeHtml(u.phone || 'N/A')}
           </div>
         </td>
         <td data-label="Status">

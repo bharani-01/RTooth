@@ -21,26 +21,56 @@ window.fetch = async function (...args) {
 
 const API_BASE = '/api/v1';
 
+/**
+ * Escapes HTML special characters to prevent stored XSS in innerHTML templates.
+ * MUST be called on ALL server-supplied strings before inserting into innerHTML.
+ */
+export const escapeHtml = (str) => {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+};
+
 export const getSessionToken = () => {
-  return localStorage.getItem('supabase_auth_token');
+  return sessionStorage.getItem('supabase_auth_token');
 };
 
 export const setSessionToken = (token) => {
-  localStorage.setItem('supabase_auth_token', token);
+  sessionStorage.setItem('supabase_auth_token', token);
 };
 
 export const clearSessionToken = () => {
-  localStorage.removeItem('supabase_auth_token');
-  localStorage.removeItem('user_profile');
+  sessionStorage.removeItem('supabase_auth_token');
+  sessionStorage.removeItem('user_profile');
 };
 
 export const getUserProfile = () => {
-  const profile = localStorage.getItem('user_profile');
+  const profile = sessionStorage.getItem('user_profile');
   return profile ? JSON.parse(profile) : null;
 };
 
 export const setUserProfile = (profile) => {
-  localStorage.setItem('user_profile', JSON.stringify(profile));
+  if (!profile) return;
+  // Only cache what the client-side guard needs. Never persist PHI client-side.
+  const safeProfile = {
+    id: profile.id,
+    role: profile.role,
+    first_name: profile.first_name,
+    last_name: profile.last_name,
+    email: profile.email,
+    status: profile.status,
+    // Doctor-specific (non-sensitive)
+    doctor_code: profile.doctor_code || undefined,
+    // Patient-specific (non-sensitive)
+    patient_code: profile.patient_code || undefined,
+    // Admin-specific
+    admin_code: profile.admin_code || undefined,
+  };
+  sessionStorage.setItem('user_profile', JSON.stringify(safeProfile));
 };
 
 /**

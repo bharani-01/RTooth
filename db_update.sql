@@ -47,4 +47,28 @@ ALTER TABLE public.checkups ADD COLUMN IF NOT EXISTS followup_notes TEXT;
 -- 7. Add status column to profiles table to track account bans and states
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'draft', 'banned'));
 
+-- 8. Create patient_images table and enable RLS
+CREATE TABLE IF NOT EXISTS public.patient_images (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  patient_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  image_type TEXT NOT NULL CHECK (image_type IN ('Lesion Photograph', 'Mouth Opening Image', 'Progression Image')),
+  file_name TEXT NOT NULL,
+  file_url TEXT NOT NULL,
+  description TEXT,
+  doctor_notes TEXT,
+  doctor_notes_visibility TEXT NOT NULL DEFAULT 'public' CHECK (doctor_notes_visibility IN ('public', 'private')),
+  uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
 
+ALTER TABLE public.patient_images ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow patient images read/write for authenticated users" ON public.patient_images;
+CREATE POLICY "Allow patient images read/write for authenticated users" ON public.patient_images FOR ALL USING (auth.uid() IS NOT NULL);
+
+-- 9. Create storage bucket SELECT policies (Enables public read/download access via URLs)
+-- Run this in your Supabase SQL Editor to allow public access to uploaded files
+DROP POLICY IF EXISTS "Allow public SELECT on patient-images" ON storage.objects;
+CREATE POLICY "Allow public SELECT on patient-images" ON storage.objects FOR SELECT USING (bucket_id = 'patient-images');
+
+DROP POLICY IF EXISTS "Allow public SELECT on patient-reports" ON storage.objects;
+CREATE POLICY "Allow public SELECT on patient-reports" ON storage.objects FOR SELECT USING (bucket_id = 'patient-reports');

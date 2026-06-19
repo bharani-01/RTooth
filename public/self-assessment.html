@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Oral Health Self-Assessment — RTooth</title>
+  <meta name="description"
+    content="Use RTooth's secure clinical screening wizard to self-assess oral cancer risk factors, mucosal lesion symptoms, and receive recommendation summaries.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/self_assessment.css">
+</head>
+
+<body>
+
+  <!-- Header / Navigation -->
+  <header>
+    <div class="container nav-bar">
+      <a href="/" class="logo" id="header-logo">
+        <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+      </a>
+      <nav class="nav-links">
+        <a href="/#features" class="nav-link">Capabilities</a>
+        <a href="/#workflow" class="nav-link">Workflow</a>
+        <a href="/self-assessment" class="nav-link active">Self Assessment</a>
+        <a href="/blog" class="nav-link">Education</a>
+        <a href="/login.html" class="btn-brand-primary" id="nav-login-btn"
+          style="padding: 8px 16px; font-size: 13.5px;">Portal Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="container" style="padding-top: 40px;">
+    
+    <div class="assessment-wrapper">
+      
+      <!-- Wizard Progress Header -->
+      <div class="assessment-header" id="wizard-header">
+        <h1 class="assessment-title">Oral Health Screening Tool</h1>
+        <p class="assessment-desc">Answer 4 quick lifestyle and symptom questions to calculate your mucosal health risk index and receive clinical guidelines. This screening is secure and anonymous.</p>
+        
+        <!-- Step Indicators -->
+        <div class="wizard-steps-indicator">
+          <div class="step-indicator-item active" id="indicator-1">
+            <span class="step-num">1</span>
+            <span class="step-label">Habits</span>
+          </div>
+          <div class="step-indicator-line"></div>
+          <div class="step-indicator-item" id="indicator-2">
+            <span class="step-num">2</span>
+            <span class="step-label">Sores</span>
+          </div>
+          <div class="step-indicator-line"></div>
+          <div class="step-indicator-item" id="indicator-3">
+            <span class="step-num">3</span>
+            <span class="step-label">Symptoms</span>
+          </div>
+          <div class="step-indicator-line"></div>
+          <div class="step-indicator-item" id="indicator-4">
+            <span class="step-num">4</span>
+            <span class="step-label">Lifestyle</span>
+          </div>
+        </div>
+
+        <div class="wizard-progress-track">
+          <div class="wizard-progress-bar" id="wizard-progress"></div>
+        </div>
+      </div>
+
+      <!-- STEP 1: TOBACCO HABITS -->
+      <div class="step-container">
+        
+        <div class="wizard-step active" id="step-1">
+          <h2 class="step-question">Step 1 of 4: What are your tobacco usage habits?</h2>
+          <div class="option-grid">
+            
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="radio" name="tobacco" value="heavy" data-points="5">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Daily User</span>
+                <span class="option-desc">I smoke cigarettes/cigars, chew tobacco, or vape daily.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="radio" name="tobacco" value="moderate" data-points="2">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Occasional User</span>
+                <span class="option-desc">I smoke or use tobacco products occasionally (socially).</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="radio" name="tobacco" value="former" data-points="1">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Former User</span>
+                <span class="option-desc">I used to use tobacco, but I successfully quit.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="radio" name="tobacco" value="never" data-points="0">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Never Used</span>
+                <span class="option-desc">I have never used any tobacco or nicotine products.</span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- STEP 2: ORAL LESIONS & SORES -->
+        <div class="wizard-step" id="step-2">
+          <h2 class="step-question">Step 2 of 4: Have you noticed any patches or sores inside your mouth?</h2>
+          <div class="option-grid">
+            
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="checkbox" name="sores" value="patches" data-points="6">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">White or Red Patches</span>
+                <span class="option-desc">I have visible white, red, or mixed velvety patches on my tongue, cheeks, or gums.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="checkbox" name="sores" value="ulcers" data-points="5">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Persistent Sore or Ulcer</span>
+                <span class="option-desc">I have a mouth sore or ulcer that has lasted for more than 14 days without healing.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="checkbox" name="sores" value="bleeding" data-points="4">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Bleeding Sore</span>
+                <span class="option-desc">I have a sore or lump inside my mouth that bleeds easily when touched or brushed.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="checkbox" name="sores" value="none" data-points="0" id="sores-none">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">None of the Above</span>
+                <span class="option-desc">My oral mucosal tissues appear healthy, with no sores or patches.</span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- STEP 3: FUNCTIONAL SYMPTOMS -->
+        <div class="wizard-step" id="step-3">
+          <h2 class="step-question">Step 3 of 4: Are you experiencing any swallowing or structural pain?</h2>
+          <div class="option-grid">
+            
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="checkbox" name="symptoms" value="swallowing" data-points="4">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Difficulty Swallowing (Dysphagia)</span>
+                <span class="option-desc">I experience pain, burning, or a feeling of blockage when swallowing food or liquids.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="checkbox" name="symptoms" value="jaw" data-points="3">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Difficulty Opening Mouth (Trismus)</span>
+                <span class="option-desc">My jaw feels stiff, or I have difficulty opening my mouth fully.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="checkbox" name="symptoms" value="voice" data-points="3">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Chronic Hoarseness or Voice Changes</span>
+                <span class="option-desc">My voice has become raspy or hoarse, and it has lasted for more than 2 weeks.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="checkbox" name="symptoms" value="none" data-points="0" id="sym-none">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">None of the Above</span>
+                <span class="option-desc">I have no pain or functional issues chewing, swallowing, or speaking.</span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- STEP 4: ALCOHOL & DEMOGRAPHICS -->
+        <div class="wizard-step" id="step-4">
+          <h2 class="step-question">Step 4 of 4: How often do you consume alcoholic beverages?</h2>
+          <div class="option-grid">
+            
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="radio" name="alcohol" value="heavy" data-points="4">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Frequent (Heavy)</span>
+                <span class="option-desc">I consume 3 or more alcoholic drinks daily.</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="radio" name="alcohol" value="moderate" data-points="2">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Moderate (Occasional)</span>
+                <span class="option-desc">I drink alcohol on weekends or occasionally (1-4 drinks a week).</span>
+              </div>
+            </label>
+
+            <label class="custom-option" onclick="selectOption(this)">
+              <input type="radio" name="alcohol" value="rare" data-points="0">
+              <span class="option-indicator"></span>
+              <div class="option-text-wrapper">
+                <span class="option-title">Rarely / Never</span>
+                <span class="option-desc">I rarely drink alcohol, or I am completely sober.</span>
+              </div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- RESULTS DISPLAY PANEL -->
+        <div class="results-panel" id="results-panel">
+          
+          <div class="risk-badge-box">
+            <span class="risk-badge" id="result-badge">Assessment Ready</span>
+            
+            <!-- Risk Gauge Meter -->
+            <div class="risk-gauge-container">
+              <div class="risk-gauge-track">
+                <div class="risk-gauge-fill" id="risk-gauge-fill"></div>
+              </div>
+              <div class="risk-gauge-markers">
+                <span class="marker-low">Low</span>
+                <span class="marker-mod">Moderate</span>
+                <span class="marker-high">High</span>
+              </div>
+            </div>
+
+            <h2 class="risk-title" id="result-title">Calculating Score...</h2>
+            <p class="risk-summary-text" id="result-summary">Processing your responses based on standard clinical risk scoring matrices.</p>
+          </div>
+
+          <div class="clinical-warning-banner" id="warning-box">
+            <svg class="warning-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <div class="warning-body">
+              <span>Important Medical Disclaimer</span>
+              This self-assessment is an educational screening tool and does NOT replace a professional diagnosis or biopsy by a qualified oncologist, surgeon, or dentist.
+            </div>
+          </div>
+
+          <div class="recommendations-box">
+            <h3 class="recommendations-title">Recommended Action Plan</h3>
+            <div class="rec-list" id="rec-list">
+              <!-- Dynamically populated recommendation cards -->
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:center; gap:16px;">
+            <button class="btn btn-brand-primary" onclick="window.print()" style="font-size:13.5px; padding:10px 20px;">Print Report</button>
+            <a href="/blog" class="btn-brand-secondary" style="font-size:13.5px; padding:10px 20px;">Access Education Hub</a>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Wizard Buttons -->
+      <div class="wizard-controls" id="wizard-controls">
+        <button class="btn-wizard-back" id="back-btn" disabled>Back Step</button>
+        <button class="btn-brand-primary" id="next-btn" style="font-size: 13.5px; padding: 10px 20px;">Next Step</button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container"
+      style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 24px; text-align: left;">
+      <div>
+        <a href="/" class="logo" style="margin-bottom: 12px; display: inline-flex;">
+          <img src="/images/rtooth_logo.png" alt="RTooth" style="height: 32px;">
+        </a>
+        <p style="font-size: 13px; max-width: 280px; color: var(--text-muted); line-height: 1.5;">Enterprise digital clinic solutions for oncology diagnostics and patient compliance tracking.</p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Product</h4>
+        <p style="margin-bottom: 6px;"><a href="/#features" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Capabilities</a></p>
+        <p style="margin-bottom: 6px;"><a href="/#workflow" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Workflow</a></p>
+        <p><a href="/login.html" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Portal Sign In</a></p>
+      </div>
+      <div>
+        <h4 style="font-size: 12px; color: var(--dark-slate); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Interactive Tools</h4>
+        <p style="margin-bottom: 6px;"><a href="/self-assessment" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Self Assessment</a></p>
+        <p><a href="/blog" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">Education Hub</a></p>
+      </div>
+    </div>
+    <div class="container" style="border-top: 1px solid var(--border-slate); margin-top: 36px; padding-top: 20px; text-align: center; font-size: 12.5px; color: var(--text-light);">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Wizard Controller JavaScript -->
+  <script>
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    const backBtn = document.getElementById('back-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const progressBar = document.getElementById('wizard-progress');
+    const wizardControls = document.getElementById('wizard-controls');
+    const wizardHeader = document.getElementById('wizard-header');
+
+    // Handle styling toggles on click
+    function selectOption(labelElement) {
+      const step = labelElement.closest('.wizard-step');
+      const input = labelElement.querySelector('input');
+      
+      if (input.type === 'radio') {
+        // Unselect all other options in this step
+        step.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+        labelElement.classList.add('selected');
+      } else if (input.type === 'checkbox') {
+        // Toggle selected styling
+        if (input.checked) {
+          labelElement.classList.add('selected');
+          
+          // If checking "None of the Above", uncheck everything else in this step
+          if (input.id === 'sores-none' || input.id === 'sym-none') {
+            step.querySelectorAll('.custom-option').forEach(opt => {
+              const otherInput = opt.querySelector('input');
+              if (otherInput !== input) {
+                otherInput.checked = false;
+                opt.classList.remove('selected');
+              }
+            });
+          } else {
+            // Uncheck "None of the Above" if selecting something else
+            const noneInput = step.querySelector('#sores-none, #sym-none');
+            if (noneInput) {
+              noneInput.checked = false;
+              noneInput.closest('.custom-option').classList.remove('selected');
+            }
+          }
+        } else {
+          labelElement.classList.remove('selected');
+        }
+      }
+    }
+
+    // Wizard Nav controls
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < totalSteps) {
+        // Ensure at least one selection is made
+        const activeStep = document.getElementById(`step-${currentStep}`);
+        const inputs = activeStep.querySelectorAll('input');
+        let selected = false;
+        inputs.forEach(inp => {
+          if (inp.checked) selected = true;
+        });
+
+        if (!selected) {
+          alert('Please select an option to proceed.');
+          return;
+        }
+
+        // Move step
+        document.getElementById(`step-${currentStep}`).classList.remove('active');
+        currentStep++;
+        document.getElementById(`step-${currentStep}`).classList.add('active');
+        
+        backBtn.removeAttribute('disabled');
+        updateProgressBar();
+
+        if (currentStep === totalSteps) {
+          nextBtn.innerText = 'Submit Assessment';
+        }
+      } else {
+        // Final submit click
+        const activeStep = document.getElementById(`step-${currentStep}`);
+        const inputs = activeStep.querySelectorAll('input');
+        let selected = false;
+        inputs.forEach(inp => {
+          if (inp.checked) selected = true;
+        });
+        if (!selected) {
+          alert('Please select an option to proceed.');
+          return;
+        }
+
+        calculateRisk();
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      if (currentStep > 1) {
+        document.getElementById(`step-${currentStep}`).classList.remove('active');
+        currentStep--;
+        document.getElementById(`step-${currentStep}`).classList.add('active');
+        
+        nextBtn.innerText = 'Next Step';
+        updateProgressBar();
+
+        if (currentStep === 1) {
+          backBtn.setAttribute('disabled', 'true');
+        }
+      }
+    });
+
+    function updateProgressBar() {
+      progressBar.style.transform = `scaleX(${currentStep / totalSteps})`;
+
+      // Update step circles active states
+      for (let i = 1; i <= totalSteps; i++) {
+        const ind = document.getElementById(`indicator-${i}`);
+        if (ind) {
+          if (i === currentStep) {
+            ind.className = 'step-indicator-item active';
+          } else if (i < currentStep) {
+            ind.className = 'step-indicator-item completed';
+          } else {
+            ind.className = 'step-indicator-item';
+          }
+        }
+      }
+    }
+
+    function calculateRisk() {
+      let totalPoints = 0;
+      const checkedInputs = document.querySelectorAll('input:checked');
+      
+      checkedInputs.forEach(input => {
+        totalPoints += parseInt(input.getAttribute('data-points') || '0');
+      });
+
+      // Hide all steps and controls
+      document.getElementById(`step-${currentStep}`).classList.remove('active');
+      wizardControls.style.display = 'none';
+      wizardHeader.style.display = 'none';
+
+      // Show Results Page
+      const resultsPanel = document.getElementById('results-panel');
+      resultsPanel.classList.add('active');
+
+      // Update Risk Gauge
+      const gaugeFill = document.getElementById('risk-gauge-fill');
+      const percentageScore = Math.min(100, (totalPoints / 16) * 100); // 16 is severe enough to peak the scale
+      if (gaugeFill) {
+        gaugeFill.style.transform = `scaleX(${percentageScore / 100})`;
+        if (totalPoints >= 9) {
+          gaugeFill.className = 'risk-gauge-fill high';
+        } else if (totalPoints >= 4) {
+          gaugeFill.className = 'risk-gauge-fill moderate';
+        } else {
+          gaugeFill.className = 'risk-gauge-fill low';
+        }
+      }
+
+      const badge = document.getElementById('result-badge');
+      const title = document.getElementById('result-title');
+      const summary = document.getElementById('result-summary');
+      const recList = document.getElementById('rec-list');
+
+      recList.innerHTML = ''; // clear
+
+      if (totalPoints >= 9) {
+        // HIGH RISK
+        badge.className = 'risk-badge high';
+        badge.innerText = 'High Risk Index';
+        title.innerText = 'Consultation Recommended';
+        summary.innerText = `Your self-reported symptoms (score: ${totalPoints}) indicate a higher risk of mucosal changes or pre-cancerous dysplasia. Immediate clinical evaluation is highly recommended.`;
+
+        addRecommendation(recList, 'Oncology Appointment Needed', 'Please consult an oral surgeon or oncologist for a visual exam and professional biopsy slot coordination within the next 7-14 days.', 'critical');
+        addRecommendation(recList, 'Immediate Tobacco Cessation', 'Any active tobacco use will continue to damage mucosal cells. Access support networks or replacement therapies to quit immediately.', 'cessation');
+        addRecommendation(recList, 'Symptom Trend Tracking', 'Keep an active log of any bleeding, pain scale changes, or difficulty swallowing to share with your specialist.', 'info');
+      } else if (totalPoints >= 4) {
+        // MODERATE RISK
+        badge.className = 'risk-badge moderate';
+        badge.innerText = 'Moderate Risk Index';
+        title.innerText = 'Screening Suggested';
+        summary.innerText = `Your self-reported symptoms (score: ${totalPoints}) show moderate risk markers, primarily linked to lifestyle factors or minor tissue irritation.`;
+
+        addRecommendation(recList, 'Dental Check-up', 'Schedule a standard dental appointment in the next 30 days to review the mucosal tissues in detail.', 'info');
+        addRecommendation(recList, 'Tobacco & Alcohol Reductions', 'Reducing or eliminating tobacco and alcohol reduces irritant contact with the oral lining, allowing tissues to heal.', 'cessation');
+        addRecommendation(recList, 'Monitor Sores', 'If any mouth sore or patch persists beyond 14 days, seek immediate clinical review.', 'info');
+      } else {
+        // LOW RISK
+        badge.className = 'risk-badge low';
+        badge.innerText = 'Low Risk Index';
+        title.innerText = 'Healthy Baseline';
+        summary.innerText = `Your self-reported symptoms (score: ${totalPoints}) show a low risk index. Your oral cavity appears healthy and has minimal risk factors.`;
+
+        addRecommendation(recList, 'Routine Yearly Screenings', 'Maintain standard preventive oral screenings during your regular annual dental cleanings.', 'info');
+        addRecommendation(recList, 'Healthy Lifestyle Habits', 'Continue avoiding tobacco products and heavy alcohol intake to protect your mucosal epithelial linings.', 'cessation');
+      }
+    }
+
+    function addRecommendation(container, title, desc, type) {
+      const card = document.createElement('div');
+      card.className = 'rec-card';
+
+      let iconSvg = '';
+      if (type === 'critical') {
+        iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+      } else if (type === 'cessation') {
+        iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
+      } else {
+        iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
+      }
+
+      card.innerHTML = `
+        <div class="rec-icon ${type === 'critical' ? '' : 'info'}">${iconSvg}</div>
+        <div class="rec-text">
+          <span class="rec-card-title">${title}</span>
+          <span class="rec-card-desc">${desc}</span>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+  </script>
+
+</body>
+</html>

@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In - rtooth Portal</title>
+  <title>Sign In — RTooth Portal</title>
+  <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
@@ -27,9 +28,9 @@
         <p class="auth-subtitle">Sign in to access your rtooth account</p>
  
         <!-- Auth Method Tabs -->
-        <div class="auth-tabs" style="display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 20px;">
-          <button type="button" class="auth-tab active" id="tab-password" style="flex: 1; padding: 12px; background: none; border: none; border-bottom: 2px solid var(--primary); color: var(--text); font-weight: 600; cursor: pointer; transition: all 0.2s;">Password</button>
-          <button type="button" class="auth-tab" id="tab-otp" style="flex: 1; padding: 12px; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: all 0.2s;">OTP Login</button>
+        <div class="auth-tabs" role="tablist" aria-label="Sign in method" style="display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 20px;">
+          <button type="button" class="auth-tab active" id="tab-password" role="tab" aria-selected="true" aria-controls="password-group" style="flex: 1; padding: 12px; background: none; border: none; border-bottom: 2px solid var(--primary); color: var(--text); font-weight: 600; cursor: pointer; transition: all 0.2s;">Password</button>
+          <button type="button" class="auth-tab" id="tab-otp" role="tab" aria-selected="false" aria-controls="otp-group" style="flex: 1; padding: 12px; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: all 0.2s;">OTP Login</button>
         </div>
 
         <!-- Alerts -->
@@ -40,21 +41,21 @@
         <form id="login-form">
           <div class="form-group" style="margin-bottom: 16px;">
             <label for="email" class="form-label">Email Address</label>
-            <input type="email" id="email" class="form-input" placeholder="e.g. doctor@rtooth.com" required>
+            <input type="email" id="email" class="form-input" placeholder="e.g. doctor@rtooth.com" autocomplete="email" required>
           </div>
  
-          <div class="form-group" id="password-group" style="margin-bottom: 24px;">
+          <div class="form-group" id="password-group" role="tabpanel" aria-labelledby="tab-password" tabindex="0" style="margin-bottom: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <label for="password" class="form-label" style="margin: 0;">Password</label>
               <a href="#" class="forgot-link" id="forgot-password-trigger" style="font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 500; transition: color 0.15s;">Forgot Password?</a>
             </div>
-            <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+            <input type="password" id="password" class="form-input" placeholder="Enter your password" autocomplete="current-password" required>
           </div>
 
-          <div class="form-group" id="otp-group" style="margin-bottom: 24px; display: none;">
+          <div class="form-group" id="otp-group" role="tabpanel" aria-labelledby="tab-otp" tabindex="0" style="margin-bottom: 24px; display: none;">
             <label for="otp-code" class="form-label">6-Digit Verification Code</label>
             <div class="otp-input-wrapper" style="display: flex; gap: 8px;">
-              <input type="text" id="otp-code" class="form-input" placeholder="Enter OTP code" maxlength="6" pattern="\d{6}" style="flex: 1;">
+              <input type="text" id="otp-code" class="form-input" placeholder="Enter OTP code" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" style="flex: 1;">
               <button type="button" class="btn btn-secondary" id="btn-send-otp" style="height: 48px; min-width: 110px; font-size: 14px; padding: 0 12px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; border-radius: 6px; font-weight: 500; color: var(--text);">Send Code</button>
             </div>
             <p class="form-help-text" style="font-size: 12px; color: var(--primary); margin-top: 6px; display: none; font-weight: 500;" id="otp-sent-help">OTP sent successfully. Code is valid for 5 minutes.</p>
@@ -318,7 +319,10 @@
   <!-- Footer -->
   <footer>
     <div class="container">
-      <p>&copy; 2026 rtooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+      <p>&copy; 2026 rtooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.
+        <a href="/privacy" style="color: var(--text-light); text-decoration: none; font-size: 12px; margin-left: 16px;">Privacy Policy</a>
+        <a href="/terms" style="color: var(--text-light); text-decoration: none; font-size: 12px; margin-left: 16px;">Terms of Service</a>
+      </p>
     </div>
   </footer>
 

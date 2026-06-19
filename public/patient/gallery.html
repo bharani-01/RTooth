@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Gallery — RTooth Patient Portal</title>
+  <meta name="description" content="Chronological patient diagnostic photo gallery for tracking oral mucosal lesions and mouth opening progression.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/patient_index.css">
+  <link rel="stylesheet" href="/css/gallery.css">
+</head>
+<body data-auth-required="true" data-allowed-roles="patient" class="dashboard-body">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/patient" class="logo" id="header-logo">
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/patient/profile" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="patient-avatar">PT</div>
+            <div class="user-info">
+              <div class="user-name" id="patient-name-badge">Patient Loading...</div>
+              <div class="user-role-label">Registered Patient</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <main class="dashboard-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-menu">
+        <a href="/patient" class="sidebar-item">
+          <svg class="sidebar-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9 22V12h6v10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          Home Portal
+        </a>
+        <a href="/patient/symptoms" class="sidebar-item">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          Symptom Tracker
+        </a>
+        <a href="/patient/self-exam" class="sidebar-item">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5-.8-.7-1.3-1.4-1.7-2.3a9.7 9.7 0 0 0-4.6 0c-.4.9-.9 1.6-1.7 2.3-2 1.6-3 3.5-3 5.5a7 7 0 0 0 7 7z"></path>
+            <path d="M12 18V12"></path>
+            <path d="M9 15h6"></path>
+          </svg>
+          Oral Self-Exam
+        </a>
+        <a href="/patient/gallery" class="sidebar-item active">
+          <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Photo Gallery
+        </a>
+      </div>
+      
+      <button class="btn btn-danger-outline" style="width: 100%; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px;" id="patient-logout-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; flex-shrink: 0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        <span>Logout Session</span>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <section class="dashboard-content">
+      
+      <div class="gallery-wrapper">
+        <div class="gallery-header">
+          <h2 class="gallery-title">Oral Photo Gallery</h2>
+          <p class="gallery-desc">Upload diagnostic photos to keep an accurate chronological progress record of your lesions and mouth opening dimensions. Share observations directly with your oncologist.</p>
+        </div>
+
+        <div class="gallery-main-grid">
+          <!-- Left Column: Upload New Photo -->
+          <div class="upload-sidebar-card">
+            <h3 class="card-heading">Upload New Photograph</h3>
+            <form id="gallery-upload-form" enctype="multipart/form-data">
+              <div class="form-group">
+                <label class="form-label" for="image-file">Select Image *</label>
+                <div class="file-drop-area" id="file-drop-area">
+                  <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                  </svg>
+                  <span class="drop-text" id="drop-text-label">Choose a file or drag it here</span>
+                  <span class="file-limits">Supports JPEG, PNG, WEBP (Max 10MB)</span>
+                  <input type="file" id="image-file" name="image_file" accept="image/png, image/jpeg, image/webp" required>
+                </div>
+                <div class="image-preview-container" id="image-preview-container" style="display: none;">
+                  <img id="upload-preview-img" src="" alt="Selected photograph preview">
+                  <button type="button" class="btn-clear-preview" id="btn-clear-preview">&times; Remove</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="image-type">Photograph Category *</label>
+                <select class="form-input" id="image-type" name="image_type" required>
+                  <option value="" disabled selected>Select category</option>
+                  <option value="Lesion Photograph">Lesion Photograph</option>
+                  <option value="Mouth Opening Image">Mouth Opening Image</option>
+                  <option value="Progression Image">Progression Image</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="image-desc">Patient Annotation / Notes</label>
+                <textarea class="form-input" id="image-desc" name="description" rows="3" placeholder="Add details about pain level, size updates, or notes..."></textarea>
+              </div>
+
+              <div class="alert alert-error" id="upload-error" style="display: none; margin-bottom: 16px;"></div>
+              <div class="alert alert-success" id="upload-success" style="display: none; margin-bottom: 16px;"></div>
+
+              <button type="submit" class="btn-brand-primary" id="btn-submit-upload" style="width: 100%; font-size: 13.5px; padding: 12px 20px;">
+                Upload Photograph
+              </button>
+            </form>
+          </div>
+
+          <!-- Right Column: Gallery Grid with Filters -->
+          <div class="gallery-display-panel">
+            <!-- Filter Tabs -->
+            <div class="gallery-filters">
+              <button class="filter-tab active" data-filter="all">All Photos</button>
+              <button class="filter-tab" data-filter="Lesion Photograph">Lesion Photos</button>
+              <button class="filter-tab" data-filter="Mouth Opening Image">Mouth Opening</button>
+              <button class="filter-tab" data-filter="Progression Image">Progression Logs</button>
+            </div>
+
+            <!-- Photos Grid Container -->
+            <div class="gallery-grid" id="gallery-container">
+              <!-- Dynamically populated -->
+              <div class="gallery-loading-state">
+                <div class="spinner"></div>
+                <p>Loading chronological photograph timeline...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Fullscreen Lightbox Modal -->
+  <div class="lightbox-modal" id="lightbox-modal">
+    <button class="lightbox-close" id="btn-close-lightbox">&times;</button>
+    <div class="lightbox-content">
+      <div class="lightbox-image-frame">
+        <img id="lightbox-img" src="" alt="Fullscreen visualization">
+      </div>
+      <div class="lightbox-sidebar">
+        <div class="lightbox-meta">
+          <span class="lightbox-badge" id="lightbox-badge">Category</span>
+          <span class="lightbox-date" id="lightbox-date">Uploaded on...</span>
+        </div>
+        
+        <div class="lightbox-section">
+          <h4 class="lightbox-section-title">Patient Annotation</h4>
+          <p class="lightbox-text" id="lightbox-patient-desc">—</p>
+        </div>
+
+        <div class="lightbox-section" id="lightbox-doc-notes-section">
+          <h4 class="lightbox-section-title" style="color: var(--primary);">Oncologist Clinical Feedback</h4>
+          <p class="lightbox-text" id="lightbox-doc-notes" style="font-style: italic;">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. Powered by Node.js & Supabase. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/gallery.js"></script>
+</body>
+</html>

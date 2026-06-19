@@ -18,4 +18,14 @@ services:
         sync: false
       - key: AUDIT_LOG_SUPABASE_ANON_KEY
         sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://rtooth-clinic.onrender.com
+      - key: APP_URL
+        value: https://rtooth-clinic.onrender.com
+      - key: BASE_URL
+        value: https://rtooth-clinic.onrender.com
 

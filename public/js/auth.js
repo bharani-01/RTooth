@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (path.includes('/reset_password') || document.getElementById('reset-password-form')) {
     initResetPasswordPage();
   }
+
+  // Initialize mobile menu toggler (if elements exist on load)
+  initMobileMenu();
 });
 
 /**
@@ -275,6 +278,10 @@ export function initMobileMenu() {
   const sidebar = document.getElementById('sidebar-container') || document.querySelector('.sidebar');
   if (!toggleBtn || !sidebar) return;
 
+  // Prevent duplicate event bindings
+  if (toggleBtn.dataset.menuListenerAttached === 'true') return;
+  toggleBtn.dataset.menuListenerAttached = 'true';
+
   // Create backdrop overlay dynamically if not exists
   let backdrop = document.getElementById('mobile-sidebar-backdrop');
   if (!backdrop) {
@@ -303,13 +310,12 @@ export function initMobileMenu() {
     backdrop.classList.remove('visible');
   });
 
-  // Close when clicking sidebar links on mobile
-  const sidebarLinks = sidebar.querySelectorAll('.sidebar-item, .btn');
-  sidebarLinks.forEach(link => {
-    link.addEventListener('click', () => {
+  // Close when clicking sidebar links on mobile (using event delegation to support dynamic sidebars)
+  sidebar.addEventListener('click', (e) => {
+    if (e.target.closest('.sidebar-item, .btn, a')) {
       sidebar.classList.remove('open');
       backdrop.classList.remove('visible');
-    });
+    }
   });
 }
 
@@ -318,20 +324,21 @@ window.initMobileMenu = initMobileMenu;
 
 export function showConfirmModal(message, title = 'Confirm Action') {
   return new Promise((resolve) => {
+    const triggerEl = document.activeElement;
     // 1. Create overlay container
     const overlay = document.createElement('div');
     overlay.className = 'custom-modal-overlay';
     
     // 2. Create card content
     overlay.innerHTML = `
-      <div class="custom-modal-card">
+      <div class="custom-modal-card" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-desc">
         <div class="custom-modal-icon warning">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
           </svg>
         </div>
-        <h3 class="custom-modal-title">${title}</h3>
-        <p class="custom-modal-message">${message}</p>
+        <h3 class="custom-modal-title" id="confirm-modal-title">${title}</h3>
+        <p class="custom-modal-message" id="confirm-modal-desc">${message}</p>
         <div class="custom-modal-actions">
           <button class="btn btn-secondary modal-cancel-btn">Cancel</button>
           <button class="btn btn-primary btn-teal modal-confirm-btn">Confirm</button>
@@ -341,16 +348,44 @@ export function showConfirmModal(message, title = 'Confirm Action') {
 
     document.body.appendChild(overlay);
 
+    const cancelBtn = overlay.querySelector('.modal-cancel-btn');
+    const confirmBtn = overlay.querySelector('.modal-confirm-btn');
+
+    cancelBtn?.focus();
+
     const cleanup = (value) => {
       overlay.classList.add('animate-fadeOut');
       overlay.addEventListener('animationend', () => {
         overlay.remove();
+        triggerEl?.focus();
       });
       resolve(value);
     };
 
-    overlay.querySelector('.modal-cancel-btn').addEventListener('click', () => cleanup(false));
-    overlay.querySelector('.modal-confirm-btn').addEventListener('click', () => cleanup(true));
+    cancelBtn.addEventListener('click', () => cleanup(false));
+    confirmBtn.addEventListener('click', () => cleanup(true));
+
+    const focusableElements = [cancelBtn, confirmBtn];
+    overlay.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        cleanup(false);
+        e.preventDefault();
+        return;
+      }
+      if (e.key === 'Tab') {
+        if (e.shiftKey) { /* Shift + Tab */
+          if (document.activeElement === focusableElements[0]) {
+            focusableElements[focusableElements.length - 1].focus();
+            e.preventDefault();
+          }
+        } else { /* Tab */
+          if (document.activeElement === focusableElements[focusableElements.length - 1]) {
+            focusableElements[0].focus();
+            e.preventDefault();
+          }
+        }
+      }
+    });
   });
 }
 
@@ -360,18 +395,19 @@ export function showAlertModal(message, title = 'Notification') {
     existing.remove();
   }
 
+  const triggerEl = document.activeElement;
   const overlay = document.createElement('div');
   overlay.className = 'custom-modal-overlay';
   
   overlay.innerHTML = `
-    <div class="custom-modal-card">
+    <div class="custom-modal-card" role="dialog" aria-modal="true" aria-labelledby="alert-modal-title" aria-describedby="alert-modal-desc">
       <div class="custom-modal-icon info">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
       </div>
-      <h3 class="custom-modal-title">${title}</h3>
-      <p class="custom-modal-message">${message}</p>
+      <h3 class="custom-modal-title" id="alert-modal-title">${title}</h3>
+      <p class="custom-modal-message" id="alert-modal-desc">${message}</p>
       <div class="custom-modal-actions single">
         <button class="btn btn-primary modal-ok-btn">OK</button>
       </div>
@@ -380,14 +416,30 @@ export function showAlertModal(message, title = 'Notification') {
 
   document.body.appendChild(overlay);
 
+  const okBtn = overlay.querySelector('.modal-ok-btn');
+  okBtn?.focus();
+
   const cleanup = () => {
     overlay.classList.add('animate-fadeOut');
     overlay.addEventListener('animationend', () => {
       overlay.remove();
+      triggerEl?.focus();
     });
   };
 
-  overlay.querySelector('.modal-ok-btn').addEventListener('click', cleanup);
+  okBtn.addEventListener('click', cleanup);
+
+  overlay.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      cleanup();
+      e.preventDefault();
+      return;
+    }
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      okBtn.focus();
+    }
+  });
 }
 
 window.showConfirmModal = showConfirmModal;
@@ -399,9 +451,8 @@ window.alert = function(message) {
 };
 
 // Override native window.confirm globally as a fallback to prevent native popups
-window.confirm = function(message) {
-  showAlertModal(message, 'Action Required');
-  return false;
+window.confirm = async function(message) {
+  return showConfirmModal(message, 'Confirm Action');
 };
 
 // Delegate Logout Button Click Handler globally
@@ -443,11 +494,13 @@ function initLoginFeatures() {
       tabPassword.style.borderBottom = '2px solid var(--primary)';
       tabPassword.style.color = 'var(--text)';
       tabPassword.style.fontWeight = '600';
+      tabPassword.setAttribute('aria-selected', 'true');
 
       tabOtp.classList.remove('active');
       tabOtp.style.borderBottom = '2px solid transparent';
       tabOtp.style.color = 'var(--text-muted)';
       tabOtp.style.fontWeight = '500';
+      tabOtp.setAttribute('aria-selected', 'false');
 
       passwordGroup.style.display = 'block';
       otpGroup.style.display = 'none';
@@ -462,11 +515,13 @@ function initLoginFeatures() {
       tabOtp.style.borderBottom = '2px solid var(--primary)';
       tabOtp.style.color = 'var(--text)';
       tabOtp.style.fontWeight = '600';
+      tabOtp.setAttribute('aria-selected', 'true');
 
       tabPassword.classList.remove('active');
       tabPassword.style.borderBottom = '2px solid transparent';
       tabPassword.style.color = 'var(--text-muted)';
       tabPassword.style.fontWeight = '500';
+      tabPassword.setAttribute('aria-selected', 'false');
 
       passwordGroup.style.display = 'none';
       otpGroup.style.display = 'block';
@@ -556,7 +611,8 @@ function initLoginFeatures() {
           showAlert(successAlert, 'Verification code sent! Redirecting to password reset...');
           document.getElementById('forgot-email').value = '';
           setTimeout(() => {
-            window.location.href = `/reset_password.html?email=${encodeURIComponent(email)}`;
+            sessionStorage.setItem('rtooth_reset_email', email);
+            window.location.href = '/reset_password.html';
           }, 1500);
         }
       } catch (err) {
@@ -635,11 +691,12 @@ function initResetPasswordPage() {
   // Dual mode: No token found. Stay in OTP flow.
   if (tokenStatus) tokenStatus.style.display = 'none';
 
-  // Check if email was pre-filled via query parameter (from login page forgot password trigger)
+  // Check if email was pre-filled via query parameter or sessionStorage
   const urlParams = new URLSearchParams(window.location.search);
-  const prefilledEmail = urlParams.get('email');
+  const prefilledEmail = urlParams.get('email') || sessionStorage.getItem('rtooth_reset_email');
 
   if (prefilledEmail) {
+    sessionStorage.removeItem('rtooth_reset_email');
     if (otpRequestForm) otpRequestForm.style.display = 'none';
     if (resetOtpForm) {
       resetOtpForm.style.display = 'block';

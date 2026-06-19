@@ -21,6 +21,7 @@ export const requireAuth = async (req, res, next) => {
     // Attach user information to request context
     req.user = user;
     req.profile = profile;
+    req.token = token;
 
     next();
   } catch (error) {

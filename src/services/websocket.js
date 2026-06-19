@@ -41,12 +41,22 @@ function getMemoryUsage() {
   return Math.max(0, Math.min(100, Math.round((used / total) * 100)));
 }
 
-/**
- * Initializes the WebSocket Server bound to the shared HTTP server port.
- * @param {import('http').Server} server - Node HTTP server instance
- */
 export function initWebSocketServer(server) {
-  wss = new WebSocketServer({ server });
+  wss = new WebSocketServer({
+    server,
+    verifyClient: ({ origin, req }, callback) => {
+      const allowedOrigins = process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+        : ['http://localhost:5000', 'http://localhost:3000'];
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(true);
+      } else {
+        console.warn(`[WEBSOCKET] Rejected connection from unauthorized origin: ${origin}`);
+        callback(false, 403, 'Forbidden');
+      }
+    }
+  });
 
   wss.on('connection', (ws) => {
     // Send initial metrics immediately on connection

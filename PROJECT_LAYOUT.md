@@ -38,6 +38,14 @@ This document provides a directory index of the RTooth Clinic Management system,
 ### Public Views & Entrypoints
 * [public/index.html](file:///d:/dental%20project/public/index.html) - Public landing page introducing RTooth with clean SVG features.
 * [public/login.html](file:///d:/dental%20project/public/login.html) - Glassmorphic login page directing users based on their assigned role.
+* [public/self-assessment.html](file:///d:/dental%20project/public/self-assessment.html) - Interactive patient oral health self-screening wizard.
+* [public/blog/index.html](file:///d:/dental%20project/public/blog/index.html) - Clinical education articles listing hub with search and filters.
+* [public/blog/understanding-leukoplakia.html](file:///d:/dental%20project/public/blog/understanding-leukoplakia.html) - Clinical overview of pre-cancerous white and red mucosal lesions.
+* [public/blog/reversing-risks.html](file:///d:/dental%20project/public/blog/reversing-risks.html) - Physiological timeline analysis of quitting tobacco.
+* [public/blog/practitioner-compliance-guide.html](file:///d:/dental%20project/public/blog/practitioner-compliance-guide.html) - Oncologist and clinic guidelines for compliance retention loops.
+* [public/blog/oral-cancer-prevention.html](file:///d:/dental%20project/public/blog/oral-cancer-prevention.html) - Mucosal screening procedures and timeline protocols.
+* [public/blog/nutrition-and-oral-health.html](file:///d:/dental%20project/public/blog/nutrition-and-oral-health.html) - Dietary antioxidant nutrients facilitating mucosal tissue repair.
+* [public/blog/nicotine-replacement-therapies.html](file:///d:/dental%20project/public/blog/nicotine-replacement-therapies.html) - NRT comparisons and behavioral relapse prevention coping strategies.
 
 ### Shared Layouts
 * [public/shared/admin_sidebar.html](file:///d:/dental%20project/public/shared/admin_sidebar.html) - Shared HTML containing menu links and logout buttons for IT-Admin roles.
@@ -57,6 +65,8 @@ This document provides a directory index of the RTooth Clinic Management system,
 
 ### Patient Dashboard Views (`role: patient`)
 * [public/patient/index.html](file:///d:/dental%20project/public/patient/index.html) - Patient home portal showing attending oncologist, diagnostic records, and staging.
+* [public/patient/symptoms.html](file:///d:/dental%20project/public/patient/symptoms.html) - Redesigned clinical Daily Symptom Tracker form and timeline logs.
+* [public/patient/self-exam.html](file:///d:/dental%20project/public/patient/self-exam.html) - Step-by-step mirror Guided Oral Self-Examination wizard.
 * [public/patient/profile.html](file:///d:/dental%20project/public/patient/profile.html) - Dedicated patient profile showing demographics, medical records, and social history.
 
 ---
@@ -64,6 +74,10 @@ This document provides a directory index of the RTooth Clinic Management system,
 ### Styling (CSS)
 * [public/css/style.css](file:///d:/dental%20project/public/css/style.css) - Core global stylesheet defining colors, typography, fixed headers, and responsive drawer layouts.
 * [public/css/landing.css](file:///d:/dental%20project/public/css/landing.css) - Page-level styles for the public landing view.
+* [public/css/blog.css](file:///d:/dental%20project/public/css/blog.css) - Custom styles for the education blog listing grid and article details view.
+* [public/css/self_assessment.css](file:///d:/dental%20project/public/css/self_assessment.css) - Custom styles for the interactive multi-step self-assessment wizard and risk reports.
+* [public/css/symptoms.css](file:///d:/dental%20project/public/css/symptoms.css) - Custom styles for the daily patient symptoms tracker, pain scale circles, and timeline logs.
+* [public/css/self_exam.css](file:///d:/dental%20project/public/css/self_exam.css) - Custom styles for the step-by-step patient Guided Oral Self-Examination tool.
 * [public/css/login.css](file:///d:/dental%20project/public/css/login.css) - Page-level styles for the login form card.
 * [public/css/admin_index.css](file:///d:/dental%20project/public/css/admin_index.css) - Page-level styles for the admin overview dashboard.
 * [public/css/admin_doctors.css](file:///d:/dental%20project/public/css/admin_doctors.css) - Page-level styles for the admin oncologist directory.
@@ -84,6 +98,7 @@ This document provides a directory index of the RTooth Clinic Management system,
 * [public/js/admin.js](file:///d:/dental%20project/public/js/admin.js) - Frontend controller logic for administrative dashboards.
 * [public/js/doctor.js](file:///d:/dental%20project/public/js/doctor.js) - Frontend controller logic for oncologist dashboards.
 * [public/js/patient.js](file:///d:/dental%20project/public/js/patient.js) - Frontend controller logic for patient portals.
+* [public/js/self_exam.js](file:///d:/dental%20project/public/js/self_exam.js) - Handles Guided Oral Self-Examination transitions, checklist validations, and auto-logging integration.
 
 ---
 

@@ -11,6 +11,11 @@ export const errorHandler = (err, req, res, next) => {
     message = 'An unexpected database/service response or timeout occurred. Please try again.';
   }
 
+  // In production, replace raw database/service error messages with a generic one
+  if (process.env.NODE_ENV === 'production' && statusCode === 500) {
+    message = 'An internal server error occurred. Please contact the administrator.';
+  }
+
   console.error(`[Global Error Interceptor] ${req.method} ${req.originalUrl} - Status: ${statusCode} - Error: ${message}`);
   
   if (statusCode === 500 && err.stack) {
