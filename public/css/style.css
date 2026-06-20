@@ -50,6 +50,101 @@
   --dark-slate: #0f172a;
   --light-slate: #f8fafc;
   --border-slate: #e2e8f0;
+  --bg-dashboard: #f5f7fa;
+}
+
+/* ── Dark Theme Overrides ── */
+[data-theme="dark"] {
+  --bg-primary: #0F0F0F;       /* Base layout background */
+  --bg-secondary: #181818;     /* Cards, modals, sidebars, header */
+  --bg-subtle: #242424;        /* Input/select backgrounds, hover states */
+  --bg-dashboard: #0F0F0F;
+  
+  --text-dark: #f8fafc;        /* Main heading/body text */
+  --text-muted: #94a3b8;       /* Helper text, descriptions */
+  --text-light: #64748b;       /* Minor labels, disabled text */
+  
+  --border-color: #2b2b2b;
+  --border-focus: #0284c7;
+  
+  --primary-light: rgba(2, 132, 199, 0.15);
+  --accent-teal-light: rgba(13, 148, 136, 0.15);
+}
+
+/* Force dark mode styles on specific elements that override light theme defaults */
+[data-theme="dark"] body.dashboard-body {
+  background-color: var(--bg-primary) !important;
+  background-image: none !important;
+}
+
+[data-theme="dark"] header,
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .nav-bar,
+[data-theme="dark"] .profile-card,
+[data-theme="dark"] .practitioner-hero-card,
+[data-theme="dark"] .practitioner-details-grid,
+[data-theme="dark"] .credential-item-card,
+[data-theme="dark"] .modal-card,
+[data-theme="dark"] .con-patient-card,
+[data-theme="dark"] .con-panel,
+[data-theme="dark"] .con-section-card,
+[data-theme="dark"] .reg-table-card,
+[data-theme="dark"] .card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .search-dropdown,
+[data-theme="dark"] .checkup-node,
+[data-theme="dark"] .dynamic-med-card {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] header {
+  background-color: rgba(24, 24, 24, 0.8) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .sidebar-item {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .sidebar-item:hover,
+[data-theme="dark"] .sidebar-item.active {
+  background-color: var(--bg-subtle) !important;
+  color: var(--primary) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] label,
+[data-theme="dark"] .pat-name,
+[data-theme="dark"] .pat-code,
+[data-theme="dark"] .cred-value,
+[data-theme="dark"] .con-pat-name,
+[data-theme="dark"] .con-panel-title,
+[data-theme="dark"] td,
+[data-theme="dark"] th {
+  color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] .con-sub,
+[data-theme="dark"] .reg-sub,
+[data-theme="dark"] .cred-label,
+[data-theme="dark"] .con-panel-label,
+[data-theme="dark"] .td-secondary {
+  color: var(--text-muted) !important;
 }
 
 /* Reset */
@@ -568,7 +663,7 @@ footer {
 }
 
 .sidebar {
-  background-color: white;
+  background-color: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
   padding: 32px 20px;
   display: flex;

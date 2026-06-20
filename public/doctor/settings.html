@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — RTooth Doctor Portal</title>
+  
+  <!-- Zero-Flash Theme Initializer -->
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'system';
+      if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=3">
+  <link rel="stylesheet" href="/css/doctor_settings.css?v=1">
+</head>
+<body data-auth-required="true" data-allowed-roles="doctor" class="dashboard-body">
+
+  <!-- Header -->
+  <header>
+    <div class="nav-bar">
+      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="header-brand-area">
+        <a href="/doctor/index.html" class="logo" id="header-logo">
+          <img src="/images/rtooth_logo.png" alt="RTooth Logo" class="logo-img">
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a href="/doctor/profile.html" class="user-badge-link">
+          <div class="user-badge">
+            <div class="user-avatar" id="doc-avatar">DR</div>
+            <div class="user-info">
+              <div class="user-name" id="doc-name-badge">Loading...</div>
+              <div class="user-role-label">Oncology Practitioner</div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <main class="dashboard-layout">
+    
+    <!-- Sidebar Container -->
+    <aside class="sidebar" id="sidebar-container">
+      <div style="color: var(--text-muted); font-size: 13px;">Loading...</div>
+    </aside>
+
+    <!-- Main Content -->
+    <section class="dashboard-content">
+      <div class="dashboard-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 24px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 700; color: var(--text-dark); margin: 0 0 4px;">App Settings</h2>
+          <p style="color: var(--text-muted); font-size: 13.5px; margin: 0;">Configure your visual preferences and clinical environment configurations.</p>
+        </div>
+      </div>
+
+      <!-- Appearance Card -->
+      <div class="profile-card" style="padding: 24px;">
+        <h3 style="font-size: 15px; color: var(--primary); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Appearance Preferences</h3>
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px; line-height: 1.5;">Customize how the RTooth interface displays on this device.</p>
+        
+        <div class="theme-options-grid">
+          <!-- Light Theme -->
+          <div class="theme-card" id="theme-btn-light" data-value="light">
+            <div class="theme-card-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </div>
+            <div class="theme-card-title">Light Theme</div>
+            <div class="theme-card-desc">Sleek high-contrast clinical white layout.</div>
+          </div>
+
+          <!-- Dark Theme -->
+          <div class="theme-card" id="theme-btn-dark" data-value="dark">
+            <div class="theme-card-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <div class="theme-card-title">Dark Theme</div>
+            <div class="theme-card-desc">Relaxed low-light premium clinical dark layout.</div>
+          </div>
+
+          <!-- System Theme -->
+          <div class="theme-card" id="theme-btn-system" data-value="system">
+            <div class="theme-card-icon">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="theme-card-title">Use System</div>
+            <div class="theme-card-desc">Sync automatically with your device's preferences.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 RTooth Clinic Management Software. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/auth.js"></script>
+  <script type="module" src="/js/settings.js?v=1"></script>
+</body>
+</html>

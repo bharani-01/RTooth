@@ -8,9 +8,15 @@ const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'RTooth Clinic <onboa
 /**
  * Base function to send an email using Resend API via native fetch
  */
+// Hardcoded toggle to pause email sending since .env cannot be modified directly
+const DISABLE_EMAIL = true;
+
 export const sendEmail = async ({ to, subject, html }) => {
-  if (!RESEND_API_KEY) {
-    console.warn(`\n[EMAIL SERVICE WARNING] RESEND_API_KEY is not defined. Email mock-printed to console:`);
+  const isEmailDisabled = DISABLE_EMAIL;
+
+  if (isEmailDisabled || !RESEND_API_KEY) {
+    const reason = isEmailDisabled ? 'hardcoded DISABLE_EMAIL flag is set to true' : 'RESEND_API_KEY is not defined';
+    console.warn(`\n[EMAIL SERVICE WARNING] Email sending is paused (${reason}). Email mock-printed to console:`);
     console.warn(`--------------------------------------------------`);
     console.warn(`TO: ${to}`);
     console.warn(`FROM: ${RESEND_FROM_EMAIL}`);

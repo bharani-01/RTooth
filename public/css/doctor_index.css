@@ -8,7 +8,7 @@
 
 /* ── Override body bg for dashboard ── */
 body.dashboard-body {
-  background-color: #f5f7fa;
+  background-color: var(--bg-dashboard);
   background-image: none;
 }
 
